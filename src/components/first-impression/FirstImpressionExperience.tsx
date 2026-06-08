@@ -4,12 +4,23 @@ import { motion } from "framer-motion";
 import { Play, ArrowRight, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+type AudioState = "idle" | "playing" | "paused";
+
 interface FirstImpressionProps {
-  isSpeaking: boolean;
-  onMeetSakshi: () => void;
+  audioState: AudioState;
+  currentTime: number;
+  duration: number;
+  onToggleAudio: () => void;
 }
 
-export default function FirstImpressionExperience({ isSpeaking, onMeetSakshi }: FirstImpressionProps) {
+export default function FirstImpressionExperience({ audioState, currentTime, duration, onToggleAudio }: FirstImpressionProps) {
+  const formatTime = (time: number) => {
+    if (!time || isNaN(time)) return "00:00";
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  };
+
   return (
     <section className="relative min-h-screen w-full flex items-center justify-center z-10 px-6 md:px-12 lg:px-24 pt-20 overflow-hidden">
       
@@ -56,35 +67,49 @@ export default function FirstImpressionExperience({ isSpeaking, onMeetSakshi }: 
           {/* Ambient Glows that pulse behind the buttons when speaking */}
           <div className={cn(
             "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full blur-[80px] transition-all duration-1000 z-[-1]",
-            isSpeaking ? "w-[400px] h-[400px] bg-accent-pink opacity-30 animate-pulse scale-110" : "w-[200px] h-[200px] bg-accent-glow opacity-0 scale-90"
+            audioState === "playing" ? "w-[400px] h-[400px] bg-accent-pink opacity-30 animate-pulse scale-110" : "w-[200px] h-[200px] bg-accent-glow opacity-0 scale-90"
           )} />
 
           <button 
-            onClick={onMeetSakshi}
+            onClick={onToggleAudio}
+            aria-label={audioState === "playing" ? "Pause Introduction" : audioState === "paused" ? "Resume Introduction" : "Meet Sakshi"}
+            onKeyDown={(e) => {
+               if (e.key === "Enter" || e.key === " ") {
+                 e.preventDefault();
+                 onToggleAudio();
+               }
+            }}
             className={cn(
               "group relative px-8 py-4 rounded-full flex items-center space-x-3 overflow-hidden transition-all duration-500",
-              isSpeaking 
+              audioState !== "idle"
                 ? "bg-white/10 text-white shadow-[0_0_40px_rgba(138,43,226,0.3)] border border-accent-purple/50 scale-95" 
                 : "bg-white text-black hover:bg-gray-200 shadow-lg hover:shadow-[0_0_20px_rgba(255,255,255,0.3)]"
             )}
           >
             <div className={cn(
               "w-8 h-8 rounded-full flex items-center justify-center transition-colors duration-500",
-              isSpeaking ? "bg-accent-purple" : "bg-black/10 group-hover:bg-black/20"
+              audioState !== "idle" ? "bg-accent-purple" : "bg-black/10 group-hover:bg-black/20"
             )}>
-              {isSpeaking ? (
+              {audioState === "playing" ? (
                 <div className="flex items-center space-x-1 h-3">
                   <span className="w-1 h-full bg-white animate-sound-wave" style={{ animationDelay: '0ms' }} />
                   <span className="w-1 h-full bg-white animate-sound-wave" style={{ animationDelay: '150ms' }} />
                   <span className="w-1 h-full bg-white animate-sound-wave" style={{ animationDelay: '300ms' }} />
                 </div>
               ) : (
-                <Play className={cn("w-4 h-4 ml-1", isSpeaking ? "text-white" : "text-black")} fill={isSpeaking ? "white" : "black"} />
+                <Play className={cn("w-4 h-4 ml-1", audioState === "paused" ? "text-white" : "text-black")} fill={audioState === "paused" ? "white" : "black"} />
               )}
             </div>
-            <span className="font-semibold tracking-wide text-lg">
-              {isSpeaking ? "Speaking..." : "Meet Sakshi"}
-            </span>
+            <div className="flex flex-col items-start">
+              <span className="font-semibold tracking-wide text-lg">
+                {audioState === "playing" ? "Pause Introduction" : audioState === "paused" ? "Resume Introduction" : "Meet Sakshi"}
+              </span>
+              {audioState !== "idle" && (
+                <span className="text-xs text-accent-lavender font-mono mt-0.5">
+                  {formatTime(currentTime)} / {formatTime(duration)}
+                </span>
+              )}
+            </div>
           </button>
 
           <button className="px-8 py-4 rounded-full glass-panel hover:bg-white/10 transition-all duration-300 text-white flex items-center space-x-2 border border-white/5 hover:border-white/20">

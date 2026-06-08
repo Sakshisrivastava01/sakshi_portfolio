@@ -43,23 +43,31 @@ function Counter({ value, suffix = "", prefix = "" }: { value: number; suffix?: 
   return <span ref={ref}>{prefix}0{suffix}</span>;
 }
 
+export type AudioState = "idle" | "playing" | "paused";
+
 export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [activeSkill, setActiveSkill] = useState<string | null>(null);
-  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [audioState, setAudioState] = useState<AudioState>("idle");
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     audioRef.current = document.getElementById("global-audio") as HTMLAudioElement;
   }, []);
 
-  const handleMeetSakshi = () => {
+  const handleToggleAudio = () => {
     if (!audioRef.current) return;
-    if (isSpeaking) return;
-    audioRef.current.currentTime = 0;
-    audioRef.current.play().catch((e) => console.error("Audio playback failed", e));
-    setIsSpeaking(true);
+    
+    if (audioState === "playing") {
+      audioRef.current.pause();
+    } else {
+      audioRef.current.play().catch((e) => console.error("Audio playback failed", e));
+    }
   };
+
+  const isSpeaking = audioState === "playing";
 
   return (
     <>
@@ -69,7 +77,19 @@ export default function Home() {
         id="global-audio" 
         src="/intro.mp3" 
         preload="auto" 
-        onEnded={() => setIsSpeaking(false)}
+        onPlay={() => setAudioState("playing")}
+        onPause={() => {
+          if (audioRef.current && audioRef.current.currentTime !== audioRef.current.duration) {
+             setAudioState("paused");
+          }
+        }}
+        onEnded={() => { 
+          setAudioState("idle"); 
+          setCurrentTime(0);
+          if (audioRef.current) audioRef.current.currentTime = 0;
+        }}
+        onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
+        onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)}
         crossOrigin="anonymous"
       />
 
@@ -87,7 +107,12 @@ export default function Home() {
             <SmoothScroll>
               <main className="relative min-h-screen bg-transparent overflow-hidden selection:bg-accent-glow selection:text-accent-pink">
                 
-                <FirstImpressionExperience isSpeaking={isSpeaking} onMeetSakshi={handleMeetSakshi} />
+                <FirstImpressionExperience 
+                  audioState={audioState} 
+                  currentTime={currentTime} 
+                  duration={duration} 
+                  onToggleAudio={handleToggleAudio} 
+                />
                 
                 {/* 2. ABOUT SECTION */}
                 <SectionLayout id="about" title="About">
