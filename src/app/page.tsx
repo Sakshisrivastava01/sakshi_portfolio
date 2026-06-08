@@ -5,6 +5,7 @@ import SmoothScroll from "@/components/layout/SmoothScroll";
 import FirstImpressionExperience from "@/components/first-impression/FirstImpressionExperience";
 import SectionLayout from "@/components/sections/SectionLayout";
 import TechnicalIntelligenceNetwork from "@/components/sections/TechnicalIntelligenceNetwork";
+import ContactModal from "@/components/sections/ContactModal";
 import InnovationLab from "@/components/sections/InnovationLab";
 import { motion, AnimatePresence, useInView, useMotionValue, useSpring } from "framer-motion";
 import { 
@@ -45,6 +46,7 @@ function Counter({ value, suffix = "", prefix = "" }: { value: number; suffix?: 
 export type AudioState = "idle" | "playing" | "paused" | "finished";
 
 export default function Home() {
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [activeSkill, setActiveSkill] = useState<string | null>(null);
   const [audioState, setAudioState] = useState<AudioState>("idle");
   const [currentTime, setCurrentTime] = useState(0);
@@ -77,6 +79,8 @@ export default function Home() {
 
   return (
     <>
+      <ContactModal isOpen={isContactModalOpen} onClose={() => setIsContactModalOpen(false)} />
+
       <audio 
         id="global-audio" 
         src="/import.mp3"
@@ -494,7 +498,10 @@ export default function Home() {
                       </p>
                       
                       <div className="flex flex-wrap justify-center gap-6 relative z-10">
-                        <button className="px-10 py-5 rounded-full bg-white text-black font-bold hover:bg-accent-pink hover:text-white transition-all duration-300 shadow-[0_0_30px_rgba(255,255,255,0.1)] hover:shadow-[0_0_40px_rgba(255,182,193,0.5)] hover:scale-105 flex items-center space-x-3 text-lg group/btn">
+                        <button 
+                          onClick={() => setIsContactModalOpen(true)}
+                          className="px-10 py-5 rounded-full bg-white text-black font-bold hover:bg-accent-pink hover:text-white transition-all duration-300 shadow-[0_0_30px_rgba(255,255,255,0.1)] hover:shadow-[0_0_40px_rgba(255,182,193,0.5)] hover:scale-105 flex items-center space-x-3 text-lg group/btn"
+                        >
                           <Mail className="w-6 h-6 group-hover/btn:animate-pulse" />
                           <span>Contact Me</span>
                         </button>
