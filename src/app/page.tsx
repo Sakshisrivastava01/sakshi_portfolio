@@ -43,7 +43,7 @@ function Counter({ value, suffix = "", prefix = "" }: { value: number; suffix?: 
   return <span ref={ref}>{prefix}0{suffix}</span>;
 }
 
-export type AudioState = "idle" | "playing" | "paused";
+export type AudioState = "idle" | "playing" | "paused" | "finished" | "error";
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
@@ -51,19 +51,59 @@ export default function Home() {
   const [audioState, setAudioState] = useState<AudioState>("idle");
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [showAudioToast, setShowAudioToast] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     audioRef.current = document.getElementById("global-audio") as HTMLAudioElement;
   }, []);
 
-  const handleToggleAudio = () => {
+  const checkAudioExists = async () => {
+    try {
+      const res = await fetch("/intro.mp3", { method: "HEAD" });
+      if (!res.ok) {
+        setAudioState("error");
+        setShowAudioToast(true);
+        setTimeout(() => setShowAudioToast(false), 3000);
+        return false;
+      }
+      return true;
+    } catch {
+      setAudioState("error");
+      setShowAudioToast(true);
+      setTimeout(() => setShowAudioToast(false), 3000);
+      return false;
+    }
+  };
+
+  const handleToggleAudio = async () => {
     if (!audioRef.current) return;
     
+    if (audioState === "error") {
+      setShowAudioToast(true);
+      setTimeout(() => setShowAudioToast(false), 3000);
+      return;
+    }
+
     if (audioState === "playing") {
       audioRef.current.pause();
-    } else {
-      audioRef.current.play().catch((e) => console.error("Audio playback failed", e));
+      return;
+    }
+
+    // Only set src if it doesn't exist to prevent native browser 404 errors on load
+    if (!audioRef.current.src || audioRef.current.src === "" || !audioRef.current.src.includes("intro.mp3")) {
+      const exists = await checkAudioExists();
+      if (!exists) return;
+      audioRef.current.src = "/intro.mp3";
+    }
+
+    try {
+      if (audioState === "finished") {
+        audioRef.current.currentTime = 0;
+      }
+      await audioRef.current.play();
+    } catch (e) {
+      // Intentionally swallow to prevent console errors from autoplay policies
     }
   };
 
@@ -73,10 +113,23 @@ export default function Home() {
     <>
       <LoadingSequence onComplete={() => setIsLoading(false)} />
       
+      <AnimatePresence>
+        {showAudioToast && (
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 50 }}
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] bg-black/80 border border-white/10 backdrop-blur-md text-white px-6 py-3 rounded-full flex items-center space-x-3 shadow-[0_0_20px_rgba(255,0,0,0.2)]"
+          >
+            <span className="text-accent-pink">⚠️</span>
+            <span>Introduction audio not found.</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <audio 
         id="global-audio" 
-        src="/intro.mp3" 
-        preload="auto" 
+        preload="none" 
         onPlay={() => setAudioState("playing")}
         onPause={() => {
           if (audioRef.current && audioRef.current.currentTime !== audioRef.current.duration) {
@@ -84,9 +137,7 @@ export default function Home() {
           }
         }}
         onEnded={() => { 
-          setAudioState("idle"); 
-          setCurrentTime(0);
-          if (audioRef.current) audioRef.current.currentTime = 0;
+          setAudioState("finished"); 
         }}
         onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
         onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)}
