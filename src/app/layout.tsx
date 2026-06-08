@@ -5,6 +5,7 @@ import CustomCursor from "@/components/layout/CustomCursor";
 import AmbientBackground from "@/components/layout/AmbientBackground";
 import ScrollIndicator from "@/components/layout/ScrollIndicator";
 import RecruiterPanel from "@/components/layout/RecruiterPanel";
+import { Analytics } from "@vercel/analytics/react";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], variable: "--font-space-grotesk" });
@@ -40,6 +41,7 @@ export default function RootLayout({
         <ScrollIndicator />
         <RecruiterPanel />
         {children}
+        <Analytics />
       </body>
     </html>
   );

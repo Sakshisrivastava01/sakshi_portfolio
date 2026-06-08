@@ -245,6 +245,7 @@ function ProjectShowcase({ project, index }: { project: ProjectData; index: numb
     <motion.div 
       ref={containerRef}
       style={{ opacity, y }}
+      data-cursor="view"
       className={cn(
         "group relative w-full rounded-[2rem] md:rounded-[3rem] border border-white/10 glass-panel overflow-hidden flex flex-col lg:flex-row shadow-2xl transition-all duration-700",
         theme.borderHover,
