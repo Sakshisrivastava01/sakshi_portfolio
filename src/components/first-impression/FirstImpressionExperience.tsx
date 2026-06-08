@@ -1,10 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Play, ArrowRight, Sparkles, RefreshCw, AlertCircle } from "lucide-react";
+import { Play, ArrowRight, Sparkles, RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-type AudioState = "idle" | "playing" | "paused" | "finished" | "error";
+type AudioState = "idle" | "playing" | "paused" | "finished";
 
 interface FirstImpressionProps {
   audioState: AudioState;
@@ -72,7 +72,7 @@ export default function FirstImpressionExperience({ audioState, currentTime, dur
 
           <button 
             onClick={onToggleAudio}
-            aria-label={audioState === "playing" ? "Pause Introduction" : audioState === "paused" ? "Resume Introduction" : audioState === "finished" ? "Replay Introduction" : audioState === "error" ? "Audio Unavailable" : "Meet Sakshi"}
+            aria-label={audioState === "playing" ? "Pause Introduction" : audioState === "paused" ? "Resume Introduction" : audioState === "finished" ? "Replay Introduction" : "Meet Sakshi"}
             onKeyDown={(e) => {
                if (e.key === "Enter" || e.key === " ") {
                  e.preventDefault();
@@ -81,16 +81,14 @@ export default function FirstImpressionExperience({ audioState, currentTime, dur
             }}
             className={cn(
               "group relative px-8 py-4 rounded-full flex items-center space-x-3 overflow-hidden transition-all duration-500 active:scale-95",
-              audioState === "error"
-                ? "bg-white/5 text-gray-400 border border-white/5 opacity-80"
-                : audioState === "playing" || audioState === "paused"
+              audioState === "playing" || audioState === "paused"
                 ? "bg-white/10 text-white shadow-[0_0_40px_rgba(138,43,226,0.3)] border border-accent-purple/50" 
                 : "bg-white text-black hover:bg-gray-200 shadow-lg hover:shadow-[0_0_20px_rgba(255,255,255,0.3)]"
             )}
           >
             <div className={cn(
               "w-8 h-8 rounded-full flex items-center justify-center transition-colors duration-500",
-              audioState === "error" ? "bg-white/10" : audioState === "playing" || audioState === "paused" ? "bg-accent-purple" : "bg-black/10 group-hover:bg-black/20"
+              audioState === "playing" || audioState === "paused" ? "bg-accent-purple" : "bg-black/10 group-hover:bg-black/20"
             )}>
               {audioState === "playing" ? (
                 <div className="flex items-center space-x-1 h-3">
@@ -98,8 +96,6 @@ export default function FirstImpressionExperience({ audioState, currentTime, dur
                   <span className="w-1 h-full bg-white animate-sound-wave" style={{ animationDelay: '150ms' }} />
                   <span className="w-1 h-full bg-white animate-sound-wave" style={{ animationDelay: '300ms' }} />
                 </div>
-              ) : audioState === "error" ? (
-                <AlertCircle className="w-4 h-4 text-gray-400" />
               ) : audioState === "finished" ? (
                 <RefreshCw className="w-4 h-4 ml-0.5 text-black" />
               ) : (
@@ -108,7 +104,7 @@ export default function FirstImpressionExperience({ audioState, currentTime, dur
             </div>
             <div className="flex flex-col items-start">
               <span className="font-semibold tracking-wide text-lg">
-                {audioState === "playing" ? "Pause Introduction" : audioState === "paused" ? "Resume Introduction" : audioState === "finished" ? "Replay Introduction" : audioState === "error" ? "Audio Unavailable" : "Meet Sakshi"}
+                {audioState === "playing" ? "Pause Introduction" : audioState === "paused" ? "Resume Introduction" : audioState === "finished" ? "Replay Introduction" : "Meet Sakshi"}
               </span>
               {(audioState === "playing" || audioState === "paused") && (
                 <span className="text-xs text-accent-lavender font-mono mt-0.5">
