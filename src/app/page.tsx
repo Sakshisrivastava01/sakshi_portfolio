@@ -4,7 +4,6 @@ import { useState, useRef, useEffect } from "react";
 import SmoothScroll from "@/components/layout/SmoothScroll";
 import FirstImpressionExperience from "@/components/first-impression/FirstImpressionExperience";
 import SectionLayout from "@/components/sections/SectionLayout";
-import LoadingSequence from "@/components/layout/LoadingSequence";
 import TechnicalIntelligenceNetwork from "@/components/sections/TechnicalIntelligenceNetwork";
 import InnovationLab from "@/components/sections/InnovationLab";
 import { motion, AnimatePresence, useInView, useMotionValue, useSpring } from "framer-motion";
@@ -46,7 +45,6 @@ function Counter({ value, suffix = "", prefix = "" }: { value: number; suffix?: 
 export type AudioState = "idle" | "playing" | "paused" | "finished";
 
 export default function Home() {
-  const [isLoading, setIsLoading] = useState(true);
   const [activeSkill, setActiveSkill] = useState<string | null>(null);
   const [audioState, setAudioState] = useState<AudioState>("idle");
   const [currentTime, setCurrentTime] = useState(0);
@@ -79,8 +77,6 @@ export default function Home() {
 
   return (
     <>
-      <LoadingSequence onComplete={() => setIsLoading(false)} />
-
       <audio 
         id="global-audio" 
         src="/intro.mp3"
@@ -103,15 +99,8 @@ export default function Home() {
         <Scene isSpeaking={isSpeaking} />
       </div>
 
-      <AnimatePresence>
-        {!isLoading && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1, ease: "easeOut" }}
-          >
-            <SmoothScroll>
-              <main className="relative min-h-screen bg-transparent overflow-hidden selection:bg-accent-glow selection:text-accent-pink">
+      <SmoothScroll>
+        <main className="relative min-h-screen bg-transparent overflow-hidden selection:bg-accent-glow selection:text-accent-pink">
                 
                 <FirstImpressionExperience 
                   audioState={audioState} 
@@ -539,9 +528,6 @@ export default function Home() {
 
               </main>
             </SmoothScroll>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </>
   );
 }
