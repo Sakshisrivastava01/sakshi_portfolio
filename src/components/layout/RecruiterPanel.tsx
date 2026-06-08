@@ -9,9 +9,9 @@ export default function RecruiterPanel() {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   const options = [
-    { id: "resume", icon: <Download className="w-5 h-5" />, label: "Download Resume", href: "#" }, // Placeholder link
-    { id: "linkedin", icon: <Linkedin className="w-5 h-5" />, label: "LinkedIn Profile", href: "#" },
-    { id: "github", icon: <Github className="w-5 h-5" />, label: "GitHub Profile", href: "#" },
+    { id: "resume", icon: <Download className="w-5 h-5" />, label: "Download Resume", href: "/Sakshi_Srivastava_Resume.pdf" },
+    { id: "linkedin", icon: <Linkedin className="w-5 h-5" />, label: "LinkedIn Profile", href: "https://www.linkedin.com/in/sakshisrivastava01" },
+    { id: "github", icon: <Github className="w-5 h-5" />, label: "GitHub Profile", href: "https://github.com/Sakshisrivastava01" },
     { id: "contact", icon: <Mail className="w-5 h-5" />, label: "Quick Contact", href: "#contact" },
   ];
 

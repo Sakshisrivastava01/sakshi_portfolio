@@ -479,9 +479,9 @@ export default function Home() {
                         
                         <div className="flex gap-4">
                           {[
-                            { icon: <Github className="w-6 h-6" />, label: "GitHub", link: "#" },
-                            { icon: <Linkedin className="w-6 h-6" />, label: "LinkedIn", link: "#" },
-                            { icon: <Code2 className="w-6 h-6" />, label: "LeetCode", link: "#" }
+                            { icon: <Github className="w-6 h-6" />, label: "GitHub", link: "https://github.com/Sakshisrivastava01" },
+                            { icon: <Linkedin className="w-6 h-6" />, label: "LinkedIn", link: "https://www.linkedin.com/in/sakshisrivastava01" },
+                            { icon: <Code2 className="w-6 h-6" />, label: "LeetCode", link: "https://leetcode.com/u/Sakshisrivastava01/" }
                           ].map((social, i) => (
                             <a key={i} href={social.link} title={social.label} className="w-16 h-16 rounded-full glass-panel flex items-center justify-center text-gray-300 hover:text-white hover:bg-white/10 hover:scale-110 transition-all duration-300 border border-white/10 hover:border-accent-lavender shadow-lg hover:shadow-[0_0_20px_rgba(230,230,250,0.3)]">
                               {social.icon}
@@ -496,8 +496,8 @@ export default function Home() {
                           <span className="hidden md:inline">All rights reserved.</span>
                         </p>
                         <div className="flex gap-8 mt-6 md:mt-0">
-                          <a href="#" className="hover:text-accent-pink transition-colors">CodeChef</a>
-                          <a href="#" className="hover:text-accent-purple transition-colors">CodeForces</a>
+                          <a href="https://www.codechef.com/users/sakshisrivastava01" className="hover:text-accent-pink transition-colors">CodeChef</a>
+                          <a href="https://codeforces.com/profile/sakshisrivastava01" className="hover:text-accent-purple transition-colors">CodeForces</a>
                         </div>
                       </div>
                     </motion.div>
