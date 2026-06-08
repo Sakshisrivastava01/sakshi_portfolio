@@ -9,7 +9,7 @@ export default function RecruiterPanel() {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   const options = [
-    { id: "resume", icon: <Download className="w-5 h-5" />, label: "Download Resume", href: "/Sakshi_Srivastava_Resume.pdf" },
+    { id: "resume", icon: <Download className="w-5 h-5" />, label: "Download Resume", href: "/Sakshi_Srivastava_Resume.pdf", download: "Sakshi_Srivastava_Resume.pdf" },
     { id: "linkedin", icon: <Linkedin className="w-5 h-5" />, label: "LinkedIn Profile", href: "https://www.linkedin.com/in/sakshisrivastava01" },
     { id: "github", icon: <Github className="w-5 h-5" />, label: "GitHub Profile", href: "https://github.com/Sakshisrivastava01" },
     { id: "contact", icon: <Mail className="w-5 h-5" />, label: "Quick Contact", href: "#contact" },
@@ -21,6 +21,7 @@ export default function RecruiterPanel() {
         <a 
           key={option.id}
           href={option.href}
+          download={option.download}
           className="relative group flex items-center"
           onMouseEnter={() => setHoveredIndex(index)}
           onMouseLeave={() => setHoveredIndex(null)}
