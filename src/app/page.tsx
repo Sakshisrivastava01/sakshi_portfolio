@@ -388,7 +388,9 @@ export default function Home() {
                           <div className="order-1 glass-panel rounded-3xl w-full md:w-5/12 px-8 py-6 border border-white/5 hover:border-accent-purple/50 transition-all duration-300 ml-6 md:ml-0 shadow-lg hover:shadow-[0_0_30px_rgba(138,43,226,0.15)] group">
                             <div className="text-accent-purple text-sm font-semibold tracking-widest uppercase mb-2">Class 10</div>
                             <h3 className="text-2xl font-bold font-heading text-white mb-2">Secondary Education</h3>
-                            <p className="text-gray-400 font-light">Completed</p>
+                            <div className="inline-block px-4 py-2 rounded-full bg-white/5 border border-white/10 text-white font-medium mt-2">
+                              Percentage: <span className="text-accent-purple">80%</span>
+                            </div>
                           </div>
                         </motion.div>
 
