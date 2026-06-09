@@ -2,7 +2,7 @@
 
 import React, { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { BrainCircuit, ShieldAlert, Activity, Network, ExternalLink, Code2, CheckCircle2, FileText, Cpu, Server, BarChart3 } from "lucide-react";
+import { BrainCircuit, ShieldAlert, ExternalLink, FileText, Cpu, Server } from "lucide-react";
 import { GithubIcon as Github } from "@/components/icons/SocialIcons";
 import { cn } from "@/lib/utils";
 
@@ -122,8 +122,8 @@ const VoiceAbstractVisual = () => (
       {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
         <motion.div 
           key={i}
-          animate={{ height: ["20px", `${Math.random() * 200 + 50}px`, "20px"] }}
-          transition={{ duration: 1.2 + Math.random(), repeat: Infinity, ease: "easeInOut" }}
+          animate={{ height: ["20px", `${(i * 37) % 200 + 50}px`, "20px"] }}
+          transition={{ duration: 1.2 + (i % 4) * 0.3, repeat: Infinity, ease: "easeInOut" }}
           className="w-2 md:w-3 bg-gradient-to-t from-accent-pink/20 via-accent-pink to-accent-pink/20 rounded-full shadow-[0_0_15px_rgba(255,182,193,0.5)]"
         />
       ))}
@@ -159,11 +159,7 @@ const KnowledgeAbstractVisual = () => (
   </div>
 );
 
-interface InnovationLabProps {
-  activeSkill?: string | null;
-}
-
-export default function InnovationLab({ activeSkill }: InnovationLabProps = {}) {
+export default function InnovationLab() {
   return (
     <section id="innovation-lab" className="relative w-full py-32 px-6 md:px-12 lg:px-24 border-t border-white/5">
       

@@ -25,7 +25,7 @@ export default function CustomCursor() {
   useEffect(() => {
     // Detect mobile / touch devices
     if (typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches) {
-      setIsMobile(true);
+      setTimeout(() => setIsMobile(true), 0);
       return;
     }
 

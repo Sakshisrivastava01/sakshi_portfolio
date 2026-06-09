@@ -259,7 +259,7 @@ export default function TechnicalIntelligenceNetwork({ onSkillSelect, activeSkil
                 />
                 <BrainCircuit className="w-8 h-8 text-white mb-2" />
                 <span className="text-[10px] uppercase tracking-[0.2em] text-accent-pink font-semibold text-center leading-tight">
-                  Sakshi's<br/>Tech Ecosystem
+                  Sakshi&apos;s<br/>Tech Ecosystem
                 </span>
               </motion.div>
             )}

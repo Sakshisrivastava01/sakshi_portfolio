@@ -2,7 +2,6 @@
 
 import { useRef, useMemo, useEffect, useState } from "react";
 import { useFrame } from "@react-three/fiber";
-import { useTexture } from "@react-three/drei";
 import * as THREE from "three";
 
 interface AvatarProps {
@@ -45,7 +44,7 @@ export default function Avatar({ isSpeaking }: AvatarProps) {
     if (isSpeaking && !analyserRef.current) {
       const audioEl = document.getElementById("avatar-audio") as HTMLAudioElement;
       if (audioEl) {
-        const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+        const audioCtx = new (window.AudioContext || (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext)();
         const analyser = audioCtx.createAnalyser();
         analyser.fftSize = 256;
         
@@ -77,13 +76,15 @@ export default function Avatar({ isSpeaking }: AvatarProps) {
   useFrame((state) => {
     if (!meshRef.current || !materialRef.current) return;
     
+    const matUniforms = materialRef.current.uniforms;
     const time = state.clock.elapsedTime;
-    uniforms.uTime.value = time;
+    matUniforms.uTime.value = time;
     
     // Audio volume processing
     let currentVolume = 0.0;
     if (isSpeaking && analyserRef.current && dataArrayRef.current) {
-      analyserRef.current.getByteFrequencyData(dataArrayRef.current as any);
+      // @ts-expect-error - TS complains about ArrayBufferLike vs ArrayBuffer
+      analyserRef.current.getByteFrequencyData(dataArrayRef.current);
       let sum = 0;
       for (let i = 0; i < dataArrayRef.current.length; i++) {
         sum += dataArrayRef.current[i];
@@ -92,22 +93,22 @@ export default function Avatar({ isSpeaking }: AvatarProps) {
       currentVolume = Math.min(avg / 100, 1.0); // Normalize
     }
     
-    uniforms.uVolume.value = THREE.MathUtils.lerp(
-      uniforms.uVolume.value,
+    matUniforms.uVolume.value = THREE.MathUtils.lerp(
+      matUniforms.uVolume.value,
       currentVolume,
       0.2
     );
 
     // Eyebrow raise
-    uniforms.uEyebrow.value = THREE.MathUtils.lerp(
-      uniforms.uEyebrow.value,
+    matUniforms.uEyebrow.value = THREE.MathUtils.lerp(
+      matUniforms.uEyebrow.value,
       isSpeaking ? 1.0 : 0.0,
       0.05
     );
     
     // Smooth transition for speaking state
-    uniforms.uSpeaking.value = THREE.MathUtils.lerp(
-      uniforms.uSpeaking.value, 
+    matUniforms.uSpeaking.value = THREE.MathUtils.lerp(
+      matUniforms.uSpeaking.value, 
       isSpeaking ? 1.0 : 0.0, 
       0.08
     );
@@ -135,9 +136,9 @@ export default function Avatar({ isSpeaking }: AvatarProps) {
     
     // Natural nodding when speaking
     if (isSpeaking) {
-      uniforms.uNod.value = Math.sin(time * 4) * 0.5 + 0.5; // 0 to 1
+      matUniforms.uNod.value = Math.sin(time * 4) * 0.5 + 0.5; // 0 to 1
     } else {
-      uniforms.uNod.value = THREE.MathUtils.lerp(uniforms.uNod.value, 0, 0.1);
+      matUniforms.uNod.value = THREE.MathUtils.lerp(matUniforms.uNod.value, 0, 0.1);
     }
 
     // Realistic blinking logic
@@ -145,16 +146,16 @@ export default function Avatar({ isSpeaking }: AvatarProps) {
     const blinkCycle = time % 4.0;
     if (blinkCycle < 0.1 || (blinkCycle > 0.2 && blinkCycle < 0.25)) { 
       // Double blink occasionally
-      uniforms.uBlink.value = THREE.MathUtils.lerp(uniforms.uBlink.value, 1.0, 0.3);
+      matUniforms.uBlink.value = THREE.MathUtils.lerp(matUniforms.uBlink.value, 1.0, 0.3);
     } else {
-      uniforms.uBlink.value = THREE.MathUtils.lerp(uniforms.uBlink.value, 0.0, 0.2);
+      matUniforms.uBlink.value = THREE.MathUtils.lerp(matUniforms.uBlink.value, 0.0, 0.2);
     }
   });
 
   // Aspect ratio adjustment
   if (!texture) return null;
-  const img = texture.image as any;
-  const imageAspect = img && img.width ? img.width / img.height : 1;
+  const img = texture.image as { width?: number; height?: number } | undefined;
+  const imageAspect = img && img.width && img.height ? img.width / img.height : 1;
   const scale = 4.5; // Adjust base size for premium feel
 
   return (

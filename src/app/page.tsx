@@ -6,15 +6,13 @@ import FirstImpressionExperience from "@/components/first-impression/FirstImpres
 import SectionLayout from "@/components/sections/SectionLayout";
 import TechnicalIntelligenceNetwork from "@/components/sections/TechnicalIntelligenceNetwork";
 import InnovationLab from "@/components/sections/InnovationLab";
-import { motion, AnimatePresence, useInView, useMotionValue, useSpring } from "framer-motion";
+import { motion, useInView, useMotionValue, useSpring } from "framer-motion";
 import { 
-  GraduationCap, Briefcase, Code2, Database, Cloud, Terminal, 
-  Cpu, Layout, Award, Trophy, Mail, Phone,
-  ExternalLink, CheckCircle2, ChevronRight, BrainCircuit,
-  Activity, Network
+  GraduationCap, Database, Terminal, 
+  Award, Trophy, Mail,
+  BrainCircuit, CheckCircle2, Network, Activity, Code2
 } from "lucide-react";
 import { GithubIcon as Github, LinkedinIcon as Linkedin } from "@/components/icons/SocialIcons";
-import { cn } from "@/lib/utils";
 import dynamic from "next/dynamic";
 
 const Scene = dynamic(() => import("@/components/canvas/Scene"), { ssr: false });
@@ -154,7 +152,7 @@ export default function Home() {
                 </SectionLayout>
 
                 {/* 4. PROJECTS SECTION (INNOVATION LAB) */}
-                <InnovationLab activeSkill={activeSkill} />
+                <InnovationLab />
 
                 {/* 5. EXPERIENCE SECTION */}
                 <SectionLayout id="experience" title="Experience Log">
@@ -485,12 +483,12 @@ export default function Home() {
                       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-accent-glow rounded-full blur-[120px] opacity-10 group-hover:opacity-30 transition-opacity duration-1000 pointer-events-none" />
                       
                       <h3 className="text-4xl md:text-6xl font-bold font-heading text-white mb-8 relative z-10 tracking-tight">
-                        Let's build something <br/>
+                        Let&apos;s build something <br/>
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-pink to-accent-lavender">meaningful together.</span>
                       </h3>
                       
                       <p className="text-xl md:text-2xl text-gray-400 font-light mb-16 leading-relaxed max-w-2xl mx-auto relative z-10">
-                        I am currently exploring opportunities in Backend Engineering and Artificial Intelligence. If you're building the future, I want to help engineer it.
+                        I am currently exploring opportunities in Backend Engineering and Artificial Intelligence. If you&apos;re building the future, I want to help engineer it.
                       </p>
                       
                       <div className="flex flex-wrap justify-center gap-6 relative z-10">
