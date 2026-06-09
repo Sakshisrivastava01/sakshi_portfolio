@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Save, BarChart2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import toast from "react-hot-toast";
 
 export default function AnalyticsAdmin() {
   const [formData, setFormData] = useState({
@@ -10,7 +11,7 @@ export default function AnalyticsAdmin() {
     vercel_analytics_enabled: true,
   });
   const [loading, setLoading] = useState(false);
-  const [saved, setSaved] = useState(false);
+  const [initialFetchDone, setInitialFetchDone] = useState(false);
 
   useEffect(() => {
     fetchAnalytics();
@@ -25,21 +26,39 @@ export default function AnalyticsAdmin() {
         vercel_analytics_enabled: data.vercel_analytics_enabled ?? true,
       });
     }
+    setInitialFetchDone(true);
   };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-      setSaved(true);
-      setTimeout(() => setSaved(false), 3000);
+      toast.error("Supabase not connected. Credentials missing.");
       return;
     }
 
     setLoading(true);
-    // Upsert logic here
-    setLoading(false);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
+    const toastId = toast.loading("Saving analytics settings...");
+
+    try {
+      const { data: existingData } = await supabase.from("analytics_settings").select("id").single();
+      
+      let error;
+      if (existingData?.id) {
+        const { error: updateError } = await supabase.from("analytics_settings").update(formData).eq("id", existingData.id);
+        error = updateError;
+      } else {
+        const { error: insertError } = await supabase.from("analytics_settings").insert([formData]);
+        error = insertError;
+      }
+
+      if (error) throw error;
+      toast.success("Analytics settings saved successfully!", { id: toastId });
+    } catch (err: any) {
+      console.error(err);
+      toast.error(`Error: ${err.message}`, { id: toastId });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -95,10 +114,9 @@ export default function AnalyticsAdmin() {
         </div>
 
         <div className="pt-4 border-t border-white/10 flex justify-end items-center gap-4">
-          {saved && <span className="text-green-400 text-sm font-medium">Changes saved!</span>}
           <button 
             type="submit"
-            disabled={loading}
+            disabled={loading || !initialFetchDone}
             className="px-6 py-3 rounded-xl bg-accent-purple text-white font-medium hover:bg-accent-pink transition-colors flex items-center gap-2 shadow-[0_0_15px_rgba(138,43,226,0.3)] disabled:opacity-50"
           >
             <Save className="w-5 h-5" />

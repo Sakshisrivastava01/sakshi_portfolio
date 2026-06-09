@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Save, FileText } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import toast from "react-hot-toast";
 
 export default function AboutAdmin() {
   const [formData, setFormData] = useState({
@@ -11,7 +12,7 @@ export default function AboutAdmin() {
     focus_areas: "", // Stored as CSV string in form, array in DB
   });
   const [loading, setLoading] = useState(false);
-  const [saved, setSaved] = useState(false);
+  const [initialFetchDone, setInitialFetchDone] = useState(false);
 
   useEffect(() => {
     fetchAbout();
@@ -27,21 +28,45 @@ export default function AboutAdmin() {
         focus_areas: data.focus_areas ? data.focus_areas.join(", ") : "",
       });
     }
+    setInitialFetchDone(true);
   };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-      setSaved(true);
-      setTimeout(() => setSaved(false), 3000);
+      toast.error("Supabase not connected. Credentials missing.");
       return;
     }
 
     setLoading(true);
-    // Upsert logic here
-    setLoading(false);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
+    const toastId = toast.loading("Saving about section...");
+
+    try {
+      const { data: existingData } = await supabase.from("about").select("id").single();
+      
+      const payload = {
+        bio: formData.bio,
+        career_objective: formData.career_objective,
+        focus_areas: formData.focus_areas.split(",").map(s => s.trim()).filter(Boolean)
+      };
+
+      let error;
+      if (existingData?.id) {
+        const { error: updateError } = await supabase.from("about").update(payload).eq("id", existingData.id);
+        error = updateError;
+      } else {
+        const { error: insertError } = await supabase.from("about").insert([payload]);
+        error = insertError;
+      }
+
+      if (error) throw error;
+      toast.success("About section saved successfully!", { id: toastId });
+    } catch (err: any) {
+      console.error(err);
+      toast.error(`Error: ${err.message}`, { id: toastId });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -86,10 +111,9 @@ export default function AboutAdmin() {
         </div>
 
         <div className="pt-4 border-t border-white/10 flex justify-end items-center gap-4">
-          {saved && <span className="text-green-400 text-sm font-medium">Changes saved!</span>}
           <button 
             type="submit"
-            disabled={loading}
+            disabled={loading || !initialFetchDone}
             className="px-6 py-3 rounded-xl bg-accent-purple text-white font-medium hover:bg-accent-pink transition-colors flex items-center gap-2 shadow-[0_0_15px_rgba(138,43,226,0.3)] disabled:opacity-50"
           >
             <Save className="w-5 h-5" />

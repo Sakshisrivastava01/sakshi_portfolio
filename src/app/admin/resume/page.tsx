@@ -3,10 +3,12 @@
 import { useState, useEffect } from "react";
 import { UploadCloud, FileText, Trash2, Download } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import toast from "react-hot-toast";
 
 export default function ResumeAdmin() {
   const [resumeUrl, setResumeUrl] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [resumeId, setResumeId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
@@ -14,9 +16,25 @@ export default function ResumeAdmin() {
   }, []);
 
   const fetchResume = async () => {
-    if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) return;
-    const { data } = await supabase.from("resume").select("*").single();
-    if (data) setResumeUrl(data.pdf_url);
+    if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase.from("resume").select("*").single();
+      if (data) {
+        setResumeUrl(data.pdf_url);
+        setResumeId(data.id);
+      }
+    } catch (err: any) {
+      console.error(err);
+      if (err.code !== "PGRST116") { // Ignore no rows returned
+        toast.error("Failed to fetch resume.");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -24,15 +42,61 @@ export default function ResumeAdmin() {
     if (!file) return;
 
     if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-      alert("Database not connected. Mock upload success.");
+      toast.error("Database not connected. Mock upload success.");
       setResumeUrl("/mock-resume.pdf");
       return;
     }
 
     setUploading(true);
-    // Supabase storage upload logic here
-    // e.g. await supabase.storage.from('resumes').upload(...)
-    setUploading(false);
+    const toastId = toast.loading("Uploading resume...");
+
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `resume-${Date.now()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError, data } = await supabase.storage.from('resumes').upload(filePath, file);
+      
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage.from('resumes').getPublicUrl(filePath);
+
+      let dbError;
+      if (resumeId) {
+        const { error } = await supabase.from("resume").update({ pdf_url: publicUrl, updated_at: new Date() }).eq("id", resumeId);
+        dbError = error;
+      } else {
+        const { data: insertData, error } = await supabase.from("resume").insert([{ pdf_url: publicUrl }]).select().single();
+        if (insertData) setResumeId(insertData.id);
+        dbError = error;
+      }
+
+      if (dbError) throw dbError;
+
+      setResumeUrl(publicUrl);
+      toast.success("Resume uploaded successfully!", { id: toastId });
+    } catch (err: any) {
+      console.error(err);
+      toast.error(`Upload Error: ${err.message}`, { id: toastId });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || !resumeId) return;
+
+    const toastId = toast.loading("Deleting resume...");
+    try {
+      const { error } = await supabase.from("resume").delete().eq("id", resumeId);
+      if (error) throw error;
+      setResumeUrl(null);
+      setResumeId(null);
+      toast.success("Resume deleted!", { id: toastId });
+    } catch (err: any) {
+      console.error(err);
+      toast.error(`Delete Error: ${err.message}`, { id: toastId });
+    }
   };
 
   return (
@@ -43,7 +107,9 @@ export default function ResumeAdmin() {
       </div>
 
       <div className="glass-panel p-8 rounded-3xl border border-white/10 space-y-6">
-        {resumeUrl ? (
+        {loading ? (
+          <div className="text-center text-gray-500 animate-pulse">Checking status...</div>
+        ) : resumeUrl ? (
           <div className="flex items-center justify-between p-4 bg-white/5 border border-white/10 rounded-xl">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-lg bg-red-500/20 text-red-400 flex items-center justify-center shrink-0">
@@ -51,14 +117,14 @@ export default function ResumeAdmin() {
               </div>
               <div>
                 <h3 className="text-lg font-medium text-white">Current Resume</h3>
-                <p className="text-sm text-gray-500">resume.pdf</p>
+                <p className="text-sm text-gray-500">Live on portfolio</p>
               </div>
             </div>
             <div className="flex gap-3">
               <a href={resumeUrl} target="_blank" rel="noreferrer" className="p-2 rounded-lg hover:bg-white/10 text-accent-lavender transition-colors" title="Download">
                 <Download className="w-5 h-5" />
               </a>
-              <button className="p-2 rounded-lg hover:bg-red-500/10 hover:text-red-400 text-gray-500 transition-colors" title="Delete">
+              <button onClick={handleDelete} className="p-2 rounded-lg hover:bg-red-500/10 hover:text-red-400 text-gray-500 transition-colors" title="Delete">
                 <Trash2 className="w-5 h-5" />
               </button>
             </div>

@@ -1,5 +1,7 @@
 "use client";
 
+import { Toaster } from "react-hot-toast";
+
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -7,7 +9,7 @@ import {
   LayoutDashboard, User, Code2, Briefcase, 
   Award, GraduationCap, Trophy, Mail, 
   FileText, Image as ImageIcon, Settings, LogOut,
-  FolderKanban, Link as LinkIcon, Music, BarChart2
+  FolderKanban, Link as LinkIcon, Music, BarChart2, DatabaseBackup
 } from "lucide-react";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -43,6 +45,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { name: "Media Library", href: "/admin/media", icon: ImageIcon },
     { name: "SEO Settings", href: "/admin/seo", icon: Settings },
     { name: "Analytics", href: "/admin/analytics", icon: BarChart2 },
+    { name: "Backup & Restore", href: "/admin/backup", icon: DatabaseBackup },
   ];
 
   return (
@@ -96,6 +99,23 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           {children}
         </div>
       </main>
+      
+      <Toaster 
+        position="bottom-right"
+        toastOptions={{
+          style: {
+            background: '#1a1a1a',
+            color: '#fff',
+            border: '1px solid rgba(255,255,255,0.1)',
+          },
+          success: {
+            iconTheme: {
+              primary: '#8b5cf6',
+              secondary: '#fff',
+            },
+          },
+        }}
+      />
     </div>
   );
 }

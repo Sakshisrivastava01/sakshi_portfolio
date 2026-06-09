@@ -1,22 +1,47 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { UploadCloud, Music, Trash2, Play } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { UploadCloud, Music, Trash2, Play, Pause } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import toast from "react-hot-toast";
 
 export default function AudioAdmin() {
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [audioId, setAudioId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     fetchAudio();
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+    };
   }, []);
 
   const fetchAudio = async () => {
-    if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) return;
-    const { data } = await supabase.from("audio").select("*").single();
-    if (data) setAudioUrl(data.audio_url);
+    if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase.from("audio").select("*").single();
+      if (data) {
+        setAudioUrl(data.audio_url);
+        setAudioId(data.id);
+      }
+    } catch (err: any) {
+      console.error(err);
+      if (err.code !== "PGRST116") { // Ignore no rows returned
+        toast.error("Failed to fetch audio.");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -24,15 +49,77 @@ export default function AudioAdmin() {
     if (!file) return;
 
     if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-      alert("Database not connected. Mock upload success.");
+      toast.error("Database not connected. Mock upload success.");
       setAudioUrl("/mock-intro.mp3");
       return;
     }
 
     setUploading(true);
-    // Supabase storage upload logic here
-    // e.g. await supabase.storage.from('audio').upload(...)
-    setUploading(false);
+    const toastId = toast.loading("Uploading audio...");
+
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `audio-${Date.now()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError, data } = await supabase.storage.from('audio').upload(filePath, file);
+      
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage.from('audio').getPublicUrl(filePath);
+
+      let dbError;
+      if (audioId) {
+        const { error } = await supabase.from("audio").update({ audio_url: publicUrl, updated_at: new Date() }).eq("id", audioId);
+        dbError = error;
+      } else {
+        const { data: insertData, error } = await supabase.from("audio").insert([{ audio_url: publicUrl }]).select().single();
+        if (insertData) setAudioId(insertData.id);
+        dbError = error;
+      }
+
+      if (dbError) throw dbError;
+
+      setAudioUrl(publicUrl);
+      toast.success("Audio uploaded successfully!", { id: toastId });
+    } catch (err: any) {
+      console.error(err);
+      toast.error(`Upload Error: ${err.message}`, { id: toastId });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || !audioId) return;
+
+    const toastId = toast.loading("Deleting audio...");
+    try {
+      const { error } = await supabase.from("audio").delete().eq("id", audioId);
+      if (error) throw error;
+      
+      if (isPlaying && audioRef.current) {
+        audioRef.current.pause();
+        setIsPlaying(false);
+      }
+      
+      setAudioUrl(null);
+      setAudioId(null);
+      toast.success("Audio deleted!", { id: toastId });
+    } catch (err: any) {
+      console.error(err);
+      toast.error(`Delete Error: ${err.message}`, { id: toastId });
+    }
+  };
+
+  const togglePlay = () => {
+    if (!audioRef.current) return;
+    if (isPlaying) {
+      audioRef.current.pause();
+    } else {
+      audioRef.current.play();
+    }
+    setIsPlaying(!isPlaying);
   };
 
   return (
@@ -43,8 +130,16 @@ export default function AudioAdmin() {
       </div>
 
       <div className="glass-panel p-8 rounded-3xl border border-white/10 space-y-6">
-        {audioUrl ? (
+        {loading ? (
+          <div className="text-center text-gray-500 animate-pulse">Checking status...</div>
+        ) : audioUrl ? (
           <div className="flex items-center justify-between p-4 bg-white/5 border border-white/10 rounded-xl">
+            <audio 
+              ref={audioRef} 
+              src={audioUrl} 
+              onEnded={() => setIsPlaying(false)} 
+              className="hidden" 
+            />
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-lg bg-accent-purple/20 text-accent-lavender flex items-center justify-center shrink-0">
                 <Music className="w-6 h-6" />
@@ -55,10 +150,10 @@ export default function AudioAdmin() {
               </div>
             </div>
             <div className="flex gap-3">
-              <button className="p-2 rounded-lg hover:bg-white/10 text-accent-lavender transition-colors" title="Play">
-                <Play className="w-5 h-5" />
+              <button onClick={togglePlay} className="p-2 rounded-lg hover:bg-white/10 text-accent-lavender transition-colors" title={isPlaying ? "Pause" : "Play"}>
+                {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
               </button>
-              <button className="p-2 rounded-lg hover:bg-red-500/10 hover:text-red-400 text-gray-500 transition-colors" title="Delete">
+              <button onClick={handleDelete} className="p-2 rounded-lg hover:bg-red-500/10 hover:text-red-400 text-gray-500 transition-colors" title="Delete">
                 <Trash2 className="w-5 h-5" />
               </button>
             </div>
