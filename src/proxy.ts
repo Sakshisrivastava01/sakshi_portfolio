@@ -12,7 +12,10 @@ export default async function proxy(request: NextRequest) {
     }
 
     try {
-      const secret = process.env.JWT_SECRET || "fallback-dev-secret-key-do-not-use-in-prod";
+      const secret = process.env.JWT_SECRET;
+      if (!secret) {
+        throw new Error("JWT_SECRET environment variable is missing");
+      }
       await jwtVerify(sessionToken, new TextEncoder().encode(secret));
       // Token is valid, allow access
       return NextResponse.next();

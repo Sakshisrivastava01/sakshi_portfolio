@@ -3,8 +3,7 @@ import { SignJWT, jwtVerify } from "jose";
 const getJwtSecretKey = () => {
   const secret = process.env.JWT_SECRET;
   if (!secret || secret.length === 0) {
-    // Fallback for development if not set
-    return new TextEncoder().encode("fallback-dev-secret-key-do-not-use-in-prod");
+    throw new Error("JWT_SECRET environment variable is missing");
   }
   return new TextEncoder().encode(secret);
 };
