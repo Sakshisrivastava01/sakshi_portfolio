@@ -58,6 +58,7 @@ export default function TopNavBar() {
       logoClickCount.current = 0;
       scrollTo("#home");
     }, 600);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router]);
 
   useEffect(() => {
