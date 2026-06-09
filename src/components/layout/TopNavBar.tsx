@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Download } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/lib/supabase";
 
 const NAV_LINKS = [
   { label: "Home", href: "#home" },
@@ -15,12 +17,63 @@ const NAV_LINKS = [
   { label: "Achievements", href: "#achievements" },
   { label: "Education", href: "#education" },
   { label: "Contact", href: "#contact" },
+  { label: "Admin Dashboard", href: "/admin/login" },
 ];
 
 export default function TopNavBar() {
   const [activeSection, setActiveSection] = useState<string>("home");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [resumeUrl, setResumeUrl] = useState("/Sakshi_Srivastava_Resume.pdf");
+  const router = useRouter();
+  const logoClickCount = useRef(0);
+  const logoClickTimer = useRef<NodeJS.Timeout | null>(null);
+
+  // Secret admin access: Ctrl+Shift+A
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.shiftKey && e.key === "A") {
+        e.preventDefault();
+        console.log("Ctrl+Shift+A detected! Redirecting to /admin/login...");
+        router.push("/admin/login");
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [router]);
+
+  // Secret admin access: 5-click logo
+  const handleLogoClick = useCallback(() => {
+    logoClickCount.current += 1;
+    console.log(`Logo clicked. Current count: ${logoClickCount.current}`);
+    if (logoClickTimer.current) clearTimeout(logoClickTimer.current);
+    if (logoClickCount.current >= 5) {
+      console.log("5-click sequence detected! Redirecting to /admin/login...");
+      logoClickCount.current = 0;
+      router.push("/admin/login");
+      return;
+    }
+    logoClickTimer.current = setTimeout(() => {
+      // If fewer than 5 clicks, just scroll home
+      logoClickCount.current = 0;
+      scrollTo("#home");
+    }, 600);
+  }, [router]);
+
+  useEffect(() => {
+    async function fetchResume() {
+      if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) return;
+      try {
+        const { data } = await supabase.from("resume").select("pdf_url").single();
+        if (data && data.pdf_url) {
+          setResumeUrl(data.pdf_url);
+        }
+      } catch (err: unknown) {
+        console.error("Error fetching resume URL from CMS:", err);
+      }
+    }
+    fetchResume();
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -48,8 +101,12 @@ export default function TopNavBar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const scrollTo = (href: string) => {
+  function scrollTo(href: string) {
     setIsMobileMenuOpen(false);
+    if (href.startsWith("/")) {
+      router.push(href);
+      return;
+    }
     const element = document.getElementById(href.substring(1));
     if (element) {
       element.scrollIntoView({ behavior: "smooth" });
@@ -69,7 +126,7 @@ export default function TopNavBar() {
       >
         <div className="px-6 flex items-center justify-between">
           {/* Logo */}
-          <div className="flex-shrink-0 cursor-pointer" onClick={() => scrollTo("#home")}>
+          <div className="flex-shrink-0 cursor-pointer" onClick={handleLogoClick}>
             <span className="text-xl font-bold font-heading tracking-tighter">
               Sakshi<span className="text-accent-pink">.</span>
             </span>
@@ -111,7 +168,7 @@ export default function TopNavBar() {
           {/* Right Action & Mobile Toggle */}
           <div className="flex items-center gap-4">
             <a
-              href="/Sakshi_Srivastava_Resume.pdf"
+              href={resumeUrl}
               download="Sakshi_Srivastava_Resume.pdf"
               className="hidden md:flex items-center gap-2 px-5 py-2 rounded-full bg-white/5 border border-white/10 hover:border-accent-pink/50 hover:bg-white/10 text-white text-sm font-medium transition-all duration-300 shadow-[0_0_15px_rgba(255,182,193,0.1)] hover:shadow-[0_0_20px_rgba(255,182,193,0.3)] group"
             >
@@ -158,7 +215,7 @@ export default function TopNavBar() {
               <motion.a
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                href="/Sakshi_Srivastava_Resume.pdf"
+                href={resumeUrl}
                 download="Sakshi_Srivastava_Resume.pdf"
                 className="mt-8 flex items-center justify-center gap-3 w-full py-4 rounded-xl bg-gradient-to-r from-accent-purple/20 to-accent-pink/20 border border-accent-pink/30 text-white font-semibold"
               >

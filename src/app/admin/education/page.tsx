@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState, useEffect } from "react";
@@ -22,11 +23,7 @@ export default function EducationAdmin() {
   const [formData, setFormData] = useState({ degree: "", school: "", year: "", cgpa: "", description: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    fetchEducation();
-  }, []);
-
-  const fetchEducation = async () => {
+  async function fetchEducation() {
     if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
       setEducation(MOCK_EDUCATION);
       setLoading(false);
@@ -44,6 +41,12 @@ export default function EducationAdmin() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    // eslint-disable-next-line
+    fetchEducation();
+  }, []);
+
 
   const handleOpenModal = (edu?: any) => {
     if (edu) {

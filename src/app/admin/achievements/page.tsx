@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState, useEffect } from "react";
@@ -22,11 +23,7 @@ export default function AchievementsAdmin() {
   const [formData, setFormData] = useState({ title: "", description: "", date: "", badge: "", link: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    fetchAchievements();
-  }, []);
-
-  const fetchAchievements = async () => {
+  async function fetchAchievements() {
     if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
       setAchievements(MOCK_ACHIEVEMENTS);
       setLoading(false);
@@ -44,6 +41,12 @@ export default function AchievementsAdmin() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    // eslint-disable-next-line
+    fetchAchievements();
+  }, []);
+
 
   const handleOpenModal = (ach?: any) => {
     if (ach) {

@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState, useEffect } from "react";
-import { UploadCloud, Image as ImageIcon, FileText, Trash2, File as FileIcon, X, Copy, ExternalLink } from "lucide-react";
+import { UploadCloud, FileText, Trash2, File as FileIcon, Image as ImageIcon, Copy, ExternalLink } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import toast from "react-hot-toast";
 
@@ -16,7 +17,7 @@ export default function MediaAdmin() {
     fetchMedia();
   }, []);
 
-  const fetchMedia = async () => {
+  async function fetchMedia() {
     if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
       setFiles([
         { id: "1", name: "mock-hero-bg.jpg", metadata: { mimetype: "image/jpeg", size: 2400000 } },
@@ -50,7 +51,7 @@ export default function MediaAdmin() {
     }
   };
 
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -154,7 +155,8 @@ export default function MediaAdmin() {
               
               <div className="w-full aspect-square bg-black/50 rounded-xl border border-white/10 flex items-center justify-center text-gray-500 mb-3 overflow-hidden relative">
                 {file.metadata?.mimetype?.startsWith('image/') && file.publicUrl ? (
-                  <img src={file.publicUrl} alt={file.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                  /* eslint-disable-next-line @next/next/no-img-element */
+<img src={file.publicUrl} alt={file.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                 ) : (
                   <div className="group-hover:text-accent-lavender transition-colors">
                     {getIcon(file.metadata?.mimetype)}

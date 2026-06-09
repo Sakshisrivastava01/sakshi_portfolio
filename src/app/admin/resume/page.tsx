@@ -11,25 +11,22 @@ export default function ResumeAdmin() {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
 
-  useEffect(() => {
-    fetchResume();
-  }, []);
-
-  const fetchResume = async () => {
+  async function fetchResume() {
     if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
       setLoading(false);
       return;
     }
 
     try {
-      const { data, error } = await supabase.from("resume").select("*").single();
+      const { data } = await supabase.from("resume").select("*").single();
       if (data) {
         setResumeUrl(data.pdf_url);
         setResumeId(data.id);
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      if (err.code !== "PGRST116") { // Ignore no rows returned
+      const e = err as { code?: string, message?: string };
+      if (e.code !== "PGRST116") { // Ignore no rows returned
         toast.error("Failed to fetch resume.");
       }
     } finally {
@@ -37,7 +34,13 @@ export default function ResumeAdmin() {
     }
   };
 
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  useEffect(() => {
+    // eslint-disable-next-line
+    fetchResume();
+  }, []);
+
+
+  async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -65,7 +68,7 @@ export default function ResumeAdmin() {
       const fileName = `resume-${Date.now()}.${fileExt}`;
       const filePath = `${fileName}`;
 
-      const { error: uploadError, data } = await supabase.storage.from('resumes').upload(filePath, file);
+      const { error: uploadError } = await supabase.storage.from('resumes').upload(filePath, file);
       
       if (uploadError) throw uploadError;
 
@@ -85,9 +88,9 @@ export default function ResumeAdmin() {
 
       setResumeUrl(publicUrl);
       toast.success("Resume uploaded successfully!", { id: toastId });
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      toast.error(`Upload Error: ${err.message}`, { id: toastId });
+      toast.error(`Upload Error: ${(err as Error).message}`, { id: toastId });
     } finally {
       setUploading(false);
     }
@@ -103,9 +106,9 @@ export default function ResumeAdmin() {
       setResumeUrl(null);
       setResumeId(null);
       toast.success("Resume deleted!", { id: toastId });
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      toast.error(`Delete Error: ${err.message}`, { id: toastId });
+      toast.error(`Delete Error: ${(err as Error).message}`, { id: toastId });
     }
   };
 

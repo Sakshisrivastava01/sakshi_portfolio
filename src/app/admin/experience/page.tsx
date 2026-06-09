@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState, useEffect } from "react";
@@ -22,11 +23,7 @@ export default function ExperienceAdmin() {
   const [formData, setFormData] = useState({ company: "", role: "", duration: "", description: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    fetchExperience();
-  }, []);
-
-  const fetchExperience = async () => {
+  async function fetchExperience() {
     if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
       setExperience(MOCK_EXPERIENCE);
       setLoading(false);
@@ -44,6 +41,12 @@ export default function ExperienceAdmin() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    // eslint-disable-next-line
+    fetchExperience();
+  }, []);
+
 
   const handleOpenModal = (exp?: any) => {
     if (exp) {

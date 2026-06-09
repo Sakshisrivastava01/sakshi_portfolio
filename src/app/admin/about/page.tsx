@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Save, FileText } from "lucide-react";
+import { Save } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import toast from "react-hot-toast";
 
@@ -14,11 +14,7 @@ export default function AboutAdmin() {
   const [loading, setLoading] = useState(false);
   const [initialFetchDone, setInitialFetchDone] = useState(false);
 
-  useEffect(() => {
-    fetchAbout();
-  }, []);
-
-  const fetchAbout = async () => {
+  async function fetchAbout() {
     if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) return;
     const { data } = await supabase.from("about").select("*").single();
     if (data) {
@@ -30,6 +26,12 @@ export default function AboutAdmin() {
     }
     setInitialFetchDone(true);
   };
+
+  useEffect(() => {
+    // eslint-disable-next-line
+    fetchAbout();
+  }, []);
+
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,9 +63,9 @@ export default function AboutAdmin() {
 
       if (error) throw error;
       toast.success("About section saved successfully!", { id: toastId });
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      toast.error(`Error: ${err.message}`, { id: toastId });
+      toast.error(`Error: ${(err as Error).message}`, { id: toastId });
     } finally {
       setLoading(false);
     }

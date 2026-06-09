@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Download, Upload, AlertTriangle, Database } from "lucide-react";
+import { Download, Upload, AlertTriangle } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import toast from "react-hot-toast";
 
@@ -37,7 +37,7 @@ export default function BackupAdmin() {
     const toastId = toast.loading("Exporting database...");
 
     try {
-      const backupData: Record<string, any> = {};
+      const backupData: Record<string, unknown> = {};
 
       // Fetch all data from all tables
       for (const table of TABLES) {
@@ -62,7 +62,7 @@ export default function BackupAdmin() {
       URL.revokeObjectURL(url);
 
       toast.success("Database exported successfully!", { id: toastId });
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Export error:", err);
       toast.error("Failed to export database.", { id: toastId });
     } finally {
@@ -138,7 +138,7 @@ export default function BackupAdmin() {
       };
 
       reader.readAsText(file);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
       toast.error("Failed to import database.", { id: toastId });
       setImporting(false);

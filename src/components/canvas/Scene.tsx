@@ -2,7 +2,7 @@
 
 import { Canvas, useFrame } from "@react-three/fiber";
 import { SoftShadows, Stars } from "@react-three/drei";
-import { Suspense, useMemo, useRef } from "react";
+import { Suspense, useRef } from "react";
 import * as THREE from "three";
 
 interface SceneProps {

@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import SmoothScroll from "@/components/layout/SmoothScroll";
 import FirstImpressionExperience from "@/components/first-impression/FirstImpressionExperience";
+import { supabase } from "@/lib/supabase";
 import SectionLayout from "@/components/sections/SectionLayout";
 import TechnicalIntelligenceNetwork from "@/components/sections/TechnicalIntelligenceNetwork";
 import InnovationLab from "@/components/sections/InnovationLab";
@@ -10,7 +11,7 @@ import Certifications from "@/components/sections/Certifications";
 import { motion, useInView, useMotionValue, useSpring } from "framer-motion";
 import { 
   GraduationCap, Database, Terminal, 
-  Award, Trophy, Mail,
+  Trophy, Mail,
   BrainCircuit, CheckCircle2, Network, Activity, Code2
 } from "lucide-react";
 import { GithubIcon as Github, LinkedinIcon as Linkedin } from "@/components/icons/SocialIcons";
@@ -48,10 +49,26 @@ export default function Home() {
   const [audioState, setAudioState] = useState<AudioState>("idle");
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [audioUrl, setAudioUrl] = useState("/import.mp3");
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     audioRef.current = document.getElementById("global-audio") as HTMLAudioElement;
+  }, []);
+
+  useEffect(() => {
+    async function fetchAudio() {
+      if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) return;
+      try {
+        const { data } = await supabase.from("audio").select("audio_url").single();
+        if (data && data.audio_url) {
+          setAudioUrl(data.audio_url);
+        }
+      } catch (err: unknown) {
+        console.error("Error fetching audio intro from CMS:", err);
+      }
+    }
+    fetchAudio();
   }, []);
 
   const handleToggleAudio = async () => {
@@ -67,7 +84,7 @@ export default function Home() {
         audioRef.current.currentTime = 0;
       }
       await audioRef.current.play();
-    } catch (e) {
+    } catch {
       // Intentionally swallow to prevent console errors from autoplay policies
     }
   };
@@ -78,7 +95,7 @@ export default function Home() {
     <>
       <audio 
         id="global-audio" 
-        src="/import.mp3"
+        src={audioUrl}
         preload="auto" 
         onPlay={() => setAudioState("playing")}
         onPause={() => {

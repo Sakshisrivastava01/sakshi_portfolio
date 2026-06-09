@@ -40,18 +40,20 @@ export default function Certifications() {
         const { data } = await supabase.from("certifications").select("*").order("created_at", { ascending: false });
         if (data && data.length > 0) {
           // Map DB columns to frontend interface
-          const mapped = data.map((cert: any) => ({
-             title: cert.title,
-             issuer: cert.issuer,
+          type CertRow = { title?: string; issuer?: string; issue_date?: string; credential_id?: string; skills?: string[]; image_url?: string; verify_url?: string; pdf_url?: string; };
+          const mapped = data.map((cert: CertRow) => ({
+             title: cert.title || "Untitled",
+             issuer: cert.issuer || "Unknown Issuer",
              date: cert.issue_date || "2024",
-             credentialId: cert.credential_id,
+             credentialId: cert.credential_id || "",
              skills: cert.skills || [],
              image: cert.image_url || "/placeholders/cert-ai.jpg",
-             verifyLink: cert.verify_url || "#"
+             verifyLink: cert.verify_url || "#",
+             pdfUrl: cert.pdf_url || ""
           }));
           setCertificationsData(mapped);
         }
-      } catch (e) {
+      } catch (e: unknown) {
         console.error("Failed to fetch certifications from Supabase", e);
       }
     }

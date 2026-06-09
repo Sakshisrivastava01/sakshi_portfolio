@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState, useEffect } from "react";
@@ -29,7 +30,7 @@ export default function SkillsAdmin() {
     fetchSkills();
   }, []);
 
-  const fetchSkills = async () => {
+  async function fetchSkills() {
     if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
       setSkills(MOCK_SKILLS);
       setLoading(false);

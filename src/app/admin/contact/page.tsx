@@ -14,16 +14,18 @@ export default function ContactAdmin() {
   const [loading, setLoading] = useState(false);
   const [initialFetchDone, setInitialFetchDone] = useState(false);
 
-  useEffect(() => {
-    fetchContact();
-  }, []);
-
-  const fetchContact = async () => {
+  async function fetchContact() {
     if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) return;
     const { data } = await supabase.from("contact").select("*").single();
     if (data) setFormData(data);
     setInitialFetchDone(true);
   };
+
+  useEffect(() => {
+    // eslint-disable-next-line
+    fetchContact();
+  }, []);
+
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,9 +51,9 @@ export default function ContactAdmin() {
 
       if (error) throw error;
       toast.success("Contact info saved successfully!", { id: toastId });
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      toast.error(`Error: ${err.message}`, { id: toastId });
+      toast.error(`Error: ${(err as Error).message}`, { id: toastId });
     } finally {
       setLoading(false);
     }

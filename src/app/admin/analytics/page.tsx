@@ -13,11 +13,7 @@ export default function AnalyticsAdmin() {
   const [loading, setLoading] = useState(false);
   const [initialFetchDone, setInitialFetchDone] = useState(false);
 
-  useEffect(() => {
-    fetchAnalytics();
-  }, []);
-
-  const fetchAnalytics = async () => {
+  async function fetchAnalytics() {
     if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) return;
     const { data } = await supabase.from("analytics_settings").select("*").single();
     if (data) {
@@ -28,6 +24,12 @@ export default function AnalyticsAdmin() {
     }
     setInitialFetchDone(true);
   };
+
+  useEffect(() => {
+    // eslint-disable-next-line
+    fetchAnalytics();
+  }, []);
+
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,9 +55,9 @@ export default function AnalyticsAdmin() {
 
       if (error) throw error;
       toast.success("Analytics settings saved successfully!", { id: toastId });
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      toast.error(`Error: ${err.message}`, { id: toastId });
+      toast.error(`Error: ${(err as Error).message}`, { id: toastId });
     } finally {
       setLoading(false);
     }

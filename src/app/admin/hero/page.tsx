@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Save, User } from "lucide-react";
+import { Save } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import toast from "react-hot-toast";
 
@@ -15,16 +15,18 @@ export default function HeroAdmin() {
   const [loading, setLoading] = useState(false);
   const [initialFetchDone, setInitialFetchDone] = useState(false);
 
-  useEffect(() => {
-    fetchHero();
-  }, []);
-
-  const fetchHero = async () => {
+  async function fetchHero() {
     if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) return;
-    const { data, error } = await supabase.from("hero").select("*").single();
+    const { data } = await supabase.from("hero").select("*").single();
     if (data) setFormData(data);
     setInitialFetchDone(true);
   };
+
+  useEffect(() => {
+    // eslint-disable-next-line
+    fetchHero();
+  }, []);
+
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,9 +55,9 @@ export default function HeroAdmin() {
 
       if (error) throw error;
       toast.success("Hero section saved successfully!", { id: toastId });
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      toast.error(`Error: ${err.message}`, { id: toastId });
+      toast.error(`Error: ${(err as Error).message}`, { id: toastId });
     } finally {
       setLoading(false);
     }

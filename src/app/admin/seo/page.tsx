@@ -15,11 +15,7 @@ export default function SEOAdmin() {
   const [loading, setLoading] = useState(false);
   const [initialFetchDone, setInitialFetchDone] = useState(false);
 
-  useEffect(() => {
-    fetchSEO();
-  }, []);
-
-  const fetchSEO = async () => {
+  async function fetchSEO() {
     if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) return;
     const { data } = await supabase.from("seo_settings").select("*").single();
     if (data) {
@@ -32,6 +28,12 @@ export default function SEOAdmin() {
     }
     setInitialFetchDone(true);
   };
+
+  useEffect(() => {
+    // eslint-disable-next-line
+    fetchSEO();
+  }, []);
+
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,9 +64,9 @@ export default function SEOAdmin() {
 
       if (error) throw error;
       toast.success("SEO settings saved successfully!", { id: toastId });
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      toast.error(`Error: ${err.message}`, { id: toastId });
+      toast.error(`Error: ${(err as Error).message}`, { id: toastId });
     } finally {
       setLoading(false);
     }

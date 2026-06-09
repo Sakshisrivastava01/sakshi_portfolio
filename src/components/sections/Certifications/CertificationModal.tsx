@@ -1,8 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { X, Download, ExternalLink, ShieldCheck, CheckCircle2 } from "lucide-react";
-import Image from "next/image";
+import { X, Download, ShieldCheck, CheckCircle2 } from "lucide-react";
 import { useEffect } from "react";
 import { Certificate } from "./CertificationCard";
 
@@ -135,16 +134,18 @@ export default function CertificationModal({ cert, onClose }: CertificationModal
               Verify Credential
             </a>
             
-            <a
-              href={cert.image}
-              download
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full py-4 rounded-xl bg-white/5 text-white font-semibold hover:bg-white/10 border border-white/10 transition-colors text-center flex items-center justify-center gap-2"
-            >
-              <Download className="w-4 h-4" />
-              Download PDF
-            </a>
+            {cert.pdfUrl && (
+              <a
+                href={cert.pdfUrl}
+                download
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full py-4 rounded-xl bg-white/5 text-white font-semibold hover:bg-white/10 border border-white/10 transition-colors text-center flex items-center justify-center gap-2"
+              >
+                <Download className="w-4 h-4" />
+                Download PDF
+              </a>
+            )}
           </div>
         </div>
       </motion.div>

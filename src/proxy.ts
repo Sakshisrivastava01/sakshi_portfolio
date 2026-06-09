@@ -19,7 +19,7 @@ export default async function proxy(request: NextRequest) {
       await jwtVerify(sessionToken, new TextEncoder().encode(secret));
       // Token is valid, allow access
       return NextResponse.next();
-    } catch (error) {
+    } catch {
       // Token is invalid or expired
       return NextResponse.redirect(new URL("/admin/login", request.url));
     }

@@ -14,37 +14,44 @@ export default function AudioAdmin() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
+    async function fetchAudio() {
+      if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase.from("audio").select("*").single();
+        
+        if (error) {
+          if (error.code !== "PGRST116") { // Ignore no rows returned
+            toast.error("Failed to fetch audio.");
+          }
+        } else if (data) {
+          setAudioId(data.id);
+          setAudioUrl(data.audio_url);
+        }
+      } catch (err: unknown) {
+        console.error(err);
+        const e = err as { code?: string, message?: string };
+        if (e.code !== "PGRST116") { // Ignore no rows returned
+          toast.error("Failed to fetch audio.");
+        }
+      } finally {
+        setLoading(false);
+      }
+    }
+
     fetchAudio();
+    const currentAudio = audioRef.current;
     return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
+      if (currentAudio) {
+        currentAudio.pause();
       }
     };
   }, []);
 
-  const fetchAudio = async () => {
-    if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const { data, error } = await supabase.from("audio").select("*").single();
-      if (data) {
-        setAudioUrl(data.audio_url);
-        setAudioId(data.id);
-      }
-    } catch (err: any) {
-      console.error(err);
-      if (err.code !== "PGRST116") { // Ignore no rows returned
-        toast.error("Failed to fetch audio.");
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -72,7 +79,7 @@ export default function AudioAdmin() {
       const fileName = `audio-${Date.now()}.${fileExt}`;
       const filePath = `${fileName}`;
 
-      const { error: uploadError, data } = await supabase.storage.from('audio').upload(filePath, file);
+      const { error: uploadError } = await supabase.storage.from('audio').upload(filePath, file);
       
       if (uploadError) throw uploadError;
 
@@ -92,9 +99,9 @@ export default function AudioAdmin() {
 
       setAudioUrl(publicUrl);
       toast.success("Audio uploaded successfully!", { id: toastId });
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      toast.error(`Upload Error: ${err.message}`, { id: toastId });
+      toast.error(`Upload Error: ${(err as Error).message}`, { id: toastId });
     } finally {
       setUploading(false);
     }
@@ -116,9 +123,9 @@ export default function AudioAdmin() {
       setAudioUrl(null);
       setAudioId(null);
       toast.success("Audio deleted!", { id: toastId });
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      toast.error(`Delete Error: ${err.message}`, { id: toastId });
+      toast.error(`Delete Error: ${(err as Error).message}`, { id: toastId });
     }
   };
 

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { SignJWT, jwtVerify } from "jose";
 
 const getJwtSecretKey = () => {
@@ -26,7 +27,7 @@ export const verifyToken = async (token: string) => {
   try {
     const verified = await jwtVerify(token, getJwtSecretKey());
     return verified.payload;
-  } catch (error) {
+  } catch {
     return null;
   }
 };

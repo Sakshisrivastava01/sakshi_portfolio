@@ -2,7 +2,6 @@
 
 import { motion } from "framer-motion";
 import { ExternalLink, Award, Calendar } from "lucide-react";
-import Image from "next/image";
 
 export interface Certificate {
   title: string;
@@ -12,6 +11,7 @@ export interface Certificate {
   skills: string[];
   image: string;
   verifyLink: string;
+  pdfUrl?: string;
 }
 
 interface CertificationCardProps {

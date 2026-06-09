@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useMemo, useEffect, useState } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 
@@ -19,7 +19,7 @@ export default function Avatar({ isSpeaking }: AvatarProps) {
         setTexture(loadedTexture);
       },
       undefined,
-      (err) => {
+      () => {
         console.warn("Could not load /avatar.png. Using transparent fallback.");
         const canvas = document.createElement("canvas");
         canvas.width = 1;
@@ -52,7 +52,7 @@ export default function Avatar({ isSpeaking }: AvatarProps) {
           const source = audioCtx.createMediaElementSource(audioEl);
           source.connect(analyser);
           analyser.connect(audioCtx.destination);
-        } catch (e) {
+        } catch (e: unknown) {
           console.warn("Audio source might already be connected", e);
         }
 

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState, useEffect } from "react";
@@ -25,7 +26,7 @@ export default function SocialAdmin() {
     fetchSocials();
   }, []);
 
-  const fetchSocials = async () => {
+  async function fetchSocials() {
     if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
       setSocials(MOCK_SOCIALS);
       setLoading(false);
