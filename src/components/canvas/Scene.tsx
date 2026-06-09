@@ -1,11 +1,37 @@
 "use client";
 
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useLoader } from "@react-three/fiber";
 import { useMemo, useRef, Suspense } from "react";
 import * as THREE from "three";
+import { useTexture } from "@react-three/drei";
 
 interface SceneProps {
   isSpeaking: boolean;
+}
+
+// 1. High-Fidelity Galaxy
+function Galaxy() {
+  const texture = useTexture("/galaxy.png");
+  const meshRef = useRef<THREE.Mesh>(null);
+  
+  useFrame(({ clock }) => {
+    if (meshRef.current) {
+      meshRef.current.rotation.z = clock.getElapsedTime() * 0.01;
+    }
+  });
+
+  return (
+    <mesh ref={meshRef} position={[25, -20, -40]} rotation={[0, 0, 0]}>
+      <planeGeometry args={[100, 100]} />
+      <meshBasicMaterial 
+        map={texture} 
+        transparent 
+        opacity={0.8} 
+        blending={THREE.AdditiveBlending} 
+        depthWrite={false} 
+      />
+    </mesh>
+  );
 }
 
 // Helper functions for deterministic initialization outside of components
@@ -28,7 +54,7 @@ const generateStars = (count: number) => {
   return [pos, siz, blink];
 };
 
-// 1. Twinkling Stars
+// 2. Twinkling Stars
 function TwinklingStars({ count = 3000 }) {
   const pointsRef = useRef<THREE.Points>(null);
   const shaderMaterialRef = useRef<THREE.ShaderMaterial>(null);
@@ -70,19 +96,14 @@ function TwinklingStars({ count = 3000 }) {
             vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
             gl_Position = projectionMatrix * mvPosition;
             gl_PointSize = aSize * (300.0 / -mvPosition.z);
-            
-            // Random blinking effect
             vAlpha = 0.5 + 0.5 * sin(uTime * 2.0 + aBlinkOffset);
           }
         `}
         fragmentShader={`
           varying float vAlpha;
           void main() {
-            // Circular particle
             float dist = distance(gl_PointCoord, vec2(0.5));
             if (dist > 0.5) discard;
-            
-            // Soft glow
             float alpha = smoothstep(0.5, 0.1, dist) * vAlpha;
             gl_FragColor = vec4(1.0, 1.0, 1.0, alpha);
           }
@@ -95,28 +116,27 @@ function TwinklingStars({ count = 3000 }) {
 const generateAsteroids = (count: number) => {
   return Array.from({ length: count }, () => ({
     pos: new THREE.Vector3(
+      (Math.random() - 0.5) * 150,
       (Math.random() - 0.5) * 100,
-      (Math.random() - 0.5) * 100,
-      (Math.random() - 0.5) * 100 - 20
+      (Math.random() - 0.5) * 80 - 30
     ),
-    rot: new THREE.Vector3(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI),
+    rot: new THREE.Vector3(0, 0, Math.random() * Math.PI * 2),
     speed: new THREE.Vector3(
-      (Math.random() - 0.5) * 0.5,
-      (Math.random() - 0.5) * 0.5,
-      (Math.random() - 0.5) * 0.5
+      -10 - Math.random() * 15, // Move left rapidly
+      -5 - Math.random() * 10,  // Move down
+      (Math.random() - 0.5) * 5
     ),
     rotSpeed: new THREE.Vector3(
-      (Math.random() - 0.5) * 0.5,
-      (Math.random() - 0.5) * 0.5,
-      (Math.random() - 0.5) * 0.5
+      0, 0, (Math.random() - 0.5) * 1.5
     ),
-    scale: Math.random() * 0.5 + 0.1
+    scale: Math.random() * 4 + 2
   }));
 };
 
-// 2. Parallax Asteroids
-function Asteroids({ count = 100 }) {
+// 3. Realistic Falling Asteroids
+function Asteroids({ count = 15 }) {
   const meshRef = useRef<THREE.InstancedMesh>(null);
+  const texture = useTexture("/asteroid.png");
   
   const dummy = useMemo(() => new THREE.Object3D(), []);
   const asteroidData = useMemo(() => generateAsteroids(count), [count]);
@@ -125,21 +145,18 @@ function Asteroids({ count = 100 }) {
     if (!meshRef.current) return;
     
     asteroidData.forEach((data, i) => {
-      // Move
+      // Move diagonally
       data.pos.addScaledVector(data.speed, delta);
-      // Rotate
+      // Rotate slowly around Z axis (since it's a 2D plane)
       data.rot.addScaledVector(data.rotSpeed, delta);
       
       // Wrap around bounds
-      if (data.pos.x > 50) data.pos.x = -50;
-      if (data.pos.x < -50) data.pos.x = 50;
-      if (data.pos.y > 50) data.pos.y = -50;
-      if (data.pos.y < -50) data.pos.y = 50;
-      if (data.pos.z > 30) data.pos.z = -70;
-      if (data.pos.z < -70) data.pos.z = 30;
+      if (data.pos.x < -60) data.pos.x = 60 + Math.random() * 20;
+      if (data.pos.y < -50) data.pos.y = 50 + Math.random() * 20;
 
       dummy.position.copy(data.pos);
-      dummy.rotation.set(data.rot.x, data.rot.y, data.rot.z);
+      // Planes always face the camera, so we only rotate around Z
+      dummy.rotation.set(0, 0, data.rot.z);
       dummy.scale.set(data.scale, data.scale, data.scale);
       dummy.updateMatrix();
       meshRef.current!.setMatrixAt(i, dummy.matrix);
@@ -150,11 +167,12 @@ function Asteroids({ count = 100 }) {
 
   return (
     <instancedMesh ref={meshRef} args={[undefined, undefined, count]}>
-      <icosahedronGeometry args={[1, 0]} />
-      <meshStandardMaterial 
-        color="#1a1a24" 
-        roughness={0.8} 
-        metalness={0.2}
+      <planeGeometry args={[2, 2]} />
+      <meshBasicMaterial 
+        map={texture} 
+        transparent 
+        alphaTest={0.1}
+        depthWrite={false}
       />
     </instancedMesh>
   );
@@ -168,16 +186,16 @@ const generateComets = (count: number) => {
       -50 - Math.random() * 50
     ),
     velocity: new THREE.Vector3(
-      (Math.random() + 0.5) * 20, // Move right
-      (Math.random() - 0.5) * 10,
-      (Math.random() + 0.5) * 20  // Move forward
+      (Math.random() + 0.5) * 30, // Move right fast
+      (Math.random() - 0.5) * 15,
+      (Math.random() + 0.5) * 30  // Move forward fast
     ),
-    length: Math.random() * 10 + 5,
-    delay: Math.random() * 10
+    length: Math.random() * 15 + 10,
+    delay: Math.random() * 8
   }));
 };
 
-// 3. Comets / Shooting Stars
+// 4. Glowing Comets
 function Comets({ count = 5 }) {
   const groupRef = useRef<THREE.Group>(null);
   
@@ -188,7 +206,7 @@ function Comets({ count = 5 }) {
     return colors.map(c => new THREE.MeshBasicMaterial({ 
       color: c, 
       transparent: true, 
-      opacity: 0.8,
+      opacity: 0.9,
       blending: THREE.AdditiveBlending 
     }));
   }, []);
@@ -205,19 +223,18 @@ function Comets({ count = 5 }) {
       comet.position.addScaledVector(comet.velocity, delta);
       
       // Reset if out of bounds
-      if (comet.position.x > 50 || comet.position.z > 20 || comet.position.y > 50 || comet.position.y < -50) {
+      if (comet.position.x > 60 || comet.position.z > 20 || comet.position.y > 60 || comet.position.y < -60) {
         comet.position.set(
-          -50 - Math.random() * 20,
+          -60 - Math.random() * 20,
           (Math.random() - 0.5) * 100,
           -50 - Math.random() * 50
         );
-        comet.delay = Math.random() * 5;
+        comet.delay = Math.random() * 3;
       }
       
       const mesh = groupRef.current!.children[i] as THREE.Mesh;
       if (mesh) {
         mesh.position.copy(comet.position);
-        // Point the cylinder in the direction of velocity
         mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), comet.velocity.clone().normalize());
       }
     });
@@ -227,47 +244,10 @@ function Comets({ count = 5 }) {
     <group ref={groupRef}>
       {comets.map((comet, i) => (
         <mesh key={i} position={comet.position}>
-          <cylinderGeometry args={[0.05, 0.2, comet.length, 8]} />
+          <cylinderGeometry args={[0.08, 0.4, comet.length, 8]} />
           <primitive object={materials[i % materials.length]} attach="material" />
         </mesh>
       ))}
-    </group>
-  );
-}
-
-// 4. Nebula Clouds
-function NebulaClouds({ isSpeaking }: { isSpeaking: boolean }) {
-  const groupRef = useRef<THREE.Group>(null);
-  
-  useFrame(({ clock }) => {
-    if (groupRef.current) {
-      groupRef.current.rotation.y = clock.getElapsedTime() * 0.02;
-      groupRef.current.rotation.z = clock.getElapsedTime() * 0.01;
-    }
-  });
-
-  return (
-    <group ref={groupRef} position={[0, 0, -10]}>
-      {/* Dark Purple Cloud */}
-      <mesh position={[-15, 8, -10]}>
-        <sphereGeometry args={[20, 32, 32]} />
-        <meshBasicMaterial color="#12001F" transparent opacity={0.6} blending={THREE.AdditiveBlending} depthWrite={false} />
-      </mesh>
-      {/* Neon Purple Cloud */}
-      <mesh position={[15, -8, -15]}>
-        <sphereGeometry args={[25, 32, 32]} />
-        <meshBasicMaterial color="#9D4EDD" transparent opacity={0.2} blending={THREE.AdditiveBlending} depthWrite={false} />
-      </mesh>
-      {/* Neon Pink Cosmic Fog */}
-      <mesh position={[0, -12, -5]}>
-        <sphereGeometry args={[18, 32, 32]} />
-        <meshBasicMaterial color="#FF5EBE" transparent opacity={0.15} blending={THREE.AdditiveBlending} depthWrite={false} />
-      </mesh>
-      {/* Electric Blue Core */}
-      <mesh position={[0, 5, -20]}>
-        <sphereGeometry args={[30, 32, 32]} />
-        <meshBasicMaterial color="#4CC9F0" transparent opacity={isSpeaking ? 0.15 : 0.08} blending={THREE.AdditiveBlending} depthWrite={false} />
-      </mesh>
     </group>
   );
 }
@@ -279,17 +259,11 @@ export default function Scene({ isSpeaking }: SceneProps) {
       dpr={[1, 2]}
       gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
     >
-      {/* Cinematic Lighting */}
-      <ambientLight intensity={0.1} color="#12001F" />
-      <directionalLight position={[10, 20, 10]} intensity={1.5} color="#9D4EDD" />
-      <pointLight position={[-10, -10, -10]} intensity={2} color="#FF5EBE" />
-      <spotLight position={[0, 0, 10]} intensity={3} color="#4CC9F0" angle={0.5} penumbra={1} />
-
       <Suspense fallback={null}>
+        <Galaxy />
         <TwinklingStars count={4000} />
-        <Asteroids count={150} />
-        <Comets count={8} />
-        <NebulaClouds isSpeaking={isSpeaking} />
+        <Asteroids count={12} />
+        <Comets count={6} />
       </Suspense>
     </Canvas>
   );

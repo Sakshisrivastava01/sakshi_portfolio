@@ -1,20 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion, useMotionValue, useSpring, AnimatePresence } from "framer-motion";
+import { motion, useMotionValue, useSpring } from "framer-motion";
 
 export default function CustomCursor() {
   const [isVisible, setIsVisible] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
-  const [isClicking, setIsClicking] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const [clickRipples, setClickRipples] = useState<{ id: number; x: number; y: number }[]>([]);
 
-  // Instant tracking for the dot
+  // Instant tracking for the cursor
   const mouseX = useMotionValue(-100);
   const mouseY = useMotionValue(-100);
 
-  // Smooth springs for the ring
+  // Smooth springs for a slight trailing glow
   const smoothConfig = { damping: 20, stiffness: 400, mass: 0.2 };
   const smoothX = useSpring(mouseX, smoothConfig);
   const smoothY = useSpring(mouseY, smoothConfig);
@@ -46,30 +44,15 @@ export default function CustomCursor() {
       }
     };
 
-    const handleMouseDown = (e: MouseEvent) => {
-      setIsClicking(true);
-      // Add ripple
-      const newRipple = { id: Date.now(), x: e.clientX, y: e.clientY };
-      setClickRipples((prev) => [...prev, newRipple]);
-      setTimeout(() => {
-        setClickRipples((prev) => prev.filter((r) => r.id !== newRipple.id));
-      }, 300); // Remove after 300ms
-    };
-    
-    const handleMouseUp = () => setIsClicking(false);
     const handleMouseLeave = () => setIsVisible(false);
 
     window.addEventListener("mousemove", moveCursor);
     window.addEventListener("mouseover", handleMouseOver);
-    window.addEventListener("mousedown", handleMouseDown);
-    window.addEventListener("mouseup", handleMouseUp);
     document.addEventListener("mouseleave", handleMouseLeave);
 
     return () => {
       window.removeEventListener("mousemove", moveCursor);
       window.removeEventListener("mouseover", handleMouseOver);
-      window.removeEventListener("mousedown", handleMouseDown);
-      window.removeEventListener("mouseup", handleMouseUp);
       document.removeEventListener("mouseleave", handleMouseLeave);
     };
   }, [mouseX, mouseY, isVisible]);
@@ -78,62 +61,72 @@ export default function CustomCursor() {
 
   return (
     <>
-      {/* 6px Glowing White Dot (Instant Tracking) */}
+      {/* Soft Trailing Glow behind the cursor */}
       <motion.div
-        className="fixed top-0 left-0 w-1.5 h-1.5 bg-white rounded-full pointer-events-none z-[10000] shadow-[0_0_8px_rgba(255,255,255,0.8)]"
-        style={{
-          x: mouseX,
-          y: mouseY,
-          translateX: "-50%",
-          translateY: "-50%",
-          opacity: isVisible ? 1 : 0,
-        }}
-        animate={{
-          scale: isClicking ? 0.8 : (isHovering ? 0 : 1)
-        }}
-        transition={{ duration: 0.15 }}
-      />
-      
-      {/* Expanding Ring (Smooth Tracking) */}
-      <motion.div
-        className="fixed top-0 left-0 rounded-full pointer-events-none z-[9999]"
+        className="fixed top-0 left-0 rounded-full pointer-events-none z-[9998] mix-blend-screen"
         style={{
           x: smoothX,
           y: smoothY,
           translateX: "-50%",
           translateY: "-50%",
-          opacity: isVisible && isHovering ? 1 : 0,
+          opacity: isVisible && isHovering ? 0.8 : 0,
         }}
-        initial={{ width: 10, height: 10 }}
         animate={{
-          width: isHovering ? 48 : 10,
-          height: isHovering ? 48 : 10,
-          backgroundColor: isHovering ? "rgba(157, 78, 221, 0.1)" : "transparent",
-          border: isHovering ? "1px solid rgba(255, 94, 190, 0.5)" : "1px solid transparent",
-          boxShadow: isHovering ? "0 0 20px rgba(157, 78, 221, 0.3)" : "none",
+          width: isHovering ? 60 : 20,
+          height: isHovering ? 60 : 20,
+          background: isHovering ? "radial-gradient(circle, rgba(255, 94, 190, 0.4) 0%, rgba(157, 78, 221, 0) 70%)" : "transparent",
         }}
         transition={{ duration: 0.2, ease: "easeOut" }}
       />
 
-      {/* Click Ripples */}
-      <AnimatePresence>
-        {clickRipples.map((ripple) => (
-          <motion.div
-            key={ripple.id}
-            className="fixed top-0 left-0 rounded-full pointer-events-none z-[9998] border border-accent-pink/60 bg-accent-pink/10"
-            style={{
-              left: ripple.x,
-              top: ripple.y,
-              translateX: "-50%",
-              translateY: "-50%",
-            }}
-            initial={{ width: 10, height: 10, opacity: 0.8 }}
-            animate={{ width: 60, height: 60, opacity: 0 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
+      {/* Main Glowing Arrow Cursor */}
+      <motion.div
+        className="fixed top-0 left-0 pointer-events-none z-[10000]"
+        style={{
+          x: mouseX,
+          y: mouseY,
+          // Shift the visual center to the top-left tip of the arrow
+          translateX: "-4px",
+          translateY: "-4px",
+          opacity: isVisible ? 1 : 0,
+        }}
+        animate={{
+          scale: isHovering ? 1.15 : 1,
+          rotate: isHovering ? -10 : 0
+        }}
+        transition={{ duration: 0.15, ease: "easeOut" }}
+      >
+        <svg
+          width="28"
+          height="32"
+          viewBox="0 0 28 32"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          className="drop-shadow-[0_0_8px_rgba(255,94,190,0.8)]"
+        >
+          <defs>
+            <linearGradient id="cursorGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#FF5EBE" />
+              <stop offset="100%" stopColor="#9D4EDD" />
+            </linearGradient>
+            <filter id="glow">
+              <feGaussianBlur stdDeviation="1.5" result="coloredBlur"/>
+              <feMerge>
+                <feMergeNode in="coloredBlur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+          </defs>
+          <path
+            d="M2.5 2.5L10.5 29.5L14 18L25.5 14.5L2.5 2.5Z"
+            fill="url(#cursorGradient)"
+            stroke="white"
+            strokeWidth="1.5"
+            strokeLinejoin="round"
+            filter="url(#glow)"
           />
-        ))}
-      </AnimatePresence>
+        </svg>
+      </motion.div>
     </>
   );
 }
