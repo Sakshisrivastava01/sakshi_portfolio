@@ -48,6 +48,16 @@ export default function AudioAdmin() {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // Validation
+    if (!file.type.startsWith("audio/")) {
+      toast.error("Only audio files are allowed.");
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("File size must be less than 10MB.");
+      return;
+    }
+
     if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
       toast.error("Database not connected. Mock upload success.");
       setAudioUrl("/mock-intro.mp3");

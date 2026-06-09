@@ -138,6 +138,16 @@ export default function ProjectsAdmin() {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // Validation
+    if (!file.type.startsWith('image/')) {
+      toast.error("Only image files are allowed.");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("File size must be less than 5MB.");
+      return;
+    }
+
     if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
       toast.error("Database not connected. Mock upload success.");
       setFormData(prev => ({ ...prev, [type === 'image' ? 'image_url' : 'banner_url']: `/mock-${type}.jpg` }));

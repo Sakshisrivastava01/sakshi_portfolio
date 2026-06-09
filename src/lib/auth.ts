@@ -10,10 +10,16 @@ const getJwtSecretKey = () => {
 };
 
 export const signToken = async (payload: any) => {
-  return await new SignJWT(payload)
-    .setProtectedHeader({ alg: "HS256" })
+  return await new SignJWT({
+    ...payload,
+    role: "authenticated",
+    aud: "authenticated",
+    iss: "supabase",
+  })
+    .setProtectedHeader({ alg: "HS256", typ: "JWT" })
     .setIssuedAt()
-    .setExpirationTime("24h") // Session valid for 24 hours
+    .setSubject("admin-user")
+    .setExpirationTime("24h")
     .sign(getJwtSecretKey());
 };
 

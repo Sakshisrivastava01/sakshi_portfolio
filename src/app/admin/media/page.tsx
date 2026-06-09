@@ -54,6 +54,12 @@ export default function MediaAdmin() {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // Validation
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("File size must be less than 10MB.");
+      return;
+    }
+
     if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
       toast.error("Database not connected. Mock upload success.");
       setFiles([{ id: Date.now().toString(), name: file.name, metadata: { mimetype: file.type, size: file.size }, publicUrl: "" }, ...files]);

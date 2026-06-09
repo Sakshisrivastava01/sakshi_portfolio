@@ -95,6 +95,12 @@ export default function BackupAdmin() {
           const jsonStr = event.target?.result as string;
           const backupData = JSON.parse(jsonStr);
 
+          if (typeof backupData !== "object" || backupData === null) {
+            toast.error("Invalid backup format: root must be an object.", { id: toastId });
+            setImporting(false);
+            return;
+          }
+
           let successCount = 0;
           let failCount = 0;
 

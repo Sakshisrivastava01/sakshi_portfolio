@@ -41,6 +41,16 @@ export default function ResumeAdmin() {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // Validation
+    if (file.type !== "application/pdf") {
+      toast.error("Only PDF files are allowed.");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("File size must be less than 5MB.");
+      return;
+    }
+
     if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
       toast.error("Database not connected. Mock upload success.");
       setResumeUrl("/mock-resume.pdf");

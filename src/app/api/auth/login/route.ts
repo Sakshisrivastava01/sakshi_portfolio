@@ -23,7 +23,7 @@ export async function POST(req: Request) {
     response.cookies.set({
       name: "admin-session",
       value: token,
-      httpOnly: true,
+      httpOnly: false,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       maxAge: 60 * 60 * 24, // 24 hours
