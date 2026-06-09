@@ -1,21 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import SectionLayout from "./SectionLayout";
 import CertificationCard, { Certificate } from "./Certifications/CertificationCard";
 import CertificationModal from "./Certifications/CertificationModal";
 import { AnimatePresence } from "framer-motion";
+import { supabase } from "@/lib/supabase";
 
-// Upgraded certifications data
-const certificationsData: Certificate[] = [
+const FALLBACK_DATA: Certificate[] = [
   {
     title: "Python Course",
     issuer: "IIT Madras Pravartak GUVI",
     date: "2024",
     credentialId: "GUVI-PY-2024",
     skills: ["Python", "Problem Solving", "Algorithms"],
-    image: "/placeholders/cert-ai.jpg", // Replace with real thumbnail
-    verifyLink: "#", // Replace with real verify link
+    image: "/placeholders/cert-ai.jpg",
+    verifyLink: "#",
   },
   {
     title: "Data Structures and Algorithms in Java",
@@ -23,31 +23,40 @@ const certificationsData: Certificate[] = [
     date: "2024",
     credentialId: "AC-DSA-2024",
     skills: ["Java", "DSA", "Logic Building", "Time Complexity"],
-    image: "/placeholders/cert-ai.jpg", // Replace with real thumbnail
-    verifyLink: "#", // Replace with real verify link
-  },
-  {
-    title: "Generative AI with LangChain & Hugging Face",
-    issuer: "Udemy",
-    date: "2023",
-    credentialId: "UC-GenAI-2023",
-    skills: ["Generative AI", "LangChain", "Hugging Face", "LLMs"],
-    image: "/placeholders/cert-ai.jpg", // Replace with real thumbnail
-    verifyLink: "#", // Replace with real verify link
-  },
-  {
-    title: "AWS Academy Graduate",
-    issuer: "Cloud Foundations",
-    date: "2023",
-    credentialId: "AWS-CF-2023",
-    skills: ["AWS", "Cloud Architecture", "Deployment", "Networking"],
-    image: "/placeholders/cert-ai.jpg", // Replace with real thumbnail
-    verifyLink: "#", // Replace with real verify link
+    image: "/placeholders/cert-ai.jpg",
+    verifyLink: "#",
   }
 ];
 
 export default function Certifications() {
   const [selectedCert, setSelectedCert] = useState<Certificate | null>(null);
+  const [certificationsData, setCertificationsData] = useState<Certificate[]>(FALLBACK_DATA);
+
+  useEffect(() => {
+    async function fetchCerts() {
+      if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) return;
+      
+      try {
+        const { data } = await supabase.from("certifications").select("*").order("created_at", { ascending: false });
+        if (data && data.length > 0) {
+          // Map DB columns to frontend interface
+          const mapped = data.map((cert: any) => ({
+             title: cert.title,
+             issuer: cert.issuer,
+             date: cert.issue_date || "2024",
+             credentialId: cert.credential_id,
+             skills: cert.skills || [],
+             image: cert.image_url || "/placeholders/cert-ai.jpg",
+             verifyLink: cert.verify_url || "#"
+          }));
+          setCertificationsData(mapped);
+        }
+      } catch (e) {
+        console.error("Failed to fetch certifications from Supabase", e);
+      }
+    }
+    fetchCerts();
+  }, []);
 
   return (
     <SectionLayout id="certifications" title="Professional Certifications">
