@@ -6,6 +6,7 @@ import FirstImpressionExperience from "@/components/first-impression/FirstImpres
 import SectionLayout from "@/components/sections/SectionLayout";
 import TechnicalIntelligenceNetwork from "@/components/sections/TechnicalIntelligenceNetwork";
 import InnovationLab from "@/components/sections/InnovationLab";
+import Certifications from "@/components/sections/Certifications";
 import { motion, useInView, useMotionValue, useSpring } from "framer-motion";
 import { 
   GraduationCap, Database, Terminal, 
@@ -332,46 +333,7 @@ export default function Home() {
                 </SectionLayout>
 
                 {/* 7. CERTIFICATIONS SECTION */}
-                <SectionLayout id="certifications" title="Certifications">
-                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-                     {[
-                       { title: "Python Course", issuer: "IIT Madras Pravartak GUVI", date: "2024", highlight: "Advanced problem-solving techniques." },
-                       { title: "Data Structures and Algorithms in Java", issuer: "Apna College", date: "2024", highlight: "Mastered core CS foundations." },
-                       { title: "Generative AI with LangChain & Hugging Face", issuer: "Udemy", date: "2023", highlight: "Built custom LLM chains." },
-                       { title: "AWS Academy Graduate", issuer: "Cloud Foundations", date: "2023", highlight: "Cloud architecture & deployment." }
-                     ].map((cert, index) => (
-                       <motion.div 
-                         key={index}
-                         initial={{ opacity: 0, y: 20 }}
-                         whileInView={{ opacity: 1, y: 0 }}
-                         viewport={{ once: true, margin: "-50px" }}
-                         transition={{ duration: 0.6, delay: index * 0.1 }}
-                         className="relative group h-32 hover:h-48 transition-[height] duration-500 ease-out overflow-hidden p-8 rounded-3xl glass-panel border border-white/5 hover:border-accent-pink/50 flex flex-col justify-center"
-                       >
-                         {/* Ambient glow on hover */}
-                         <div className="absolute inset-0 bg-gradient-to-br from-accent-pink/0 to-accent-lavender/0 group-hover:from-accent-pink/10 group-hover:to-accent-lavender/10 transition-colors duration-500" />
-                         
-                         <div className="relative z-10 flex items-center gap-6">
-                           <div className="p-4 rounded-full bg-white/5 text-white group-hover:bg-accent-pink group-hover:text-black transition-colors shrink-0 shadow-[0_0_0_rgba(255,182,193,0)] group-hover:shadow-[0_0_20px_rgba(255,182,193,0.5)]">
-                             <Award className="w-6 h-6" />
-                           </div>
-                           <div>
-                             <h4 className="text-xl text-white font-semibold font-heading leading-tight">{cert.title}</h4>
-                             <p className="text-gray-400 text-sm font-medium tracking-wide uppercase mt-2 group-hover:text-accent-lavender transition-colors">{cert.issuer}</p>
-                           </div>
-                         </div>
-                         
-                         {/* Hidden details revealed on hover */}
-                         <div className="relative z-10 mt-6 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100 pl-[88px]">
-                           <div className="flex items-center gap-3 text-sm">
-                             <span className="px-2 py-1 rounded bg-white/10 text-white font-mono">{cert.date}</span>
-                             <span className="text-gray-300 font-light italic">{cert.highlight}</span>
-                           </div>
-                         </div>
-                       </motion.div>
-                     ))}
-                   </div>
-                </SectionLayout>
+                <Certifications />
 
                 {/* 8. EDUCATION SECTION */}
                 <SectionLayout id="education" title="Education">
