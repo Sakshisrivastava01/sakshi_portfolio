@@ -4,7 +4,7 @@ import "./globals.css";
 import CustomCursor from "@/components/layout/CustomCursor";
 import AmbientBackground from "@/components/layout/AmbientBackground";
 import ScrollIndicator from "@/components/layout/ScrollIndicator";
-import RecruiterPanel from "@/components/layout/RecruiterPanel";
+import TopNavBar from "@/components/layout/TopNavBar";
 import { Analytics } from "@vercel/analytics/react";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -39,7 +39,7 @@ export default function RootLayout({
         <CustomCursor />
         <AmbientBackground />
         <ScrollIndicator />
-        <RecruiterPanel />
+        <TopNavBar />
         {children}
         <Analytics />
       </body>

@@ -22,7 +22,7 @@ export default function FirstImpressionExperience({ audioState, currentTime, dur
   };
 
   return (
-    <section className="relative min-h-screen w-full flex items-center justify-center z-10 px-6 md:px-12 lg:px-24 pt-20 overflow-hidden">
+    <section id="home" className="relative min-h-screen w-full flex items-center justify-center z-10 px-6 md:px-12 lg:px-24 pt-20 overflow-hidden">
       
       {/* Central Content Area: Identity & Intro */}
       <div className="flex flex-col items-center text-center space-y-8 z-20 relative max-w-4xl mx-auto">
@@ -114,7 +114,16 @@ export default function FirstImpressionExperience({ audioState, currentTime, dur
             </div>
           </button>
 
-          <button className="px-8 py-4 rounded-full glass-panel hover:bg-white/10 transition-all duration-300 text-white flex items-center space-x-2 border border-white/5 hover:border-white/20">
+          <button 
+            onClick={() => document.getElementById('innovation-lab')?.scrollIntoView({ behavior: 'smooth' })}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                document.getElementById('innovation-lab')?.scrollIntoView({ behavior: 'smooth' });
+              }
+            }}
+            className="group relative z-50 cursor-pointer pointer-events-auto px-8 py-4 rounded-full glass-panel hover:bg-white/10 transition-all duration-300 text-white flex items-center space-x-2 border border-white/5 hover:border-white/20"
+          >
             <span>Explore My Work</span>
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </button>
