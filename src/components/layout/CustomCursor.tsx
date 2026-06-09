@@ -1,29 +1,25 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { motion, useMotionValue, useSpring, AnimatePresence } from "framer-motion";
 
 export default function CustomCursor() {
   const [isVisible, setIsVisible] = useState(false);
-  const [hoverState, setHoverState] = useState<"idle" | "button" | "view" | "open">("idle");
+  const [isHovering, setIsHovering] = useState(false);
   const [isClicking, setIsClicking] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [clickRipples, setClickRipples] = useState<{ id: number; x: number; y: number }[]>([]);
 
-  // Mouse position tracking
+  // Instant tracking for the dot
   const mouseX = useMotionValue(-100);
   const mouseY = useMotionValue(-100);
 
-  // Smooth springs for trailing elements
-  const springConfig = { damping: 25, stiffness: 300, mass: 0.5 };
-  const smoothX = useSpring(mouseX, springConfig);
-  const smoothY = useSpring(mouseY, springConfig);
-
-  // Particle tracking
-  const [rotation, setRotation] = useState(0);
-  const requestRef = useRef<number | undefined>(undefined);
+  // Smooth springs for the ring
+  const smoothConfig = { damping: 20, stiffness: 400, mass: 0.2 };
+  const smoothX = useSpring(mouseX, smoothConfig);
+  const smoothY = useSpring(mouseY, smoothConfig);
 
   useEffect(() => {
-    // Detect mobile / touch devices
     if (typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches) {
       setTimeout(() => setIsMobile(true), 0);
       return;
@@ -37,24 +33,29 @@ export default function CustomCursor() {
 
     const handleMouseOver = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      
-      // Determine hover state based on target attributes
-      if (target.closest('[data-cursor="view"]')) {
-        setHoverState("view");
-      } else if (target.closest('a')) {
-        setHoverState("open");
-      } else if (
+      if (
+        target.closest('a') || 
         target.closest('button') || 
         target.closest('[role="button"]') ||
+        target.closest('[data-cursor="view"]') ||
         target.tagName.toLowerCase() === "button"
       ) {
-        setHoverState("button");
+        setIsHovering(true);
       } else {
-        setHoverState("idle");
+        setIsHovering(false);
       }
     };
 
-    const handleMouseDown = () => setIsClicking(true);
+    const handleMouseDown = (e: MouseEvent) => {
+      setIsClicking(true);
+      // Add ripple
+      const newRipple = { id: Date.now(), x: e.clientX, y: e.clientY };
+      setClickRipples((prev) => [...prev, newRipple]);
+      setTimeout(() => {
+        setClickRipples((prev) => prev.filter((r) => r.id !== newRipple.id));
+      }, 300); // Remove after 300ms
+    };
+    
     const handleMouseUp = () => setIsClicking(false);
     const handleMouseLeave = () => setIsVisible(false);
 
@@ -73,129 +74,66 @@ export default function CustomCursor() {
     };
   }, [mouseX, mouseY, isVisible]);
 
-  // Orbit Animation Loop
-  useEffect(() => {
-    if (isMobile) return;
-    
-    const animateParticles = () => {
-      setRotation(prev => (prev + 2) % 360);
-      requestRef.current = requestAnimationFrame(animateParticles);
-    };
-    
-    requestRef.current = requestAnimationFrame(animateParticles);
-    
-    return () => {
-      if (requestRef.current) {
-        cancelAnimationFrame(requestRef.current);
-      }
-    };
-  }, [isMobile]);
-
   if (isMobile) return null;
-
-  // Determine styles based on hover state
-  const getOrbitStyles = () => {
-    if (hoverState === "view" || hoverState === "open") return { scale: 3.5, opacity: 0 };
-    if (hoverState === "button") return { scale: 0.8, backgroundColor: "rgba(255, 182, 193, 0.1)", borderColor: "rgba(255, 182, 193, 0.8)", boxShadow: "0 0 20px rgba(255, 182, 193, 0.5)" };
-    return { scale: 1, backgroundColor: "transparent", borderColor: "rgba(230, 230, 250, 0.4)", boxShadow: "none" };
-  };
-
-  const particles = [0, 72, 144, 216, 288];
 
   return (
     <>
-      {/* Tiny glowing white star core */}
+      {/* 6px Glowing White Dot (Instant Tracking) */}
       <motion.div
-        className="fixed top-0 left-0 w-1.5 h-1.5 bg-white rounded-full pointer-events-none z-[9999] shadow-[0_0_10px_rgba(255,255,255,1)]"
+        className="fixed top-0 left-0 w-1.5 h-1.5 bg-white rounded-full pointer-events-none z-[10000] shadow-[0_0_8px_rgba(255,255,255,0.8)]"
         style={{
           x: mouseX,
           y: mouseY,
           translateX: "-50%",
           translateY: "-50%",
           opacity: isVisible ? 1 : 0,
-          scale: hoverState === "view" || hoverState === "open" ? 0 : 1,
         }}
         animate={{
-          scale: isClicking ? 0.5 : (hoverState !== "idle" ? 0 : 1)
+          scale: isClicking ? 0.8 : (isHovering ? 0 : 1)
         }}
         transition={{ duration: 0.15 }}
       />
       
-      {/* Soft lavender orbit ring and hover states */}
+      {/* Expanding Ring (Smooth Tracking) */}
       <motion.div
-        className="fixed top-0 left-0 w-10 h-10 rounded-full pointer-events-none z-[9998] border border-accent-lavender/40 flex items-center justify-center backdrop-blur-[1px]"
+        className="fixed top-0 left-0 rounded-full pointer-events-none z-[9999]"
         style={{
           x: smoothX,
           y: smoothY,
           translateX: "-50%",
           translateY: "-50%",
-          opacity: isVisible ? 1 : 0,
+          opacity: isVisible && isHovering ? 1 : 0,
         }}
+        initial={{ width: 10, height: 10 }}
         animate={{
-          ...getOrbitStyles(),
-          scale: isClicking ? getOrbitStyles().scale * 0.8 : getOrbitStyles().scale,
+          width: isHovering ? 48 : 10,
+          height: isHovering ? 48 : 10,
+          backgroundColor: isHovering ? "rgba(157, 78, 221, 0.1)" : "transparent",
+          border: isHovering ? "1px solid rgba(255, 94, 190, 0.5)" : "1px solid transparent",
+          boxShadow: isHovering ? "0 0 20px rgba(157, 78, 221, 0.3)" : "none",
         }}
-        transition={{ duration: 0.2 }}
-      >
-        {/* Click cosmic pulse */}
-        <AnimatePresence>
-          {isClicking && (
-            <motion.div
-              initial={{ scale: 0.5, opacity: 0.8 }}
-              animate={{ scale: 2.5, opacity: 0 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.4, ease: "easeOut" }}
-              className="absolute inset-0 rounded-full border border-accent-pink/60 bg-accent-pink/10"
-            />
-          )}
-        </AnimatePresence>
-      </motion.div>
+        transition={{ duration: 0.2, ease: "easeOut" }}
+      />
 
-      {/* Orbiting Particles */}
-      <motion.div
-         className="fixed top-0 left-0 w-10 h-10 pointer-events-none z-[9999]"
-         style={{
-           x: smoothX,
-           y: smoothY,
-           translateX: "-50%",
-           translateY: "-50%",
-           opacity: isVisible && hoverState === "idle" ? 1 : 0,
-         }}
-      >
-        <div 
-          className="absolute inset-0"
-          style={{ transform: `rotate(${rotation}deg)` }}
-        >
-          {particles.map((angle, i) => (
-            <div
-              key={i}
-              className="absolute top-1/2 left-1/2 w-1 h-1 bg-accent-lavender rounded-full shadow-[0_0_5px_rgba(230,230,250,1)]"
-              style={{
-                transform: `translate(-50%, -50%) rotate(${angle}deg) translateY(-20px)`,
-              }}
-            />
-          ))}
-        </div>
-      </motion.div>
-
-      {/* Hover Text (VIEW / OPEN) */}
-      <motion.div
-        className="fixed top-0 left-0 pointer-events-none z-[10000] flex items-center justify-center font-mono text-[10px] tracking-widest font-bold text-black bg-white rounded-full px-3 py-1 shadow-[0_0_20px_rgba(255,255,255,0.8)]"
-        style={{
-          x: smoothX,
-          y: smoothY,
-          translateX: "-50%",
-          translateY: "-50%",
-        }}
-        initial={{ opacity: 0, scale: 0 }}
-        animate={{
-          opacity: (hoverState === "view" || hoverState === "open") && isVisible ? 1 : 0,
-          scale: (hoverState === "view" || hoverState === "open") ? (isClicking ? 0.9 : 1) : 0,
-        }}
-        transition={{ duration: 0.2 }}
-      >
-        {hoverState === "view" ? "VIEW ↗" : "OPEN ↗"}
-      </motion.div>
+      {/* Click Ripples */}
+      <AnimatePresence>
+        {clickRipples.map((ripple) => (
+          <motion.div
+            key={ripple.id}
+            className="fixed top-0 left-0 rounded-full pointer-events-none z-[9998] border border-accent-pink/60 bg-accent-pink/10"
+            style={{
+              left: ripple.x,
+              top: ripple.y,
+              translateX: "-50%",
+              translateY: "-50%",
+            }}
+            initial={{ width: 10, height: 10, opacity: 0.8 }}
+            animate={{ width: 60, height: 60, opacity: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+          />
+        ))}
+      </AnimatePresence>
     </>
   );
 }

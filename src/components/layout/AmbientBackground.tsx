@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 
 export default function AmbientBackground() {
   return (
-    <div className="fixed inset-0 z-[-1] overflow-hidden pointer-events-none bg-luxury-black">
+    <div className="fixed inset-0 z-[-1] overflow-hidden pointer-events-none" style={{ backgroundColor: "#050505" }}>
       {/* Pink Orb */}
       <motion.div
         animate={{
@@ -13,7 +13,7 @@ export default function AmbientBackground() {
           scale: [1, 1.2, 1],
         }}
         transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute top-0 left-1/4 w-[40vw] h-[40vw] bg-accent-pink rounded-full mix-blend-screen opacity-[0.03] filter blur-[100px]"
+        className="absolute top-0 left-1/4 w-[40vw] h-[40vw] bg-[#FF5EBE] rounded-full mix-blend-screen opacity-[0.03] filter blur-[100px]"
       />
       
       {/* Purple Orb */}
@@ -24,7 +24,7 @@ export default function AmbientBackground() {
           scale: [1, 1.3, 1],
         }}
         transition={{ duration: 30, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute top-1/3 right-1/4 w-[50vw] h-[50vw] bg-accent-purple rounded-full mix-blend-screen opacity-[0.03] filter blur-[120px]"
+        className="absolute top-1/3 right-1/4 w-[50vw] h-[50vw] bg-[#9D4EDD] rounded-full mix-blend-screen opacity-[0.03] filter blur-[120px]"
       />
       
       {/* Lavender Orb */}
@@ -35,7 +35,7 @@ export default function AmbientBackground() {
           scale: [1, 1.1, 1],
         }}
         transition={{ duration: 35, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute bottom-0 left-1/3 w-[60vw] h-[60vw] bg-accent-lavender rounded-full mix-blend-screen opacity-[0.02] filter blur-[150px]"
+        className="absolute bottom-0 left-1/3 w-[60vw] h-[60vw] bg-[#4CC9F0] rounded-full mix-blend-screen opacity-[0.02] filter blur-[150px]"
       />
       
       {/* Subtle Noise Texture for premium feel */}
