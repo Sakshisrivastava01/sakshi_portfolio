@@ -1,7 +1,7 @@
 "use client";
 
 import { Canvas, useFrame } from "@react-three/fiber";
-import { SoftShadows, Stars, Sparkles, Line } from "@react-three/drei";
+import { SoftShadows, Stars, Line } from "@react-three/drei";
 import { Suspense, useMemo, useRef } from "react";
 import * as THREE from "three";
 
@@ -167,15 +167,7 @@ export default function Scene({ isSpeaking }: SceneProps) {
         {/* New Constellations Layer */}
         <Constellations count={8} />
 
-        {/* Energy Particles / Cosmic Dust */}
-        <Sparkles 
-          count={400} 
-          scale={25} 
-          size={isSpeaking ? 4 : 2} 
-          speed={isSpeaking ? 0.8 : 0.2} 
-          opacity={isSpeaking ? 0.8 : 0.4}
-          color="#e0b0ff" // Lavender particles
-        />
+
         
         {/* Nebula Fog */}
         <NebulaClouds isSpeaking={isSpeaking} />
