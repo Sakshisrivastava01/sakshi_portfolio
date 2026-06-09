@@ -6,7 +6,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { 
   LayoutDashboard, User, Code2, Briefcase, 
   Award, GraduationCap, Trophy, Mail, 
-  FileText, Image as ImageIcon, Settings, LogOut
+  FileText, Image as ImageIcon, Settings, LogOut,
+  FolderKanban, Link as LinkIcon, Music, BarChart2
 } from "lucide-react";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -26,19 +27,22 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   };
 
   const navItems = [
-    { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
+    { name: "Overview", href: "/admin", icon: LayoutDashboard },
     { name: "Hero", href: "/admin/hero", icon: User },
     { name: "About", href: "/admin/about", icon: FileText },
     { name: "Skills", href: "/admin/skills", icon: Code2 },
     { name: "Experience", href: "/admin/experience", icon: Briefcase },
-    { name: "Projects", href: "/admin/projects", icon: LayoutDashboard },
+    { name: "Projects", href: "/admin/projects", icon: FolderKanban },
     { name: "Certifications", href: "/admin/certifications", icon: Award },
     { name: "Education", href: "/admin/education", icon: GraduationCap },
     { name: "Achievements", href: "/admin/achievements", icon: Trophy },
-    { name: "Contact & Social", href: "/admin/contact", icon: Mail },
+    { name: "Contact", href: "/admin/contact", icon: Mail },
     { name: "Resume", href: "/admin/resume", icon: FileText },
+    { name: "Social Links", href: "/admin/social", icon: LinkIcon },
+    { name: "Audio", href: "/admin/audio", icon: Music },
     { name: "Media Library", href: "/admin/media", icon: ImageIcon },
-    { name: "Settings", href: "/admin/settings", icon: Settings },
+    { name: "SEO Settings", href: "/admin/seo", icon: Settings },
+    { name: "Analytics", href: "/admin/analytics", icon: BarChart2 },
   ];
 
   return (
