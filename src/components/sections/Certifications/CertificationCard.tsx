@@ -47,12 +47,12 @@ export default function CertificationCard({ cert }: CertificationCardProps) {
         </div>
 
         {/* ======================= BACK SIDE ======================= */}
-        <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] [-webkit-backface-visibility:hidden] [transform:rotateY(180deg)] rounded-3xl bg-[#0A0A0F] border border-white/10 flex flex-col p-6 overflow-hidden">
+        <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] [-webkit-backface-visibility:hidden] [transform:rotateY(180deg)] [transform-style:preserve-3d] rounded-3xl bg-[#0A0A0F] border border-white/10 flex flex-col p-6 overflow-hidden">
           {/* Background Effects */}
           <div className="absolute inset-0 bg-gradient-to-t from-purple-900/20 to-transparent opacity-50 pointer-events-none" />
           
-          <div className="relative z-50 flex flex-col h-full gap-4">
-            {/* Header */}
+          <div className="relative z-50 flex flex-col h-full [transform:translateZ(50px)] pointer-events-auto" style={{ gap: "16px" }}>
+            {/* Header section */}
             <div className="flex-none">
               <h4 className="text-lg font-semibold text-white/90 mb-1 leading-tight">{cert.title}</h4>
               <p className="text-sm text-purple-400/80">{cert.issuer}</p>
@@ -63,7 +63,7 @@ export default function CertificationCard({ cert }: CertificationCardProps) {
 
             {/* Skills Tags */}
             <div className="flex-grow overflow-hidden relative">
-              <div className="absolute inset-0 overflow-y-auto custom-scrollbar pr-2 pb-2 flex flex-wrap gap-2 content-start">
+              <div className="absolute inset-0 overflow-y-auto custom-scrollbar flex flex-wrap content-start" style={{ gap: "8px" }}>
                 {cert.skills.map((skill, i) => (
                   <span 
                     key={i} 
@@ -75,15 +75,14 @@ export default function CertificationCard({ cert }: CertificationCardProps) {
               </div>
             </div>
 
-            {/* Actions (Vertical Mobile, Horizontal Desktop) */}
-            <div className="flex-none flex flex-col xl:flex-row gap-4 w-full mt-2">
+            {/* Actions (Vertical Mobile, Horizontal Desktop) - margin-top: auto aligns it at the bottom */}
+            <div className="flex-none flex flex-col xl:flex-row w-full mt-auto" style={{ gap: "16px" }}>
               {cert.verifyUrl && (
                 <a 
                   href={cert.verifyUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex-1 min-h-[44px] relative z-50 pointer-events-auto group/btn flex items-center justify-center gap-2 px-3 rounded-xl bg-purple-600/20 border border-purple-500/50 hover:bg-purple-600/40 text-purple-200 font-semibold text-[11px] xl:text-xs transition-all duration-300 hover:shadow-[0_0_20px_rgba(168,85,247,0.6)] whitespace-nowrap backdrop-blur-md"
-                  onClick={(e) => { e.stopPropagation(); }}
+                  className="flex-1 min-h-[44px] group/btn flex items-center justify-center gap-2 px-3 rounded-xl bg-purple-600/20 border border-purple-500/50 hover:bg-purple-600/40 text-purple-200 font-semibold text-[11px] xl:text-xs transition-all duration-300 hover:shadow-[0_0_20px_rgba(168,85,247,0.6)] whitespace-nowrap backdrop-blur-md"
                 >
                   <ExternalLink className="w-4 h-4 shrink-0 group-hover/btn:scale-110 transition-transform" />
                   <span className="truncate">Verify Certificate</span>
@@ -95,8 +94,7 @@ export default function CertificationCard({ cert }: CertificationCardProps) {
                   href={cert.imageUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex-1 min-h-[44px] relative z-50 pointer-events-auto group/btn flex items-center justify-center gap-2 px-3 rounded-xl bg-white/10 border border-white/20 hover:bg-white/20 text-white font-semibold text-[11px] xl:text-xs transition-all duration-300 hover:shadow-[0_0_20px_rgba(255,255,255,0.2)] whitespace-nowrap backdrop-blur-md"
-                  onClick={(e) => { e.stopPropagation(); }}
+                  className="flex-1 min-h-[44px] group/btn flex items-center justify-center gap-2 px-3 rounded-xl bg-white/10 border border-white/20 hover:bg-white/20 text-white font-semibold text-[11px] xl:text-xs transition-all duration-300 hover:shadow-[0_0_20px_rgba(255,255,255,0.2)] whitespace-nowrap backdrop-blur-md"
                 >
                   <ImageIcon className="w-4 h-4 shrink-0 group-hover/btn:scale-110 transition-transform" />
                   <span className="truncate">View Badge</span>
@@ -107,8 +105,7 @@ export default function CertificationCard({ cert }: CertificationCardProps) {
                 <a 
                   href={cert.pdfUrl}
                   download
-                  className="flex-1 min-h-[44px] relative z-50 pointer-events-auto group/btn flex items-center justify-center gap-2 px-3 rounded-xl bg-white/10 border border-white/20 hover:bg-white/20 text-white font-semibold text-[11px] xl:text-xs transition-all duration-300 hover:shadow-[0_0_20px_rgba(255,255,255,0.2)] whitespace-nowrap backdrop-blur-md"
-                  onClick={(e) => { e.stopPropagation(); }}
+                  className="flex-1 min-h-[44px] group/btn flex items-center justify-center gap-2 px-3 rounded-xl bg-white/10 border border-white/20 hover:bg-white/20 text-white font-semibold text-[11px] xl:text-xs transition-all duration-300 hover:shadow-[0_0_20px_rgba(255,255,255,0.2)] whitespace-nowrap backdrop-blur-md"
                 >
                   <Download className="w-4 h-4 shrink-0 group-hover/btn:-translate-y-0.5 transition-transform" />
                   <span className="truncate">Download PDF</span>
