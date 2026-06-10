@@ -14,7 +14,7 @@ export default function CertificationCard({ cert }: CertificationCardProps) {
       <div className="w-full h-full relative transition-all duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)] shadow-xl group-hover:shadow-[0_0_30px_rgba(168,85,247,0.4)] rounded-2xl">
         
         {/* ======================= FRONT SIDE ======================= */}
-        <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] [-webkit-backface-visibility:hidden] rounded-2xl overflow-hidden bg-[#0A0A0F] border border-white/10 flex flex-col items-center justify-center p-6 relative">
+        <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] [-webkit-backface-visibility:hidden] rounded-3xl overflow-hidden bg-[#0A0A0F] border border-white/10 flex flex-col items-center justify-center p-6 relative">
           {/* Neon Glow Background Effects */}
           <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-transparent to-pink-500/10 opacity-50 group-hover:opacity-100 transition-opacity duration-500" />
           <div className="absolute -top-24 -right-24 w-48 h-48 bg-purple-600/30 blur-[60px] rounded-full group-hover:bg-purple-500/40 transition-colors duration-500" />
@@ -47,13 +47,13 @@ export default function CertificationCard({ cert }: CertificationCardProps) {
         </div>
 
         {/* ======================= BACK SIDE ======================= */}
-        <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] [-webkit-backface-visibility:hidden] [transform:rotateY(180deg)] rounded-2xl bg-[#0A0A0F] border border-white/10 flex flex-col justify-between p-6 overflow-hidden">
+        <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] [-webkit-backface-visibility:hidden] [transform:rotateY(180deg)] rounded-3xl bg-[#0A0A0F] border border-white/10 flex flex-col p-6 overflow-hidden">
           {/* Background Effects */}
-          <div className="absolute inset-0 bg-gradient-to-t from-purple-900/20 to-transparent opacity-50" />
+          <div className="absolute inset-0 bg-gradient-to-t from-purple-900/20 to-transparent opacity-50 pointer-events-none" />
           
-          <div className="relative z-10 flex flex-col h-full">
+          <div className="relative z-50 flex flex-col h-full gap-4">
             {/* Header */}
-            <div className="mb-4">
+            <div className="flex-none">
               <h4 className="text-lg font-semibold text-white/90 mb-1 leading-tight">{cert.title}</h4>
               <p className="text-sm text-purple-400/80">{cert.issuer}</p>
               {cert.credentialId && (
@@ -62,12 +62,12 @@ export default function CertificationCard({ cert }: CertificationCardProps) {
             </div>
 
             {/* Skills Tags */}
-            <div className="mb-4 flex-grow overflow-hidden">
-              <div className="flex flex-wrap gap-2 max-h-full overflow-y-auto custom-scrollbar pr-1 pb-2">
+            <div className="flex-grow overflow-hidden relative">
+              <div className="absolute inset-0 overflow-y-auto custom-scrollbar pr-2 pb-2 flex flex-wrap gap-2 content-start">
                 {cert.skills.map((skill, i) => (
                   <span 
                     key={i} 
-                    className="text-[10px] sm:text-xs px-2 py-1 rounded-full bg-white/5 border border-purple-500/30 text-purple-200 hover:bg-purple-500/20 hover:border-purple-500/60 hover:shadow-[0_0_10px_rgba(168,85,247,0.4)] transition-all duration-300 whitespace-nowrap"
+                    className="text-[10px] sm:text-xs px-2 py-1 rounded-full bg-white/5 border border-purple-500/30 text-purple-200 hover:bg-purple-500/20 hover:border-purple-500/60 transition-all duration-300 whitespace-nowrap"
                   >
                     #{skill}
                   </span>
@@ -76,15 +76,16 @@ export default function CertificationCard({ cert }: CertificationCardProps) {
             </div>
 
             {/* Actions (Vertical Mobile, Horizontal Desktop) */}
-            <div className="flex flex-col xl:flex-row gap-2 mt-auto w-full">
+            <div className="flex-none flex flex-col xl:flex-row gap-4 w-full mt-2">
               {cert.verifyUrl && (
                 <a 
                   href={cert.verifyUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex-1 min-h-[40px] group/btn flex items-center justify-center gap-1.5 px-2 rounded-lg bg-purple-600/10 border border-purple-500/50 hover:bg-purple-600/20 text-purple-300 font-semibold text-[10px] xl:text-xs transition-all duration-300 hover:shadow-[0_0_15px_rgba(168,85,247,0.5)] whitespace-nowrap backdrop-blur-sm"
+                  className="flex-1 min-h-[44px] relative z-50 pointer-events-auto group/btn flex items-center justify-center gap-2 px-3 rounded-xl bg-purple-600/20 border border-purple-500/50 hover:bg-purple-600/40 text-purple-200 font-semibold text-[11px] xl:text-xs transition-all duration-300 hover:shadow-[0_0_20px_rgba(168,85,247,0.6)] whitespace-nowrap backdrop-blur-md"
+                  onClick={(e) => { e.stopPropagation(); }}
                 >
-                  <ExternalLink className="w-3.5 h-3.5 shrink-0 group-hover/btn:scale-110 transition-transform" />
+                  <ExternalLink className="w-4 h-4 shrink-0 group-hover/btn:scale-110 transition-transform" />
                   <span className="truncate">Verify Certificate</span>
                 </a>
               )}
@@ -94,9 +95,10 @@ export default function CertificationCard({ cert }: CertificationCardProps) {
                   href={cert.imageUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex-1 min-h-[40px] group/btn flex items-center justify-center gap-1.5 px-2 rounded-lg bg-white/5 border border-white/20 hover:bg-white/10 text-white font-semibold text-[10px] xl:text-xs transition-all duration-300 hover:shadow-[0_0_15px_rgba(255,255,255,0.1)] whitespace-nowrap backdrop-blur-md"
+                  className="flex-1 min-h-[44px] relative z-50 pointer-events-auto group/btn flex items-center justify-center gap-2 px-3 rounded-xl bg-white/10 border border-white/20 hover:bg-white/20 text-white font-semibold text-[11px] xl:text-xs transition-all duration-300 hover:shadow-[0_0_20px_rgba(255,255,255,0.2)] whitespace-nowrap backdrop-blur-md"
+                  onClick={(e) => { e.stopPropagation(); }}
                 >
-                  <ImageIcon className="w-3.5 h-3.5 shrink-0 group-hover/btn:scale-110 transition-transform" />
+                  <ImageIcon className="w-4 h-4 shrink-0 group-hover/btn:scale-110 transition-transform" />
                   <span className="truncate">View Badge</span>
                 </a>
               )}
@@ -105,9 +107,10 @@ export default function CertificationCard({ cert }: CertificationCardProps) {
                 <a 
                   href={cert.pdfUrl}
                   download
-                  className="flex-1 min-h-[40px] group/btn flex items-center justify-center gap-1.5 px-2 rounded-lg bg-white/5 border border-white/20 hover:bg-white/10 text-white font-semibold text-[10px] xl:text-xs transition-all duration-300 hover:shadow-[0_0_15px_rgba(255,255,255,0.1)] whitespace-nowrap backdrop-blur-md"
+                  className="flex-1 min-h-[44px] relative z-50 pointer-events-auto group/btn flex items-center justify-center gap-2 px-3 rounded-xl bg-white/10 border border-white/20 hover:bg-white/20 text-white font-semibold text-[11px] xl:text-xs transition-all duration-300 hover:shadow-[0_0_20px_rgba(255,255,255,0.2)] whitespace-nowrap backdrop-blur-md"
+                  onClick={(e) => { e.stopPropagation(); }}
                 >
-                  <Download className="w-3.5 h-3.5 shrink-0 group-hover/btn:-translate-y-0.5 transition-transform" />
+                  <Download className="w-4 h-4 shrink-0 group-hover/btn:-translate-y-0.5 transition-transform" />
                   <span className="truncate">Download PDF</span>
                 </a>
               )}
