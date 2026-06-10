@@ -83,7 +83,6 @@ export default function CertificationCard({ cert }: CertificationCardProps) {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex-1 min-h-[40px] group/btn flex items-center justify-center gap-1.5 px-2 rounded-lg bg-purple-600/10 border border-purple-500/50 hover:bg-purple-600/20 text-purple-300 font-semibold text-[10px] xl:text-xs transition-all duration-300 hover:shadow-[0_0_15px_rgba(168,85,247,0.5)] whitespace-nowrap backdrop-blur-sm"
-                  onClick={(e) => e.stopPropagation()}
                 >
                   <ExternalLink className="w-3.5 h-3.5 shrink-0 group-hover/btn:scale-110 transition-transform" />
                   <span className="truncate">Verify Certificate</span>
@@ -96,7 +95,6 @@ export default function CertificationCard({ cert }: CertificationCardProps) {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex-1 min-h-[40px] group/btn flex items-center justify-center gap-1.5 px-2 rounded-lg bg-white/5 border border-white/20 hover:bg-white/10 text-white font-semibold text-[10px] xl:text-xs transition-all duration-300 hover:shadow-[0_0_15px_rgba(255,255,255,0.1)] whitespace-nowrap backdrop-blur-md"
-                  onClick={(e) => e.stopPropagation()}
                 >
                   <ImageIcon className="w-3.5 h-3.5 shrink-0 group-hover/btn:scale-110 transition-transform" />
                   <span className="truncate">View Badge</span>
@@ -108,7 +106,6 @@ export default function CertificationCard({ cert }: CertificationCardProps) {
                   href={cert.pdfUrl}
                   download
                   className="flex-1 min-h-[40px] group/btn flex items-center justify-center gap-1.5 px-2 rounded-lg bg-white/5 border border-white/20 hover:bg-white/10 text-white font-semibold text-[10px] xl:text-xs transition-all duration-300 hover:shadow-[0_0_15px_rgba(255,255,255,0.1)] whitespace-nowrap backdrop-blur-md"
-                  onClick={(e) => e.stopPropagation()}
                 >
                   <Download className="w-3.5 h-3.5 shrink-0 group-hover/btn:-translate-y-0.5 transition-transform" />
                   <span className="truncate">Download PDF</span>
