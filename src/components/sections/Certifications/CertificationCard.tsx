@@ -8,6 +8,9 @@ interface CertificationCardProps {
 }
 
 export default function CertificationCard({ cert }: CertificationCardProps) {
+  // Special rule: Hide verify button for DSA with Java
+  const showVerifyButton = cert.id !== "1";
+
   return (
     <div className="group relative w-full h-[450px] perspective-1000 [perspective:1000px] cursor-pointer">
       {/* 3D Container */}
@@ -29,18 +32,11 @@ export default function CertificationCard({ cert }: CertificationCardProps) {
             <span className="text-xs text-white/80 font-medium tracking-wide">{cert.issuer}</span>
           </div>
 
-          {/* Center Graphic / Image Thumbnail */}
+          {/* Center Graphic - NO IMAGE ON FRONT */}
           <div className="relative w-32 h-32 mb-8 z-20 group-hover:scale-105 transition-transform duration-500">
             <div className="absolute inset-0 bg-gradient-to-tr from-purple-600 to-pink-600 rounded-2xl blur-lg opacity-50 group-hover:opacity-80 transition-opacity duration-500 animate-pulse" />
             <div className="relative w-full h-full bg-[#13131A] border border-white/20 rounded-2xl flex items-center justify-center shadow-inner overflow-hidden">
-               {cert.imageUrl ? (
-                 <div 
-                   className="absolute inset-0 bg-cover bg-center opacity-90 transition-transform duration-500 group-hover:scale-110" 
-                   style={{ backgroundImage: `url('${cert.imageUrl}')` }} 
-                 />
-               ) : (
-                 <Award className="w-16 h-16 text-purple-400 drop-shadow-[0_0_10px_rgba(168,85,247,0.8)]" />
-               )}
+               <Award className="w-16 h-16 text-purple-400 drop-shadow-[0_0_10px_rgba(168,85,247,0.8)]" />
             </div>
           </div>
 
@@ -84,9 +80,9 @@ export default function CertificationCard({ cert }: CertificationCardProps) {
 
             {/* Actions (Vertical Mobile, Horizontal Desktop) */}
             <div className="flex flex-col xl:flex-row gap-2 mt-auto w-full">
-              {cert.credentialUrl && (
+              {showVerifyButton && cert.verifyUrl && (
                 <a 
-                  href={cert.credentialUrl}
+                  href={cert.verifyUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex-1 min-h-[40px] group/btn flex items-center justify-center gap-1.5 px-2 rounded-lg bg-purple-600/10 border border-purple-500/50 hover:bg-purple-600/20 text-purple-300 font-semibold text-[10px] xl:text-xs transition-all duration-300 hover:shadow-[0_0_15px_rgba(168,85,247,0.5)] whitespace-nowrap backdrop-blur-sm"
@@ -97,26 +93,30 @@ export default function CertificationCard({ cert }: CertificationCardProps) {
                 </a>
               )}
               
-              <a 
-                href={cert.imageUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1 min-h-[40px] group/btn flex items-center justify-center gap-1.5 px-2 rounded-lg bg-white/5 border border-white/20 hover:bg-white/10 text-white font-semibold text-[10px] xl:text-xs transition-all duration-300 hover:shadow-[0_0_15px_rgba(255,255,255,0.1)] whitespace-nowrap backdrop-blur-md"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <ImageIcon className="w-3.5 h-3.5 shrink-0 group-hover/btn:scale-110 transition-transform" />
-                <span className="truncate">View Badge</span>
-              </a>
+              {cert.imageUrl && (
+                <a 
+                  href={cert.imageUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 min-h-[40px] group/btn flex items-center justify-center gap-1.5 px-2 rounded-lg bg-white/5 border border-white/20 hover:bg-white/10 text-white font-semibold text-[10px] xl:text-xs transition-all duration-300 hover:shadow-[0_0_15px_rgba(255,255,255,0.1)] whitespace-nowrap backdrop-blur-md"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <ImageIcon className="w-3.5 h-3.5 shrink-0 group-hover/btn:scale-110 transition-transform" />
+                  <span className="truncate">View Badge</span>
+                </a>
+              )}
 
-              <a 
-                href={cert.pdfUrl}
-                download
-                className="flex-1 min-h-[40px] group/btn flex items-center justify-center gap-1.5 px-2 rounded-lg bg-white/5 border border-white/20 hover:bg-white/10 text-white font-semibold text-[10px] xl:text-xs transition-all duration-300 hover:shadow-[0_0_15px_rgba(255,255,255,0.1)] whitespace-nowrap backdrop-blur-md"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <Download className="w-3.5 h-3.5 shrink-0 group-hover/btn:-translate-y-0.5 transition-transform" />
-                <span className="truncate">Download PDF</span>
-              </a>
+              {cert.pdfUrl && (
+                <a 
+                  href={cert.pdfUrl}
+                  download
+                  className="flex-1 min-h-[40px] group/btn flex items-center justify-center gap-1.5 px-2 rounded-lg bg-white/5 border border-white/20 hover:bg-white/10 text-white font-semibold text-[10px] xl:text-xs transition-all duration-300 hover:shadow-[0_0_15px_rgba(255,255,255,0.1)] whitespace-nowrap backdrop-blur-md"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <Download className="w-3.5 h-3.5 shrink-0 group-hover/btn:-translate-y-0.5 transition-transform" />
+                  <span className="truncate">Download PDF</span>
+                </a>
+              )}
             </div>
           </div>
         </div>
