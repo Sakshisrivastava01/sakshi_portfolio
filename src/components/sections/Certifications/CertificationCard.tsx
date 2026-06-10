@@ -1,17 +1,15 @@
 "use client";
 
-import { ExternalLink, Download, Award } from "lucide-react";
+import { ExternalLink, Download, Award, Image as ImageIcon } from "lucide-react";
 import { Certification } from "@/data/certifications";
-import Image from "next/image";
 
 interface CertificationCardProps {
   cert: Certification;
-  index: number;
 }
 
-export default function CertificationCard({ cert, index }: CertificationCardProps) {
+export default function CertificationCard({ cert }: CertificationCardProps) {
   return (
-    <div className="group relative w-full h-[400px] perspective-1000 [perspective:1000px] cursor-pointer">
+    <div className="group relative w-full h-[450px] perspective-1000 [perspective:1000px] cursor-pointer">
       {/* 3D Container */}
       <div className="w-full h-full relative transition-all duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)] shadow-xl group-hover:shadow-[0_0_30px_rgba(168,85,247,0.4)] rounded-2xl">
         
@@ -31,11 +29,18 @@ export default function CertificationCard({ cert, index }: CertificationCardProp
             <span className="text-xs text-white/80 font-medium tracking-wide">{cert.issuer}</span>
           </div>
 
-          {/* Center Graphic / Image Placeholder */}
+          {/* Center Graphic / Image Thumbnail */}
           <div className="relative w-32 h-32 mb-8 z-20 group-hover:scale-105 transition-transform duration-500">
             <div className="absolute inset-0 bg-gradient-to-tr from-purple-600 to-pink-600 rounded-2xl blur-lg opacity-50 group-hover:opacity-80 transition-opacity duration-500 animate-pulse" />
-            <div className="relative w-full h-full bg-[#13131A] border border-white/20 rounded-2xl flex items-center justify-center shadow-inner">
-               <Award className="w-16 h-16 text-purple-400 drop-shadow-[0_0_10px_rgba(168,85,247,0.8)]" />
+            <div className="relative w-full h-full bg-[#13131A] border border-white/20 rounded-2xl flex items-center justify-center shadow-inner overflow-hidden">
+               {cert.imageUrl ? (
+                 <div 
+                   className="absolute inset-0 bg-cover bg-center opacity-90 transition-transform duration-500 group-hover:scale-110" 
+                   style={{ backgroundImage: `url('${cert.imageUrl}')` }} 
+                 />
+               ) : (
+                 <Award className="w-16 h-16 text-purple-400 drop-shadow-[0_0_10px_rgba(168,85,247,0.8)]" />
+               )}
             </div>
           </div>
 
@@ -58,20 +63,18 @@ export default function CertificationCard({ cert, index }: CertificationCardProp
             <div className="mb-4">
               <h4 className="text-lg font-semibold text-white/90 mb-1 leading-tight">{cert.title}</h4>
               <p className="text-sm text-purple-400/80">{cert.issuer}</p>
-            </div>
-
-            {/* Recruiter Summary */}
-            <div className="mb-4 text-sm text-white/60 leading-relaxed font-light flex-grow">
-              Demonstrated expertise and hands-on proficiency in core concepts, validated through this official credential.
+              {cert.credentialId && (
+                 <p className="text-xs text-gray-400 mt-1 font-mono break-all">ID: {cert.credentialId}</p>
+              )}
             </div>
 
             {/* Skills Tags */}
-            <div className="mb-6">
-              <div className="flex flex-wrap gap-2 max-h-[100px] overflow-y-auto custom-scrollbar">
+            <div className="mb-4 flex-grow overflow-hidden">
+              <div className="flex flex-wrap gap-2 max-h-full overflow-y-auto custom-scrollbar pr-1 pb-2">
                 {cert.skills.map((skill, i) => (
                   <span 
                     key={i} 
-                    className="text-xs px-2.5 py-1 rounded-full bg-white/5 border border-purple-500/30 text-purple-200 hover:bg-purple-500/20 hover:border-purple-500/60 hover:shadow-[0_0_10px_rgba(168,85,247,0.4)] transition-all duration-300"
+                    className="text-[10px] sm:text-xs px-2 py-1 rounded-full bg-white/5 border border-purple-500/30 text-purple-200 hover:bg-purple-500/20 hover:border-purple-500/60 hover:shadow-[0_0_10px_rgba(168,85,247,0.4)] transition-all duration-300 whitespace-nowrap"
                   >
                     #{skill}
                   </span>
@@ -79,31 +82,41 @@ export default function CertificationCard({ cert, index }: CertificationCardProp
               </div>
             </div>
 
-            {/* Actions */}
-            <div className="flex flex-col gap-3 mt-auto">
-              {cert.verify_url && (
+            {/* Actions (Vertical Mobile, Horizontal Desktop) */}
+            <div className="flex flex-col xl:flex-row gap-2 mt-auto w-full">
+              {cert.credentialUrl && (
                 <a 
-                  href={cert.verify_url}
+                  href={cert.credentialUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full group/btn flex items-center justify-center gap-2 py-2.5 rounded-lg bg-purple-600/10 border border-purple-500/50 hover:bg-purple-600/20 text-purple-300 font-medium text-sm transition-all duration-300 hover:shadow-[0_0_15px_rgba(168,85,247,0.5)]"
+                  className="flex-1 min-h-[40px] group/btn flex items-center justify-center gap-1.5 px-2 rounded-lg bg-purple-600/10 border border-purple-500/50 hover:bg-purple-600/20 text-purple-300 font-semibold text-[10px] xl:text-xs transition-all duration-300 hover:shadow-[0_0_15px_rgba(168,85,247,0.5)] whitespace-nowrap backdrop-blur-sm"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <ExternalLink className="w-4 h-4 group-hover/btn:scale-110 transition-transform" />
-                  Verify Certificate
+                  <ExternalLink className="w-3.5 h-3.5 shrink-0 group-hover/btn:scale-110 transition-transform" />
+                  <span className="truncate">Verify Certificate</span>
                 </a>
               )}
-              {cert.pdf_url && (
-                <a 
-                  href={cert.pdf_url}
-                  download
-                  className="w-full group/btn flex items-center justify-center gap-2 py-2.5 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 text-white/80 font-medium text-sm backdrop-blur-md transition-all duration-300"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <Download className="w-4 h-4 group-hover/btn:-translate-y-0.5 transition-transform" />
-                  Download PDF
-                </a>
-              )}
+              
+              <a 
+                href={cert.imageUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 min-h-[40px] group/btn flex items-center justify-center gap-1.5 px-2 rounded-lg bg-white/5 border border-white/20 hover:bg-white/10 text-white font-semibold text-[10px] xl:text-xs transition-all duration-300 hover:shadow-[0_0_15px_rgba(255,255,255,0.1)] whitespace-nowrap backdrop-blur-md"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <ImageIcon className="w-3.5 h-3.5 shrink-0 group-hover/btn:scale-110 transition-transform" />
+                <span className="truncate">View Badge</span>
+              </a>
+
+              <a 
+                href={cert.pdfUrl}
+                download
+                className="flex-1 min-h-[40px] group/btn flex items-center justify-center gap-1.5 px-2 rounded-lg bg-white/5 border border-white/20 hover:bg-white/10 text-white font-semibold text-[10px] xl:text-xs transition-all duration-300 hover:shadow-[0_0_15px_rgba(255,255,255,0.1)] whitespace-nowrap backdrop-blur-md"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Download className="w-3.5 h-3.5 shrink-0 group-hover/btn:-translate-y-0.5 transition-transform" />
+                <span className="truncate">Download PDF</span>
+              </a>
             </div>
           </div>
         </div>

@@ -25,7 +25,6 @@ export default function Certifications() {
           <CertificationCard
             key={cert.id || index}
             cert={cert}
-            index={index}
           />
         ))}
       </div>
