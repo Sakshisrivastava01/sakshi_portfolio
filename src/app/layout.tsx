@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
-import CustomCursor from "@/components/layout/CustomCursor";
 import AmbientBackground from "@/components/layout/AmbientBackground";
 import ScrollIndicator from "@/components/layout/ScrollIndicator";
 import TopNavBar from "@/components/layout/TopNavBar";
@@ -35,8 +34,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className={`${inter.variable} ${spaceGrotesk.variable} bg-luxury-black text-foreground antialiased selection:bg-accent-glow selection:text-accent-pink`}>
-        <CustomCursor />
+      <body className={`${inter.variable} ${spaceGrotesk.variable} bg-luxury-black text-foreground antialiased selection:bg-accent-glow selection:text-accent-pink overflow-x-hidden w-full max-w-[100vw]`}>
         <AmbientBackground />
         <ScrollIndicator />
         <TopNavBar />

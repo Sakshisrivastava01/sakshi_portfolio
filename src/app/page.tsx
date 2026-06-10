@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from "react";
 import SmoothScroll from "@/components/layout/SmoothScroll";
 import FirstImpressionExperience from "@/components/first-impression/FirstImpressionExperience";
-import { supabase } from "@/lib/supabase";
 import SectionLayout from "@/components/sections/SectionLayout";
 import TechnicalIntelligenceNetwork from "@/components/sections/TechnicalIntelligenceNetwork";
 import InnovationLab from "@/components/sections/InnovationLab";
@@ -54,21 +53,6 @@ export default function Home() {
 
   useEffect(() => {
     audioRef.current = document.getElementById("global-audio") as HTMLAudioElement;
-  }, []);
-
-  useEffect(() => {
-    async function fetchAudio() {
-      if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) return;
-      try {
-        const { data } = await supabase.from("audio").select("audio_url").single();
-        if (data && data.audio_url) {
-          setAudioUrl(data.audio_url);
-        }
-      } catch (err: unknown) {
-        console.error("Error fetching audio intro from CMS:", err);
-      }
-    }
-    fetchAudio();
   }, []);
 
   const handleToggleAudio = async () => {
@@ -457,7 +441,7 @@ export default function Home() {
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
                       transition={{ duration: 1 }}
-                      className="glass-panel p-12 md:p-20 rounded-[3rem] border border-white/10 text-center relative overflow-hidden group hover:border-accent-pink/30 transition-colors duration-700"
+                      className="glass-panel p-8 md:p-20 rounded-[3rem] border border-white/10 text-center relative overflow-hidden group hover:border-accent-pink/30 transition-colors duration-700"
                     >
                       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-accent-glow rounded-full blur-[120px] opacity-10 group-hover:opacity-30 transition-opacity duration-1000 pointer-events-none" />
                       

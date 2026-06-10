@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Download } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { supabase } from "@/lib/supabase";
 
 const NAV_LINKS = [
   { label: "Home", href: "#home" },
@@ -25,55 +24,13 @@ export default function TopNavBar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [resumeUrl, setResumeUrl] = useState("/Sakshi_Srivastava_Resume.pdf");
   const router = useRouter();
-  const logoClickCount = useRef(0);
-  const logoClickTimer = useRef<NodeJS.Timeout | null>(null);
 
-  // Secret admin access: Ctrl+Shift+A
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.shiftKey && e.key === "A") {
-        e.preventDefault();
-        console.log("Ctrl+Shift+A detected! Redirecting to /admin/login...");
-        router.push("/admin/login");
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [router]);
-
-  // Secret admin access: 5-click logo
   const handleLogoClick = useCallback(() => {
-    logoClickCount.current += 1;
-    console.log(`Logo clicked. Current count: ${logoClickCount.current}`);
-    if (logoClickTimer.current) clearTimeout(logoClickTimer.current);
-    if (logoClickCount.current >= 5) {
-      console.log("5-click sequence detected! Redirecting to /admin/login...");
-      logoClickCount.current = 0;
-      router.push("/admin/login");
-      return;
-    }
-    logoClickTimer.current = setTimeout(() => {
-      // If fewer than 5 clicks, just scroll home
-      logoClickCount.current = 0;
-      scrollTo("#home");
-    }, 600);
+    scrollTo("#home");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router]);
 
-  useEffect(() => {
-    async function fetchResume() {
-      if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) return;
-      try {
-        const { data } = await supabase.from("resume").select("pdf_url").single();
-        if (data && data.pdf_url) {
-          setResumeUrl(data.pdf_url);
-        }
-      } catch (err: unknown) {
-        console.error("Error fetching resume URL from CMS:", err);
-      }
-    }
-    fetchResume();
-  }, []);
+
 
   useEffect(() => {
     const handleScroll = () => {
