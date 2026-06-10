@@ -14,7 +14,6 @@ export const certifications: Certification[] = [
     id: "1",
     title: "DSA with Java",
     issuer: "Apna College",
-    verify_url: "http://66a7cc80d84663336c0980cf/",
     skills: ["Java", "Data Structures", "Algorithms", "Problem Solving", "DSA"]
   },
   {
