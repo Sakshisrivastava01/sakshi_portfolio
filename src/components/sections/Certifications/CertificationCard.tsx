@@ -8,9 +8,6 @@ interface CertificationCardProps {
 }
 
 export default function CertificationCard({ cert }: CertificationCardProps) {
-  // Special rule: Hide verify button for DSA with Java
-  const showVerifyButton = cert.id !== "1";
-
   return (
     <div className="group relative w-full h-[450px] perspective-1000 [perspective:1000px] cursor-pointer">
       {/* 3D Container */}
@@ -80,7 +77,7 @@ export default function CertificationCard({ cert }: CertificationCardProps) {
 
             {/* Actions (Vertical Mobile, Horizontal Desktop) */}
             <div className="flex flex-col xl:flex-row gap-2 mt-auto w-full">
-              {showVerifyButton && cert.verifyUrl && (
+              {cert.verifyUrl && (
                 <a 
                   href={cert.verifyUrl}
                   target="_blank"
