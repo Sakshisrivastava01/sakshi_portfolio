@@ -1,7 +1,14 @@
 import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://dummy.supabase.co";
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "dummy-anon-key";
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://missing-url.supabase.co";
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "missing-key";
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.error(
+    "⚠️ CRITICAL: NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY is missing. " +
+    "The CMS and database integration will not function until these are set in your environment variables."
+  );
+}
 
 // Helper to get cookie on client side
 const getCookie = (name: string) => {

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Lock, ArrowRight, ShieldCheck } from "lucide-react";
+import { Lock, ArrowRight, ShieldCheck, ArrowLeft, Home } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function LoginPage() {
@@ -39,6 +39,15 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-[#050505] flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Top Left Back Button */}
+      <button 
+        onClick={() => router.push("/")}
+        className="fixed top-6 left-6 z-50 glass-panel px-4 py-2 rounded-full border border-white/10 flex items-center gap-2 text-white/80 hover:text-white hover:bg-white/5 transition-all"
+      >
+        <ArrowLeft className="w-4 h-4" />
+        <span className="text-sm font-medium">Back to Portfolio</span>
+      </button>
+
       {/* Background Ambient Glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-accent-purple/20 blur-[120px] rounded-full pointer-events-none" />
 
@@ -88,6 +97,17 @@ export default function LoginPage() {
             </button>
           </form>
 
+        </div>
+
+        {/* Home Link Below Card */}
+        <div className="mt-8 text-center">
+          <button 
+            onClick={() => router.push("/")}
+            className="text-gray-400 hover:text-white flex items-center justify-center gap-2 mx-auto transition-colors text-sm"
+          >
+            <Home className="w-4 h-4" />
+            Portfolio Home
+          </button>
         </div>
       </motion.div>
     </div>

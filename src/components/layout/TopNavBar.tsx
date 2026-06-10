@@ -17,7 +17,6 @@ const NAV_LINKS = [
   { label: "Achievements", href: "#achievements" },
   { label: "Education", href: "#education" },
   { label: "Contact", href: "#contact" },
-  { label: "Admin Dashboard", href: "/admin/login" },
 ];
 
 export default function TopNavBar() {

@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { motion, useMotionValue, AnimatePresence } from "framer-motion";
+import { useEffect, useState, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function CustomCursor() {
   const [isVisible, setIsVisible] = useState(false);
@@ -9,13 +9,8 @@ export default function CustomCursor() {
   const [hoverState, setHoverState] = useState<"idle" | "link" | "button" | "card">("idle");
   const [isClicking, setIsClicking] = useState(false);
 
-  // Instant tracking for the arrow
-  const mouseX = useMotionValue(-100);
-  const mouseY = useMotionValue(-100);
-
-  // Position for the floating label
-  const labelX = useMotionValue(-100);
-  const labelY = useMotionValue(-100);
+  const cursorRef = useRef<HTMLDivElement>(null);
+  const labelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Detect touch device
@@ -25,10 +20,13 @@ export default function CustomCursor() {
     }
 
     const moveCursor = (e: MouseEvent) => {
-      mouseX.set(e.clientX);
-      mouseY.set(e.clientY);
-      labelX.set(e.clientX + 25);
-      labelY.set(e.clientY + 25);
+      // Direct DOM mutation for zero-latency tracking
+      if (cursorRef.current) {
+        cursorRef.current.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;
+      }
+      if (labelRef.current) {
+        labelRef.current.style.transform = `translate3d(${e.clientX + 25}px, ${e.clientY + 25}px, 0)`;
+      }
 
       if (!isVisible) setIsVisible(true);
     };
@@ -68,7 +66,7 @@ export default function CustomCursor() {
       window.removeEventListener("mouseup", handleMouseUp);
       document.removeEventListener("mouseleave", handleMouseLeave);
     };
-  }, [mouseX, mouseY, labelX, labelY, isVisible]);
+  }, [isVisible]);
 
   if (isMobile) return null;
 
@@ -87,65 +85,71 @@ export default function CustomCursor() {
 
   return (
     <>
-      <motion.div
+      {/* Zero-latency positioning container */}
+      <div
+        ref={cursorRef}
         className="fixed top-0 left-0 pointer-events-none z-[9999]"
         style={{
-          x: mouseX,
-          y: mouseY,
-          // Minor negative translation so the tip of the arrow is perfectly on the actual mouse click point
-          translateX: "-2px", 
-          translateY: "-2px",
           opacity: isVisible ? 1 : 0,
+          willChange: "transform",
         }}
-        animate={{
-          scale: isClicking ? 0.9 : getCursorStyle().scale,
-          filter: getCursorStyle().filter
-        }}
-        transition={{ duration: 0.15, ease: "easeOut" }}
       >
-        <svg
-          width="20"
-          height="22"
-          viewBox="0 0 24 24"
-          fill="rgba(255, 255, 255, 0.9)"
-          stroke="white"
-          strokeWidth="1.5"
-          strokeLinejoin="round"
+        <motion.div
+          animate={{
+            scale: isClicking ? 0.9 : getCursorStyle().scale,
+            filter: getCursorStyle().filter
+          }}
+          transition={{ duration: 0.15, ease: "easeOut" }}
+          style={{
+            // Offset the tip so the 0,0 top-left perfectly aligns with the real mouse position
+            transform: "translate(-2px, -2px)",
+          }}
         >
-          {/* Classic premium arrow pointer shape */}
-          <path d="M5.5 3.5L18.5 10.5L12 13L9.5 19.5L5.5 3.5Z" />
-        </svg>
+          <svg
+            width="20"
+            height="22"
+            viewBox="0 0 24 24"
+            fill="rgba(255, 255, 255, 0.9)"
+            stroke="white"
+            strokeWidth="1.5"
+            strokeLinejoin="round"
+          >
+            <path d="M5.5 3.5L18.5 10.5L12 13L9.5 19.5L5.5 3.5Z" />
+          </svg>
 
-        {/* Instant Click Ripple Pulse */}
-        <AnimatePresence>
-          {isClicking && (
-            <motion.div
-              initial={{ scale: 0.8, opacity: 0.8 }}
-              animate={{ scale: 2.5, opacity: 0 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2, ease: "easeOut" }}
-              className="absolute inset-0 rounded-full border border-accent-pink/60 bg-accent-pink/10 mix-blend-screen"
-            />
-          )}
-        </AnimatePresence>
-      </motion.div>
+          {/* Instant Click Ripple Pulse */}
+          <AnimatePresence>
+            {isClicking && (
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0.8 }}
+                animate={{ scale: 2.5, opacity: 0 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2, ease: "easeOut" }}
+                className="absolute inset-0 rounded-full border border-accent-pink/60 bg-accent-pink/10 mix-blend-screen"
+              />
+            )}
+          </AnimatePresence>
+        </motion.div>
+      </div>
 
       {/* Floating Label for Cards */}
-      <motion.div
-        className="fixed top-0 left-0 pointer-events-none z-[10000] flex items-center justify-center font-mono text-[10px] tracking-widest font-bold text-black bg-white rounded-full px-3 py-1 shadow-[0_0_15px_rgba(255,255,255,0.5)]"
-        style={{
-          x: labelX,
-          y: labelY,
-        }}
-        initial={{ opacity: 0, scale: 0 }}
-        animate={{
-          opacity: hoverState === "card" && isVisible ? 1 : 0,
-          scale: hoverState === "card" ? 1 : 0.8,
-        }}
-        transition={{ duration: 0.2 }}
+      <div
+        ref={labelRef}
+        className="fixed top-0 left-0 pointer-events-none z-[10000]"
+        style={{ willChange: "transform" }}
       >
-        VIEW ↗
-      </motion.div>
+        <motion.div
+          className="flex items-center justify-center font-mono text-[10px] tracking-widest font-bold text-black bg-white rounded-full px-3 py-1 shadow-[0_0_15px_rgba(255,255,255,0.5)]"
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{
+            opacity: hoverState === "card" && isVisible ? 1 : 0,
+            scale: hoverState === "card" ? 1 : 0.8,
+          }}
+          transition={{ duration: 0.2 }}
+        >
+          VIEW ↗
+        </motion.div>
+      </div>
     </>
   );
 }
