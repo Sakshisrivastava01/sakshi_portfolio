@@ -136,53 +136,49 @@ export default function CompetitiveProgramming() {
               </div>
             </div>
 
-            <div className="flex flex-wrap gap-4 md:gap-8 lg:ml-auto">
-              <div className="space-y-1">
-                <div className="text-gray-500 text-xs uppercase tracking-wider font-semibold">Problems Solved</div>
-                <div className="text-2xl font-bold text-white">
-                  {loading && !lc ? '...' : lc?.solved || 0}
-                </div>
-              </div>
-              <div className="space-y-1">
-                <div className="text-gray-500 text-xs uppercase tracking-wider font-semibold">Contest Rating</div>
-                <div className="text-2xl font-bold text-white">
-                  {loading && !lc ? '...' : lc?.rating || 0}
-                </div>
-              </div>
-              <div className="space-y-1">
-                <div className="text-gray-500 text-xs uppercase tracking-wider font-semibold">Global Rank</div>
-                <div className="text-2xl font-bold text-[#ffa116]">
-                  {loading && !lc ? '...' : lc?.rank || 'N/A'}
-                </div>
-              </div>
-              <div className="space-y-1">
-                <div className="text-gray-500 text-xs uppercase tracking-wider font-semibold">Contests</div>
-                <div className="text-2xl font-bold text-white">
-                  {loading && !lc ? '...' : lc?.contestCount || 0}
-                </div>
-              </div>
-            </div>
-
             <button 
               onClick={() => fetchData(true)}
               disabled={loading}
-              className="mt-4 lg:mt-0 flex items-center gap-2 px-6 py-3 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#ffa116]/50 transition-all duration-300 text-white font-medium disabled:opacity-50 group/btn shrink-0"
+              className="mt-4 lg:mt-0 flex items-center gap-2 px-6 py-3 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#ffa116]/50 transition-all duration-300 text-white font-medium disabled:opacity-50 group/btn shrink-0 lg:ml-auto"
             >
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-[#ffa116]' : 'group-hover/btn:rotate-180 transition-transform duration-500'}`} />
-              {loading ? 'Syncing...' : 'Sync LeetCode'}
+              {loading ? 'Syncing...' : 'Refresh LeetCode Stats'}
             </button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
-          {/* Rating Progression Graph */}
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="glass-panel p-6 md:p-8 rounded-3xl border border-white/5 lg:col-span-2"
-          >
+        {/* Hero Statistics Row */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="glass-panel p-6 md:p-8 rounded-3xl border border-white/5 hover:border-[#ffa116]/30 transition-all duration-300 relative overflow-hidden group">
+             <div className="absolute inset-0 bg-gradient-to-br from-[#ffa116]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+             <div className="text-gray-400 text-xs uppercase tracking-widest font-semibold mb-2 relative z-10">Problems Solved</div>
+             <div className="text-4xl font-bold font-heading text-white relative z-10">{loading && !lc ? '...' : lc?.solved || 0}</div>
+          </div>
+          <div className="glass-panel p-6 md:p-8 rounded-3xl border border-white/5 hover:border-accent-pink/30 transition-all duration-300 relative overflow-hidden group">
+             <div className="absolute inset-0 bg-gradient-to-br from-accent-pink/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+             <div className="text-gray-400 text-xs uppercase tracking-widest font-semibold mb-2 relative z-10">Contest Rating</div>
+             <div className="text-4xl font-bold font-heading text-[#ffa116] relative z-10">{loading && !lc ? '...' : lc?.rating || 0}</div>
+          </div>
+          <div className="glass-panel p-6 md:p-8 rounded-3xl border border-white/5 hover:border-accent-purple/30 transition-all duration-300 relative overflow-hidden group">
+             <div className="absolute inset-0 bg-gradient-to-br from-accent-purple/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+             <div className="text-gray-400 text-xs uppercase tracking-widest font-semibold mb-2 relative z-10">Global Percentile</div>
+             <div className="text-4xl font-bold font-heading text-white relative z-10">{loading && !lc ? '...' : lc?.rank || 'N/A'}</div>
+          </div>
+          <div className="glass-panel p-6 md:p-8 rounded-3xl border border-white/5 hover:border-blue-400/30 transition-all duration-300 relative overflow-hidden group">
+             <div className="absolute inset-0 bg-gradient-to-br from-blue-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+             <div className="text-gray-400 text-xs uppercase tracking-widest font-semibold mb-2 relative z-10">Contests Participated</div>
+             <div className="text-4xl font-bold font-heading text-white relative z-10">{loading && !lc ? '...' : lc?.contestCount || 0}</div>
+          </div>
+        </div>
+
+
+        {/* Rating Progression Graph */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="glass-panel p-6 md:p-8 rounded-3xl border border-white/5 w-full"
+        >
             <h4 className="text-xl font-bold font-heading text-white mb-6 flex items-center gap-2">
               <TrendingUp className="text-[#ffa116]" /> Rating Progression
             </h4>
@@ -217,45 +213,48 @@ export default function CompetitiveProgramming() {
             </div>
           </motion.div>
 
-          {/* Recent Contests */}
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="glass-panel p-6 md:p-8 rounded-3xl border border-white/5 flex flex-col"
-          >
-            <h4 className="text-xl font-bold font-heading text-white mb-6 flex items-center gap-2">
-              <Trophy className="text-accent-pink" /> Recent Contests
-            </h4>
-            <div className="space-y-4 flex-grow overflow-y-auto pr-2 custom-scrollbar">
-              {recentContests.length > 0 ? (
-                recentContests.map((h, i) => (
-                  <div key={i} className="p-4 rounded-xl bg-white/5 border border-white/5 hover:border-accent-pink/30 transition-colors">
-                    <div className="flex justify-between items-start mb-2">
-                      <h5 className="font-semibold text-white text-sm line-clamp-1" title={h.contest.title}>{h.contest.title}</h5>
-                      <span className="text-xs text-gray-400 whitespace-nowrap ml-2">
+        {/* Recent Contests */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="w-full"
+        >
+          <h4 className="text-xl font-bold font-heading text-white mb-6 flex items-center gap-2">
+            <Trophy className="text-accent-pink" /> Recent Contests
+          </h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {recentContests.length > 0 ? (
+              recentContests.map((h, i) => (
+                <div key={i} className="glass-panel p-6 rounded-2xl border border-white/5 hover:border-accent-pink/30 transition-all duration-300 relative overflow-hidden group/contest">
+                  <div className="absolute inset-0 bg-gradient-to-br from-accent-pink/5 to-transparent opacity-0 group-hover/contest:opacity-100 transition-opacity duration-500" />
+                  <div className="relative z-10 flex flex-col h-full justify-between">
+                    <div>
+                      <span className="text-xs text-gray-400 mb-2 block">
                         {new Date(h.contest.startTime * 1000).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
                       </span>
+                      <h5 className="font-bold font-heading text-white text-base line-clamp-2 mb-4" title={h.contest.title}>{h.contest.title}</h5>
                     </div>
-                    <div className="flex justify-between items-center mt-3">
-                      <span className="text-xs px-2 py-1 rounded bg-white/10 text-gray-300">
-                        Rank: <strong className="text-white">{h.ranking}</strong>
-                      </span>
-                      <span className="text-xs px-2 py-1 rounded bg-[#ffa116]/10 text-[#ffa116]">
-                        Rating: <strong>{Math.round(h.rating)}</strong>
-                      </span>
+                    <div className="flex justify-between items-center pt-4 border-t border-white/5">
+                      <div className="flex flex-col">
+                        <span className="text-[10px] text-gray-500 uppercase tracking-wider">Rank</span>
+                        <span className="font-semibold text-white">{h.ranking}</span>
+                      </div>
+                      <div className="flex flex-col text-right">
+                        <span className="text-[10px] text-gray-500 uppercase tracking-wider">Rating</span>
+                        <span className="font-semibold text-[#ffa116]">{Math.round(h.rating)}</span>
+                      </div>
                     </div>
                   </div>
-                ))
-              ) : (
-                <div className="flex items-center justify-center h-full text-gray-500">
-                  {loading ? 'Loading contests...' : 'No recent contests.'}
                 </div>
-              )}
-            </div>
-          </motion.div>
-
-        </div>
+              ))
+            ) : (
+              <div className="col-span-1 md:col-span-2 lg:col-span-4 flex items-center justify-center py-12 text-gray-500 glass-panel rounded-2xl border border-white/5">
+                {loading ? 'Loading contests...' : 'No recent contests.'}
+              </div>
+            )}
+          </div>
+        </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           
@@ -267,10 +266,10 @@ export default function CompetitiveProgramming() {
             className="glass-panel p-6 md:p-8 rounded-3xl border border-white/5 lg:col-span-2 overflow-x-auto"
           >
             <h4 className="text-xl font-bold font-heading text-white mb-6 flex items-center gap-2">
-              <Activity className="text-green-400" /> Submission Heatmap
+              <Activity className="text-[#ffa116]" /> Consistency Tracker
             </h4>
-            <div className="min-w-[700px]">
-              <div className="grid grid-rows-7 grid-flow-col gap-[3px]">
+            <div className="min-w-[1040px] overflow-x-auto pb-4">
+              <div className="grid grid-rows-7 grid-flow-col gap-[4px]">
                 {heatmapData.map((count, i) => {
                   let colorClass = 'bg-white/5';
                   if (count > 0 && count <= 2) colorClass = 'bg-[#ffa116]/40';
@@ -280,19 +279,19 @@ export default function CompetitiveProgramming() {
                   return (
                     <div 
                       key={i} 
-                      className={`w-3 h-3 rounded-sm ${colorClass} hover:ring-1 hover:ring-white transition-all cursor-pointer`}
+                      className={`w-4 h-4 rounded-sm ${colorClass} hover:ring-1 hover:ring-white transition-all cursor-pointer`}
                       title={`${count} submissions`}
                     />
                   );
                 })}
               </div>
-              <div className="flex justify-end items-center gap-2 mt-4 text-xs text-gray-500">
+              <div className="flex justify-end items-center gap-2 mt-6 text-xs text-gray-400">
                 <span>Less</span>
-                <div className="flex gap-[3px]">
-                  <div className="w-3 h-3 rounded-sm bg-white/5" />
-                  <div className="w-3 h-3 rounded-sm bg-[#ffa116]/40" />
-                  <div className="w-3 h-3 rounded-sm bg-[#ffa116]/70" />
-                  <div className="w-3 h-3 rounded-sm bg-[#ffa116]" />
+                <div className="flex gap-[4px]">
+                  <div className="w-4 h-4 rounded-sm bg-white/5" />
+                  <div className="w-4 h-4 rounded-sm bg-[#ffa116]/40" />
+                  <div className="w-4 h-4 rounded-sm bg-[#ffa116]/70" />
+                  <div className="w-4 h-4 rounded-sm bg-[#ffa116]" />
                 </div>
                 <span>More</span>
               </div>

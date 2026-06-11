@@ -2,9 +2,9 @@
 
 <div align="center">
 
-### Backend Developer • AI/ML Enthusiast • Cybersecurity Learner
+### Backend Developer • AI/ML Enthusiast
 
-A modern, production-grade developer portfolio showcasing software engineering projects, technical expertise, certifications, and a continuous learning journey in Backend Systems, Artificial Intelligence, and Cybersecurity.
+A modern, production-grade developer portfolio showcasing software engineering projects, backend systems, artificial intelligence solutions, machine learning applications, certifications, and technical achievements.
 
 <p>
   <a href="https://sakshi-portfolio-delta-eight.vercel.app">
@@ -36,15 +36,15 @@ A modern, production-grade developer portfolio showcasing software engineering p
 
 ## 🎯 Overview
 
-This repository houses the source code for my professional portfolio. Engineered with a focus on **impact, performance, and scalability**, the application serves as a dynamic resume. It highlights my technical journey spanning **Backend Development, Machine Learning algorithms, Cybersecurity principles, and general Software Engineering**.
+This repository houses the source code for my professional portfolio. Engineered with a focus on **impact, performance, and scalable applications**, the application serves as a dynamic resume. It highlights my technical journey spanning **Backend Development, Artificial Intelligence, Machine Learning, and overall Software Engineering**. With a strong foundation in **Data Structures and Algorithms** and **Database Management Systems**, I focus on robust problem solving to build highly efficient and resilient applications using tools like **Java**, **Spring Boot**, and **REST APIs**.
 
 ---
 
 ## 🚀 Key Highlights
 
-- **📱 Responsive Design**: Seamless viewing experience across mobile, tablet, and desktop viewports.
+- **⚙️ Scalable Backend Systems**: Demonstrating robust architecture and API design using enterprise-level technologies.
+- **🤖 AI/ML Projects**: Showcasing practical applications of Artificial Intelligence and Machine Learning models.
 - **⚡ Performance Optimization**: Optimized image loading, caching, and server-side rendering for superior Core Web Vitals.
-- **♿ Accessibility (a11y)**: Semantic HTML and ARIA attributes for inclusive web access.
 - **🎨 Modern UI/UX**: Clean layout featuring sleek typography, intuitive navigation, and smooth animations.
 - **🛠️ Type Safety**: End-to-end type safety using strict TypeScript configurations.
 - **☁️ Production Deployment**: Automated CI/CD pipeline integrated with Vercel for zero-downtime deployments.
@@ -68,7 +68,7 @@ The portfolio is built following modern web development best practices:
 | Domain | Technologies |
 | :--- | :--- |
 | **Framework** | Next.js 15 (App Router), React 19 |
-| **Language** | TypeScript |
+| **Language** | TypeScript, Java |
 | **Styling** | Tailwind CSS, PostCSS |
 | **Linting/Formatting** | ESLint |
 | **Deployment** | Vercel |
@@ -115,14 +115,14 @@ sakshi_portfolio/
 
 ---
 
-## 📫 Contact & Connect
+## 📫 Backend Developer | AI/ML Enthusiast
 
 Feel free to reach out for collaborations, software engineering opportunities, or technical discussions!
 
 - 🌐 **Portfolio**: [sakshi-portfolio-delta-eight.vercel.app](https://sakshi-portfolio-delta-eight.vercel.app)
 - 🐙 **GitHub**: [@Sakshisrivastava01](https://github.com/Sakshisrivastava01)
-- 💼 **LinkedIn**: [Sakshi Srivastava](https://linkedin.com/in/sakshisrivastava01) <!-- Update with actual link if different -->
-- 📧 **Email**: [sakshisrivastava01@gmail.com](mailto:sakshisrivastava01@gmail.com) <!-- Update with actual email if different -->
+- 💼 **LinkedIn**: [Sakshi Srivastava](https://linkedin.com/in/sakshisrivastava01)
+- 📧 **Email**: [sakshisrivastava200306@gmail.com](mailto:sakshisrivastava200306@gmail.com)
 
 ---
 
