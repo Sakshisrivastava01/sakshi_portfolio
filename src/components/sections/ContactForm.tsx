@@ -38,11 +38,18 @@ export default function ContactForm() {
       const publicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || "";
 
       if (!serviceId || !templateId || !publicKey) {
-        console.error("EmailJS credentials are not configured in .env.local");
-        toast.error("Failed to send message. EmailJS is not configured.");
+        console.warn("EmailJS environment variables missing");
+        toast.error("Failed to send message. Please try again.");
         setIsSubmitting(false);
         return;
       }
+
+      console.log("EmailJS Payload:", {
+        from_name: data.fullName,
+        reply_to: data.email,
+        subject: data.subject,
+        message: data.message
+      });
 
       await emailjs.send(
         serviceId,
