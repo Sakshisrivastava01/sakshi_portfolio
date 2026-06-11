@@ -119,9 +119,9 @@ sakshi_portfolio/
 
 Feel free to reach out for collaborations, software engineering opportunities, or technical discussions!
 
-- 🌐 **Portfolio**: [sakshi-portfolio-delta-eight.vercel.app](https://sakshi-portfolio-delta-eight.vercel.app)
+- 🌐 **Portfolio**: [sakshi-portfolio-delta-eight.vercel.app](https://sakshi-portfolio-delta-eight.vercel.app/)
 - 🐙 **GitHub**: [@Sakshisrivastava01](https://github.com/Sakshisrivastava01)
-- 💼 **LinkedIn**: [Sakshi Srivastava](https://linkedin.com/in/sakshisrivastava01)
+- 💼 **LinkedIn**: [Sakshi Srivastava](https://www.linkedin.com/in/sakshi19819/)
 - 📧 **Email**: [sakshisrivastava200306@gmail.com](mailto:sakshisrivastava200306@gmail.com)
 
 ---
