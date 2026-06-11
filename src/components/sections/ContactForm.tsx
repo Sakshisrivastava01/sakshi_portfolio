@@ -37,6 +37,10 @@ export default function ContactForm() {
       const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || "";
       const publicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || "";
 
+      console.log("SERVICE_ID:", process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID);
+      console.log("TEMPLATE_ID:", process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID);
+      console.log("PUBLIC_KEY:", process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY);
+
       if (!serviceId || !templateId || !publicKey) {
         console.warn("EmailJS environment variables missing");
         toast.error("Failed to send message. Please try again.");
