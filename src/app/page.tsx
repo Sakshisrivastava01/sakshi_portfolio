@@ -7,6 +7,7 @@ import SectionLayout from "@/components/sections/SectionLayout";
 import TechnicalIntelligenceNetwork from "@/components/sections/TechnicalIntelligenceNetwork";
 import InnovationLab from "@/components/sections/InnovationLab";
 import Certifications from "@/components/sections/Certifications";
+import CompetitiveProgramming from "@/components/sections/CompetitiveProgramming";
 import { motion, useInView, useMotionValue, useSpring } from "framer-motion";
 import { 
   GraduationCap, Database, Terminal, 
@@ -332,6 +333,9 @@ export default function Home() {
                      ))}
                    </div>
                 </SectionLayout>
+
+                {/* COMPETITIVE PROGRAMMING SECTION */}
+                <CompetitiveProgramming />
 
                 {/* 7. CERTIFICATIONS SECTION */}
                 <Certifications />
