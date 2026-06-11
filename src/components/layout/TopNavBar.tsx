@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Download } from "lucide-react";
@@ -22,7 +22,7 @@ export default function TopNavBar() {
   const [activeSection, setActiveSection] = useState<string>("home");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [resumeUrl, setResumeUrl] = useState("/Sakshi_Srivastava_Resume.pdf");
+  const [resumeUrl] = useState("/Sakshi_Srivastava_Resume.pdf");
   const router = useRouter();
 
   const handleLogoClick = useCallback(() => {

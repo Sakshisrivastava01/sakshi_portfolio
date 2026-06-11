@@ -49,7 +49,7 @@ export default function Home() {
   const [audioState, setAudioState] = useState<AudioState>("idle");
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [audioUrl, setAudioUrl] = useState("/import.mp3");
+  const [audioUrl] = useState("/import.mp3");
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {

@@ -1,46 +1,40 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
-import { RefreshCw, Trophy, Code2, Activity, Award, Star, TrendingUp, Database, BrainCircuit, Globe } from "lucide-react";
+import { RefreshCw, Code2, Activity, Award, TrendingUp, Trophy, ExternalLink } from "lucide-react";
 import SectionLayout from "./SectionLayout";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from "recharts";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import toast, { Toaster } from 'react-hot-toast';
 
-interface PlatformData {
+interface LCContestHistory {
+  rating: number;
+  ranking: number;
+  contest: {
+    title: string;
+    startTime: number;
+  };
+}
+
+interface LCBadge {
+  displayName: string;
+  icon: string;
+}
+
+interface LeetCodeData {
   username: string;
-  solved: number | string;
-  rating: number | string;
+  solved: number;
+  rating: number;
   rank: string;
+  contestCount: number;
+  badges: LCBadge[];
+  history: LCContestHistory[];
+  calendar: Record<string, number>;
 }
 
 interface CPData {
-  platforms: {
-    leetcode: PlatformData;
-    codeforces: PlatformData;
-    codechef: PlatformData;
-    gfg: PlatformData;
-    hackerrank: PlatformData;
-  };
-  totalSolved: number;
+  leetcode: LeetCodeData;
 }
-
-const mockRatingProgression = [
-  { name: 'Jan', lc: 1500, cf: 1200 },
-  { name: 'Feb', lc: 1600, cf: 1250 },
-  { name: 'Mar', lc: 1650, cf: 1280 },
-  { name: 'Apr', lc: 1700, cf: 1300 },
-  { name: 'May', lc: 1735, cf: 1320 },
-];
-
-const mockDsaTopics = [
-  { subject: 'Arrays', A: 120, fullMark: 150 },
-  { subject: 'Strings', A: 98, fullMark: 150 },
-  { subject: 'DP', A: 86, fullMark: 150 },
-  { subject: 'Graphs', A: 65, fullMark: 150 },
-  { subject: 'Trees', A: 85, fullMark: 150 },
-  { subject: 'Math', A: 65, fullMark: 150 },
-];
 
 export default function CompetitiveProgramming() {
   const [data, setData] = useState<CPData | null>(null);
@@ -52,29 +46,71 @@ export default function CompetitiveProgramming() {
       const res = await fetch('/api/cp');
       const json = await res.json();
       setData(json);
-      if (showToast) toast.success('Data refreshed successfully!');
-    } catch (e) {
-      console.error(e);
-      if (showToast) toast.error('Failed to fetch latest data.');
+      if (showToast) toast.success('LeetCode data synced!');
+    } catch (error) {
+      console.error(error);
+      if (showToast) toast.error('Failed to fetch data.');
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchData();
   }, []);
 
-  // Generate GitHub-style heatmap data (mock)
-  const [heatmapData] = useState(() => Array.from({ length: 52 * 7 }).map(() => Math.floor(Math.random() * 5)));
+  const lc = data?.leetcode;
 
-  const platformCards = [
-    { name: 'LeetCode', color: 'text-yellow-400', bg: 'bg-yellow-400/10', border: 'border-yellow-400/30', data: data?.platforms?.leetcode, url: 'https://leetcode.com/u/_sakshi19_/', icon: <Code2 /> },
-    { name: 'Codeforces', color: 'text-red-400', bg: 'bg-red-400/10', border: 'border-red-400/30', data: data?.platforms?.codeforces, url: 'https://codeforces.com/profile/sakshi_190819', icon: <TrendingUp /> },
-    { name: 'CodeChef', color: 'text-orange-400', bg: 'bg-orange-400/10', border: 'border-orange-400/30', data: data?.platforms?.codechef, url: 'https://www.codechef.com/users/sakshi_200306', icon: <Trophy /> },
-    { name: 'GeeksForGeeks', color: 'text-green-400', bg: 'bg-green-400/10', border: 'border-green-400/30', data: data?.platforms?.gfg, url: 'https://www.geeksforgeeks.org/profile/sakshisrivasq50o', icon: <Database /> },
-    { name: 'HackerRank', color: 'text-green-500', bg: 'bg-green-500/10', border: 'border-green-500/30', data: data?.platforms?.hackerrank, url: 'https://www.hackerrank.com/profile/sakshisrivasta41', icon: <Globe /> }
-  ];
+  // Format chart data
+  const chartData = useMemo(() => {
+    if (!lc?.history) return [];
+    return lc.history.map((h) => {
+      const date = new Date(h.contest.startTime * 1000);
+      return {
+        name: date.toLocaleDateString(undefined, { month: 'short', year: '2-digit' }),
+        rating: Math.round(h.rating),
+        contestName: h.contest.title
+      };
+    });
+  }, [lc]);
+
+  // Generate heatmap data: last 365 days
+  const heatmapData = useMemo(() => {
+    if (!lc?.calendar) return Array(364).fill(0);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const days = [];
+    // Go back 364 days to have 52 complete weeks
+    for (let i = 364; i >= 0; i--) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      // so a proper approach is to group by YYYY-MM-DD. 
+      // But for simplicity, let's just check the exact timestamp or nearby ones
+      // Actually, LC provides exact day timestamps in UTC.
+      
+      // Better: Convert calendar to a local Date string map for lookup
+      let count = 0;
+      for (const [ts, c] of Object.entries(lc.calendar)) {
+         const subDate = new Date(parseInt(ts) * 1000);
+         if (subDate.getFullYear() === d.getFullYear() && 
+             subDate.getMonth() === d.getMonth() && 
+             subDate.getDate() === d.getDate()) {
+             count += c;
+         }
+      }
+      days.push(count);
+    }
+    return days;
+  }, [lc]);
+
+  const recentContests = useMemo(() => {
+    if (!lc?.history) return [];
+    // Sort descending by time and take top 4
+    return [...lc.history]
+      .sort((a, b) => b.contest.startTime - a.contest.startTime)
+      .slice(0, 4);
+  }, [lc]);
 
   return (
     <SectionLayout id="competitive-programming" title="Competitive Programming Journey">
@@ -82,140 +118,145 @@ export default function CompetitiveProgramming() {
       
       <div className="max-w-6xl mx-auto space-y-8">
         
-        {/* Header: Total Solved & Refresh */}
-        <div className="flex flex-col md:flex-row justify-between items-center gap-6 glass-panel p-6 md:p-8 rounded-3xl border border-white/5 relative overflow-hidden group">
-          <div className="absolute inset-0 bg-gradient-to-br from-accent-purple/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        {/* Header / Hero Stats */}
+        <div className="glass-panel p-6 md:p-8 rounded-3xl border border-white/5 relative overflow-hidden group">
+          <div className="absolute inset-0 bg-gradient-to-br from-accent-purple/5 to-accent-pink/5 opacity-50 group-hover:opacity-100 transition-opacity duration-500" />
           
-          <div className="flex items-center gap-6 relative z-10">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-accent-purple to-accent-pink flex items-center justify-center shadow-[0_0_20px_rgba(138,43,226,0.4)]">
-              <Trophy className="w-8 h-8 text-white" />
-            </div>
-            <div>
-              <h3 className="text-gray-400 text-sm tracking-widest uppercase font-semibold mb-1">Total Problems Solved</h3>
-              <div className="text-4xl md:text-5xl font-bold font-heading text-white">
-                {loading && !data ? <span className="animate-pulse">---</span> : data?.totalSolved || 0}
-                <span className="text-accent-pink">+</span>
+          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8 relative z-10">
+            <div className="flex items-center gap-6">
+              <div className="w-20 h-20 rounded-2xl bg-[#ffa116]/10 border border-[#ffa116]/30 flex items-center justify-center shadow-[0_0_30px_rgba(255,161,22,0.15)] shrink-0">
+                <Code2 className="w-10 h-10 text-[#ffa116]" />
+              </div>
+              <div>
+                <a href="https://leetcode.com/u/_sakshi19_/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 hover:text-accent-pink transition-colors">
+                  <h3 className="text-2xl md:text-3xl font-bold font-heading text-white">_sakshi19_</h3>
+                  <ExternalLink className="w-5 h-5 text-gray-400" />
+                </a>
+                <p className="text-gray-400 mt-1">LeetCode Profile</p>
               </div>
             </div>
+
+            <div className="flex flex-wrap gap-4 md:gap-8 lg:ml-auto">
+              <div className="space-y-1">
+                <div className="text-gray-500 text-xs uppercase tracking-wider font-semibold">Problems Solved</div>
+                <div className="text-2xl font-bold text-white">
+                  {loading && !lc ? '...' : lc?.solved || 0}
+                </div>
+              </div>
+              <div className="space-y-1">
+                <div className="text-gray-500 text-xs uppercase tracking-wider font-semibold">Contest Rating</div>
+                <div className="text-2xl font-bold text-white">
+                  {loading && !lc ? '...' : lc?.rating || 0}
+                </div>
+              </div>
+              <div className="space-y-1">
+                <div className="text-gray-500 text-xs uppercase tracking-wider font-semibold">Global Rank</div>
+                <div className="text-2xl font-bold text-[#ffa116]">
+                  {loading && !lc ? '...' : lc?.rank || 'N/A'}
+                </div>
+              </div>
+              <div className="space-y-1">
+                <div className="text-gray-500 text-xs uppercase tracking-wider font-semibold">Contests</div>
+                <div className="text-2xl font-bold text-white">
+                  {loading && !lc ? '...' : lc?.contestCount || 0}
+                </div>
+              </div>
+            </div>
+
+            <button 
+              onClick={() => fetchData(true)}
+              disabled={loading}
+              className="mt-4 lg:mt-0 flex items-center gap-2 px-6 py-3 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#ffa116]/50 transition-all duration-300 text-white font-medium disabled:opacity-50 group/btn shrink-0"
+            >
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-[#ffa116]' : 'group-hover/btn:rotate-180 transition-transform duration-500'}`} />
+              {loading ? 'Syncing...' : 'Sync LeetCode'}
+            </button>
           </div>
-
-          <button 
-            onClick={() => fetchData(true)}
-            disabled={loading}
-            className="flex items-center gap-2 px-6 py-3 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-accent-pink/50 transition-all duration-300 text-white font-medium disabled:opacity-50 group/btn relative z-10"
-          >
-            <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin text-accent-pink' : 'group-hover/btn:rotate-180 transition-transform duration-500'}`} />
-            {loading ? 'Syncing...' : 'Sync Latest Data'}
-          </button>
         </div>
 
-        {/* Platform Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-          {platformCards.map((platform, i) => (
-             <motion.a 
-               href={platform.url}
-               target="_blank"
-               rel="noopener noreferrer"
-               key={i}
-               initial={{ opacity: 0, y: 20 }}
-               whileInView={{ opacity: 1, y: 0 }}
-               viewport={{ once: true }}
-               transition={{ delay: i * 0.1, duration: 0.5 }}
-               className={`glass-panel p-5 rounded-2xl border border-white/5 hover:${platform.border} transition-all duration-300 shadow-lg hover:shadow-[0_0_20px_rgba(255,255,255,0.05)] relative overflow-hidden group/card flex flex-col h-full`}
-             >
-               <div className={`absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl ${platform.bg} rounded-bl-full opacity-50 group-hover/card:scale-110 transition-transform duration-500`} />
-               
-               <div className="flex items-center gap-3 mb-4 relative z-10">
-                 <div className={`p-2 rounded-xl bg-white/5 ${platform.color}`}>
-                   {platform.icon}
-                 </div>
-                 <h4 className="font-bold text-white tracking-wide">{platform.name}</h4>
-               </div>
-               
-               <div className="space-y-3 relative z-10 flex-grow">
-                 <div className="flex justify-between items-center border-b border-white/5 pb-2">
-                   <span className="text-gray-500 text-xs uppercase tracking-wider">Solved</span>
-                   <span className="font-semibold text-white">
-                     {loading && !data ? '...' : platform.data?.solved || 'N/A'}
-                   </span>
-                 </div>
-                 <div className="flex justify-between items-center border-b border-white/5 pb-2">
-                   <span className="text-gray-500 text-xs uppercase tracking-wider">Rating</span>
-                   <span className={`font-semibold ${platform.color}`}>
-                     {loading && !data ? '...' : platform.data?.rating || 'N/A'}
-                   </span>
-                 </div>
-                 <div className="flex justify-between items-center">
-                   <span className="text-gray-500 text-xs uppercase tracking-wider">Rank</span>
-                   <span className="font-semibold text-gray-300 text-sm">
-                     {loading && !data ? '...' : platform.data?.rank || 'N/A'}
-                   </span>
-                 </div>
-               </div>
-             </motion.a>
-          ))}
-        </div>
-
-        {/* Charts & Analytics */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           
-          {/* Rating Progression */}
+          {/* Rating Progression Graph */}
           <motion.div 
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="glass-panel p-6 md:p-8 rounded-3xl border border-white/5"
+            className="glass-panel p-6 md:p-8 rounded-3xl border border-white/5 lg:col-span-2"
           >
             <h4 className="text-xl font-bold font-heading text-white mb-6 flex items-center gap-2">
-              <TrendingUp className="text-accent-pink" /> Rating Progression
+              <TrendingUp className="text-[#ffa116]" /> Rating Progression
             </h4>
             <div className="h-[300px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={mockRatingProgression}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" vertical={false} />
-                  <XAxis dataKey="name" stroke="#6b7280" fontSize={12} tickLine={false} axisLine={false} />
-                  <YAxis stroke="#6b7280" fontSize={12} tickLine={false} axisLine={false} width={40} />
-                  <Tooltip 
-                    contentStyle={{ backgroundColor: '#111', borderColor: '#333', borderRadius: '10px' }}
-                    itemStyle={{ color: '#fff' }}
-                  />
-                  <Line type="monotone" dataKey="lc" name="LeetCode" stroke="#facc15" strokeWidth={3} dot={{ r: 4, fill: '#111', strokeWidth: 2 }} activeDot={{ r: 6 }} />
-                  <Line type="monotone" dataKey="cf" name="Codeforces" stroke="#f87171" strokeWidth={3} dot={{ r: 4, fill: '#111', strokeWidth: 2 }} activeDot={{ r: 6 }} />
-                </LineChart>
-              </ResponsiveContainer>
+              {chartData.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={chartData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" vertical={false} />
+                    <XAxis dataKey="name" stroke="#6b7280" fontSize={12} tickLine={false} axisLine={false} />
+                    <YAxis stroke="#6b7280" fontSize={12} tickLine={false} axisLine={false} domain={['dataMin - 100', 'dataMax + 100']} width={40} />
+                    <Tooltip 
+                      contentStyle={{ backgroundColor: '#111', borderColor: '#333', borderRadius: '10px' }}
+                      itemStyle={{ color: '#fff' }}
+                      labelStyle={{ color: '#9ca3af', marginBottom: '4px' }}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="rating" 
+                      name="Rating" 
+                      stroke="#ffa116" 
+                      strokeWidth={3} 
+                      dot={{ r: 4, fill: '#111', strokeWidth: 2 }} 
+                      activeDot={{ r: 6 }} 
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-gray-500">
+                  {loading ? 'Loading history...' : 'No contest history available.'}
+                </div>
+              )}
             </div>
           </motion.div>
 
-          {/* DSA Topic Analysis */}
+          {/* Recent Contests */}
           <motion.div 
-            initial={{ opacity: 0, x: 20 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="glass-panel p-6 md:p-8 rounded-3xl border border-white/5 relative"
+            className="glass-panel p-6 md:p-8 rounded-3xl border border-white/5 flex flex-col"
           >
             <h4 className="text-xl font-bold font-heading text-white mb-6 flex items-center gap-2">
-              <BrainCircuit className="text-accent-purple" /> DSA Mastery Radar
+              <Trophy className="text-accent-pink" /> Recent Contests
             </h4>
-            <div className="h-[300px] w-full absolute inset-0 top-16 md:top-20 z-0 opacity-20 pointer-events-none flex justify-center items-center">
-               <div className="w-64 h-64 bg-accent-purple/30 rounded-full blur-[80px]" />
-            </div>
-            <div className="h-[300px] w-full relative z-10">
-              <ResponsiveContainer width="100%" height="100%">
-                <RadarChart cx="50%" cy="50%" outerRadius="70%" data={mockDsaTopics}>
-                  <PolarGrid stroke="#ffffff20" />
-                  <PolarAngleAxis dataKey="subject" stroke="#9ca3af" fontSize={12} />
-                  <PolarRadiusAxis angle={30} domain={[0, 150]} stroke="transparent" tick={false} />
-                  <Radar name="Strength" dataKey="A" stroke="#c084fc" fill="#c084fc" fillOpacity={0.4} />
-                  <Tooltip 
-                    contentStyle={{ backgroundColor: '#111', borderColor: '#c084fc50', borderRadius: '10px' }}
-                  />
-                </RadarChart>
-              </ResponsiveContainer>
+            <div className="space-y-4 flex-grow overflow-y-auto pr-2 custom-scrollbar">
+              {recentContests.length > 0 ? (
+                recentContests.map((h, i) => (
+                  <div key={i} className="p-4 rounded-xl bg-white/5 border border-white/5 hover:border-accent-pink/30 transition-colors">
+                    <div className="flex justify-between items-start mb-2">
+                      <h5 className="font-semibold text-white text-sm line-clamp-1" title={h.contest.title}>{h.contest.title}</h5>
+                      <span className="text-xs text-gray-400 whitespace-nowrap ml-2">
+                        {new Date(h.contest.startTime * 1000).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center mt-3">
+                      <span className="text-xs px-2 py-1 rounded bg-white/10 text-gray-300">
+                        Rank: <strong className="text-white">{h.ranking}</strong>
+                      </span>
+                      <span className="text-xs px-2 py-1 rounded bg-[#ffa116]/10 text-[#ffa116]">
+                        Rating: <strong>{Math.round(h.rating)}</strong>
+                      </span>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="flex items-center justify-center h-full text-gray-500">
+                  {loading ? 'Loading contests...' : 'No recent contests.'}
+                </div>
+              )}
             </div>
           </motion.div>
+
         </div>
 
-        {/* Activity Heatmap & Badges */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           
           {/* Heatmap */}
@@ -226,32 +267,32 @@ export default function CompetitiveProgramming() {
             className="glass-panel p-6 md:p-8 rounded-3xl border border-white/5 lg:col-span-2 overflow-x-auto"
           >
             <h4 className="text-xl font-bold font-heading text-white mb-6 flex items-center gap-2">
-              <Activity className="text-green-400" /> Activity Heatmap
+              <Activity className="text-green-400" /> Submission Heatmap
             </h4>
             <div className="min-w-[700px]">
               <div className="grid grid-rows-7 grid-flow-col gap-[3px]">
-                {heatmapData.map((level, i) => (
-                  <div 
-                    key={i} 
-                    className={`w-3 h-3 rounded-sm ${
-                      level === 0 ? 'bg-white/5' :
-                      level === 1 ? 'bg-accent-purple/40' :
-                      level === 2 ? 'bg-accent-purple/70' :
-                      level === 3 ? 'bg-accent-pink/70' :
-                      'bg-accent-pink'
-                    } hover:ring-1 hover:ring-white transition-all cursor-pointer`}
-                    title={`Activity Level: ${level}`}
-                  />
-                ))}
+                {heatmapData.map((count, i) => {
+                  let colorClass = 'bg-white/5';
+                  if (count > 0 && count <= 2) colorClass = 'bg-[#ffa116]/40';
+                  else if (count > 2 && count <= 5) colorClass = 'bg-[#ffa116]/70';
+                  else if (count > 5) colorClass = 'bg-[#ffa116]';
+                  
+                  return (
+                    <div 
+                      key={i} 
+                      className={`w-3 h-3 rounded-sm ${colorClass} hover:ring-1 hover:ring-white transition-all cursor-pointer`}
+                      title={`${count} submissions`}
+                    />
+                  );
+                })}
               </div>
               <div className="flex justify-end items-center gap-2 mt-4 text-xs text-gray-500">
                 <span>Less</span>
                 <div className="flex gap-[3px]">
                   <div className="w-3 h-3 rounded-sm bg-white/5" />
-                  <div className="w-3 h-3 rounded-sm bg-accent-purple/40" />
-                  <div className="w-3 h-3 rounded-sm bg-accent-purple/70" />
-                  <div className="w-3 h-3 rounded-sm bg-accent-pink/70" />
-                  <div className="w-3 h-3 rounded-sm bg-accent-pink" />
+                  <div className="w-3 h-3 rounded-sm bg-[#ffa116]/40" />
+                  <div className="w-3 h-3 rounded-sm bg-[#ffa116]/70" />
+                  <div className="w-3 h-3 rounded-sm bg-[#ffa116]" />
                 </div>
                 <span>More</span>
               </div>
@@ -263,25 +304,32 @@ export default function CompetitiveProgramming() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="glass-panel p-6 md:p-8 rounded-3xl border border-white/5"
+            className="glass-panel p-6 md:p-8 rounded-3xl border border-white/5 flex flex-col"
           >
             <h4 className="text-xl font-bold font-heading text-white mb-6 flex items-center gap-2">
-              <Award className="text-yellow-400" /> Badges
+              <Award className="text-accent-purple" /> LeetCode Badges
             </h4>
-            <div className="grid grid-cols-2 gap-4">
-              {[
-                { name: '50 Days Badge', icon: <Star className="text-yellow-400" /> },
-                { name: '100 Days Badge', icon: <Star className="text-orange-400" /> },
-                { name: 'Annual Badge', icon: <Award className="text-accent-pink" /> },
-                { name: 'Top 10%', icon: <Trophy className="text-accent-purple" /> },
-              ].map((badge, i) => (
-                <div key={i} className="flex flex-col items-center justify-center p-4 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors text-center gap-2">
-                  <div className="p-3 rounded-full bg-black/50 shadow-inner">
-                    {badge.icon}
+            <div className="grid grid-cols-2 gap-4 overflow-y-auto custom-scrollbar pr-2">
+              {lc?.badges && lc.badges.length > 0 ? (
+                lc.badges.map((badge, i) => (
+                  <div key={i} className="flex flex-col items-center justify-center p-4 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors text-center gap-3">
+                    <div className="w-12 h-12 flex items-center justify-center">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img 
+                        src={badge.icon.startsWith('/') ? `https://leetcode.com${badge.icon}` : badge.icon} 
+                        alt={badge.displayName} 
+                        className="max-w-full max-h-full drop-shadow-md" 
+                        loading="lazy"
+                      />
+                    </div>
+                    <span className="text-xs font-medium text-gray-300">{badge.displayName}</span>
                   </div>
-                  <span className="text-xs font-medium text-gray-300">{badge.name}</span>
+                ))
+              ) : (
+                <div className="col-span-2 flex items-center justify-center py-8 text-gray-500">
+                  {loading ? 'Loading badges...' : 'No badges earned yet.'}
                 </div>
-              ))}
+              )}
             </div>
           </motion.div>
 
