@@ -463,12 +463,12 @@ export default function Home() {
                           </p>
                           
                           <div className="flex flex-col gap-8">
-                            <a href="mailto:sakshisrivastava200306@gmail.com" className="inline-flex items-center gap-4 text-white hover:text-accent-pink transition-colors w-fit group/email">
+                            <div className="inline-flex items-center gap-4 text-white hover:text-accent-pink transition-colors w-fit group/email">
                               <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center border border-white/10 group-hover/email:border-accent-pink transition-colors">
                                 <Mail className="w-5 h-5" />
                               </div>
                               <span className="text-lg font-medium">sakshisrivastava200306@gmail.com</span>
-                            </a>
+                            </div>
 
                             <div className="flex gap-4">
                               {[

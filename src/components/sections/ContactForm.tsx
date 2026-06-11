@@ -11,6 +11,7 @@ import { Send, Loader2 } from "lucide-react";
 const formSchema = z.object({
   fullName: z.string().min(2, "Full name must be at least 2 characters"),
   email: z.string().email("Please enter a valid email address"),
+  subject: z.string().min(2, "Subject must be at least 2 characters"),
   message: z.string().min(10, "Message must be at least 10 characters"),
 });
 
@@ -49,6 +50,7 @@ export default function ContactForm() {
         {
           from_name: data.fullName,
           reply_to: data.email,
+          subject: data.subject,
           message: data.message,
           to_email: "sakshisrivastava200306@gmail.com",
         },
@@ -97,6 +99,22 @@ export default function ContactForm() {
         />
         {errors.email && (
           <p className="text-red-400 text-xs mt-1">{errors.email.message}</p>
+        )}
+      </div>
+
+      <div>
+        <label htmlFor="subject" className="block text-sm font-medium text-gray-300 mb-1">
+          Subject
+        </label>
+        <input
+          id="subject"
+          {...register("subject")}
+          disabled={isSubmitting}
+          className={`w-full bg-black/40 border ${errors.subject ? 'border-red-500' : 'border-white/10 focus:border-accent-pink'} rounded-xl px-4 py-3 text-white placeholder-gray-500 outline-none transition-colors disabled:opacity-50`}
+          placeholder="Portfolio Inquiry"
+        />
+        {errors.subject && (
+          <p className="text-red-400 text-xs mt-1">{errors.subject.message}</p>
         )}
       </div>
 
