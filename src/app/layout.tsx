@@ -5,6 +5,7 @@ import AmbientBackground from "@/components/layout/AmbientBackground";
 import ScrollIndicator from "@/components/layout/ScrollIndicator";
 import TopNavBar from "@/components/layout/TopNavBar";
 import { Analytics } from "@vercel/analytics/react";
+import { Toaster } from "react-hot-toast";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], variable: "--font-space-grotesk" });
@@ -40,6 +41,13 @@ export default function RootLayout({
         <TopNavBar />
         {children}
         <Analytics />
+        <Toaster position="bottom-right" toastOptions={{
+          style: {
+            background: '#1a1a1a',
+            color: '#fff',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+          },
+        }} />
       </body>
     </html>
   );

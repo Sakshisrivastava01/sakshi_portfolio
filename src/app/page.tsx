@@ -15,6 +15,7 @@ import {
   BrainCircuit, CheckCircle2, Network, Activity, Code2
 } from "lucide-react";
 import { GithubIcon as Github, LinkedinIcon as Linkedin } from "@/components/icons/SocialIcons";
+import ContactForm from "@/components/sections/ContactForm";
 import dynamic from "next/dynamic";
 
 const Scene = dynamic(() => import("@/components/canvas/Scene"), { ssr: false });
@@ -439,44 +440,53 @@ export default function Home() {
 
                 {/* 9. CONTACT SECTION */}
                 <SectionLayout id="contact" title="Get in Touch" className="pb-32 pt-20">
-                  <div className="max-w-4xl mx-auto">
+                  <div className="max-w-6xl mx-auto">
                     <motion.div 
                       initial={{ opacity: 0, y: 50 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
                       transition={{ duration: 1 }}
-                      className="glass-panel p-8 md:p-20 rounded-[3rem] border border-white/10 text-center relative overflow-hidden group hover:border-accent-pink/30 transition-colors duration-700"
+                      className="glass-panel p-8 md:p-12 lg:p-20 rounded-[3rem] border border-white/10 relative overflow-hidden group hover:border-accent-pink/30 transition-colors duration-700"
                     >
                       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-accent-glow rounded-full blur-[120px] opacity-10 group-hover:opacity-30 transition-opacity duration-1000 pointer-events-none" />
                       
-                      <h3 className="text-4xl md:text-6xl font-bold font-heading text-white mb-8 relative z-10 tracking-tight">
-                        Let&apos;s build something <br/>
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-pink to-accent-lavender">meaningful together.</span>
-                      </h3>
-                      
-                      <p className="text-xl md:text-2xl text-gray-400 font-light mb-16 leading-relaxed max-w-2xl mx-auto relative z-10">
-                        I am currently exploring opportunities in Backend Engineering and Artificial Intelligence. If you&apos;re building the future, I want to help engineer it.
-                      </p>
-                      
-                      <div className="flex flex-wrap justify-center gap-6 relative z-10">
-                        <a 
-                          href="mailto:sakshisrivastava01@gmail.com?subject=Portfolio%20Inquiry&body=Hello%20Sakshi%2C%0A%0A"
-                          className="px-10 py-5 rounded-full bg-white text-black font-bold hover:bg-accent-pink hover:text-white transition-all duration-300 shadow-[0_0_30px_rgba(255,255,255,0.1)] hover:shadow-[0_0_40px_rgba(255,182,193,0.5)] hover:scale-105 flex items-center space-x-3 text-lg group/btn"
-                        >
-                          <Mail className="w-6 h-6 group-hover/btn:animate-pulse" />
-                          <span>Contact Me</span>
-                        </a>
-                        
-                        <div className="flex gap-4">
-                          {[
-                            { icon: <Github className="w-6 h-6" />, label: "GitHub", link: "https://github.com/Sakshisrivastava01" },
-                            { icon: <Linkedin className="w-6 h-6" />, label: "LinkedIn", link: "https://www.linkedin.com/in/sakshisrivastava01" },
-                            { icon: <Code2 className="w-6 h-6" />, label: "LeetCode", link: "https://leetcode.com/u/Sakshisrivastava01/" }
-                          ].map((social, i) => (
-                            <a key={i} href={social.link} target="_blank" rel="noopener noreferrer" title={social.label} className="w-16 h-16 rounded-full glass-panel flex items-center justify-center text-gray-300 hover:text-white hover:bg-white/10 hover:scale-110 transition-all duration-300 border border-white/10 hover:border-accent-lavender shadow-lg hover:shadow-[0_0_20px_rgba(230,230,250,0.3)]">
-                              {social.icon}
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 relative z-10">
+                        {/* Left Column: Text and Details */}
+                        <div className="flex flex-col justify-center">
+                          <h3 className="text-4xl md:text-5xl lg:text-6xl font-bold font-heading text-white mb-6 tracking-tight">
+                            Let&apos;s build something <br/>
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-pink to-accent-lavender">meaningful together.</span>
+                          </h3>
+                          
+                          <p className="text-lg md:text-xl text-gray-400 font-light mb-12 leading-relaxed max-w-lg">
+                            I am currently exploring opportunities in Backend Engineering and Artificial Intelligence. If you&apos;re building the future, I want to help engineer it.
+                          </p>
+                          
+                          <div className="flex flex-col gap-8">
+                            <a href="mailto:sakshisrivastava200306@gmail.com" className="inline-flex items-center gap-4 text-white hover:text-accent-pink transition-colors w-fit group/email">
+                              <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center border border-white/10 group-hover/email:border-accent-pink transition-colors">
+                                <Mail className="w-5 h-5" />
+                              </div>
+                              <span className="text-lg font-medium">sakshisrivastava200306@gmail.com</span>
                             </a>
-                          ))}
+
+                            <div className="flex gap-4">
+                              {[
+                                { icon: <Github className="w-5 h-5" />, label: "GitHub", link: "https://github.com/Sakshisrivastava01" },
+                                { icon: <Linkedin className="w-5 h-5" />, label: "LinkedIn", link: "https://www.linkedin.com/in/sakshi19819/" },
+                                { icon: <Code2 className="w-5 h-5" />, label: "LeetCode", link: "https://leetcode.com/u/Sakshisrivastava01/" }
+                              ].map((social, i) => (
+                                <a key={i} href={social.link} target="_blank" rel="noopener noreferrer" title={social.label} className="w-12 h-12 rounded-full glass-panel flex items-center justify-center text-gray-300 hover:text-white hover:bg-white/10 hover:scale-110 transition-all duration-300 border border-white/10 hover:border-accent-lavender shadow-lg hover:shadow-[0_0_20px_rgba(230,230,250,0.3)]">
+                                  {social.icon}
+                                </a>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Right Column: Contact Form */}
+                        <div className="bg-black/20 rounded-3xl p-6 md:p-8 border border-white/10 backdrop-blur-sm">
+                          <ContactForm />
                         </div>
                       </div>
                       
