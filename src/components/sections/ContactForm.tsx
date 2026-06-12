@@ -41,6 +41,13 @@ export default function ContactForm() {
       console.log("TEMPLATE_ID:", process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID);
       console.log("PUBLIC_KEY:", process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY);
 
+      console.log("PAYLOAD:", {
+        from_name: data.fullName,
+        reply_to: data.email,
+        subject: data.subject,
+        message: data.message,
+      });
+
       if (!serviceId || !templateId || !publicKey) {
         console.warn("EmailJS environment variables missing");
         toast.error("Failed to send message. Please try again.");
@@ -70,9 +77,14 @@ export default function ContactForm() {
 
       toast.success("Message sent successfully. I'll get back to you soon!");
       reset();
-    } catch (error) {
-      console.error("EmailJS Error:", error);
-      toast.error("Failed to send message. Please try again.");
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.error("EMAILJS FULL ERROR:", error);
+      console.error("STATUS:", error?.status);
+      console.error("TEXT:", error?.text);
+      console.error("RAW:", JSON.stringify(error, null, 2));
+
+      toast.error(error?.text || "Unknown EmailJS error");
     } finally {
       setIsSubmitting(false);
     }
