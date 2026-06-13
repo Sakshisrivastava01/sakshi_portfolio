@@ -270,13 +270,17 @@ export default function CompetitiveProgramming() {
     const now = new Date();
     const todayUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
     
-    const endDate = new Date(todayUTC);
-    const dayOfWeek = endDate.getUTCDay();
-    const diffToSunday = dayOfWeek === 0 ? 0 : 7 - dayOfWeek;
-    endDate.setUTCDate(endDate.getUTCDate() + diffToSunday);
+    const currentSunday = new Date(todayUTC);
+    const dayOfWeek = currentSunday.getUTCDay(); // 0 is Sun, ..., 6 is Sat
+    currentSunday.setUTCDate(currentSunday.getUTCDate() - dayOfWeek);
     
-    const startDate = new Date(endDate);
-    startDate.setUTCDate(startDate.getUTCDate() - 363);
+    // Start date: 52 weeks before the current Sunday (always a Sunday)
+    const startDate = new Date(currentSunday);
+    startDate.setUTCDate(startDate.getUTCDate() - 52 * 7);
+    
+    // End date: upcoming Saturday
+    const endDate = new Date(currentSunday);
+    endDate.setUTCDate(endDate.getUTCDate() + 6);
     
     const days = [];
     const tempDate = new Date(startDate);
@@ -635,13 +639,13 @@ export default function CompetitiveProgramming() {
                     <div className="flex gap-1">
                       {/* Weekdays labels */}
                       <div className="flex flex-col gap-1 pr-2 text-[9px] text-gray-500 font-mono font-semibold shrink-0 w-8">
+                        <span className="h-3.5 flex items-center opacity-0">Sun</span>
                         <span className="h-3.5 flex items-center">Mon</span>
                         <span className="h-3.5 flex items-center opacity-0">Tue</span>
                         <span className="h-3.5 flex items-center">Wed</span>
                         <span className="h-3.5 flex items-center opacity-0">Thu</span>
                         <span className="h-3.5 flex items-center">Fri</span>
-                        <span className="h-3.5 flex items-center opacity-0">Sat</span>
-                        <span className="h-3.5 flex items-center font-bold text-accent-pink">Sun</span>
+                        <span className="h-3.5 flex items-center opacity-0 font-bold text-accent-pink">Sat</span>
                       </div>
                       
                       {/* Weeks grid */}
