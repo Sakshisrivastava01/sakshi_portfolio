@@ -2,7 +2,7 @@
 
 import React, { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { BrainCircuit, ShieldAlert, ExternalLink, FileText, Cpu, Server } from "lucide-react";
+import { BrainCircuit, ExternalLink, FileText, Cpu } from "lucide-react";
 import { GithubIcon as Github } from "@/components/icons/SocialIcons";
 import { cn } from "@/lib/utils";
 
@@ -26,26 +26,6 @@ interface ProjectData {
 
 // Data
 const PROJECTS: ProjectData[] = [
-  {
-    id: "project-dangen",
-    title: "DANGEN",
-    tag: "Flagship Project",
-    isFlagship: true,
-    status: "Live",
-    icon: <ShieldAlert className="w-6 h-6" />,
-    theme: "purple",
-    description: "AI-powered cyber defense platform for real-time threat detection and intelligent anomaly monitoring.",
-    metrics: [
-      { label: "Uptime", value: "99.9%" },
-      { label: "Threat Detection", value: "<50ms" },
-      { label: "Accuracy", value: "99.2%" }
-    ],
-    tech: ["Python", "Machine Learning", "TensorFlow", "Cyber Security", "Flask", "Data Analytics"],
-    links: {
-      github: "https://github.com/Sakshisrivastava01/cyber_threatdangen",
-      demo: "https://cyber-threatdangen.vercel.app"
-    }
-  },
   {
     id: "project-vaani",
     title: "Vaani-X",
@@ -87,33 +67,7 @@ const PROJECTS: ProjectData[] = [
 ];
 
 // Abstract Visual Generators for Project "Screenshots"
-const CyberAbstractVisual = () => (
-  <div className="absolute inset-0 overflow-hidden flex items-center justify-center opacity-40 group-hover:opacity-80 transition-opacity duration-1000 bg-[#020005]">
-    <div className="relative w-full h-full flex items-center justify-center">
-      {/* Network Nodes Grid */}
-      <svg className="absolute w-[150%] h-[150%] opacity-30" viewBox="0 0 100 100">
-        <motion.path 
-          d="M10,50 L40,20 L70,50 L40,80 Z M10,50 L70,50 M40,20 L40,80 M25,35 L55,65 M25,65 L55,35" 
-          stroke="rgba(138,43,226,0.5)" 
-          strokeWidth="0.2" 
-          fill="none"
-          initial={{ pathLength: 0 }}
-          animate={{ pathLength: 1 }}
-          transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
-        />
-      </svg>
-      {/* Central Shield/Core */}
-      <motion.div 
-        animate={{ scale: [0.9, 1.1, 0.9], opacity: [0.3, 0.8, 0.3] }} 
-        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute w-48 h-48 border-[1px] border-accent-purple rounded-full mix-blend-screen shadow-[0_0_50px_rgba(138,43,226,0.3)] flex items-center justify-center" 
-      >
-        <Server className="w-16 h-16 text-accent-purple/50" />
-      </motion.div>
-      <div className="absolute w-full h-full bg-gradient-to-t from-black via-transparent to-black" />
-    </div>
-  </div>
-);
+
 
 const VoiceAbstractVisual = () => (
   <div className="absolute inset-0 overflow-hidden flex items-center justify-center opacity-40 group-hover:opacity-80 transition-opacity duration-1000 bg-[#050002]">
@@ -253,7 +207,6 @@ function ProjectShowcase({ project, index }: { project: ProjectData; index: numb
         "relative w-full lg:w-[45%] h-[300px] md:h-[400px] lg:h-auto overflow-hidden border-b lg:border-b-0 lg:border-r border-white/10 bg-black/40",
         isImageRight ? "lg:order-2 lg:border-r-0 lg:border-l" : "lg:order-1"
       )}>
-        {project.id === "project-dangen" && <CyberAbstractVisual />}
         {project.id === "project-vaani" && <VoiceAbstractVisual />}
         {project.id === "project-noteroot" && <KnowledgeAbstractVisual />}
         
