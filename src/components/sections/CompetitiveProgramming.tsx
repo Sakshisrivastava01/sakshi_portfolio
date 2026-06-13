@@ -602,89 +602,92 @@ export default function CompetitiveProgramming() {
               <div className="relative z-10">
                 {/* Heatmap Grid Wrapper */}
                 <div className="flex flex-col gap-2">
-                  {/* Month Labels Row */}
-                  <div className="relative h-5 text-[10px] text-gray-500 font-mono flex">
-                    <div className="w-8 shrink-0" />
-                    <div className="relative flex-1 h-full select-none">
-                      {weeks.map((week, colIndex) => {
-                        const prevWeek = weeks[colIndex - 1];
-                        const currentMonth = week[0].date.getUTCMonth();
-                        const prevMonth = prevWeek ? prevWeek[0].date.getUTCMonth() : -1;
-                        
-                        if (currentMonth !== prevMonth) {
-                          const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-                          const monthName = MONTHS[currentMonth];
-                          return (
-                            <div 
-                              key={colIndex} 
-                              className="absolute text-center" 
-                              style={{ left: `${colIndex * 19}px` }}
-                            >
-                              {monthName}
-                            </div>
-                          );
-                        }
-                        return null;
-                      })}
-                    </div>
-                  </div>
-                  
-                  {/* Heatmap Columns */}
-                  <div className="flex gap-1 overflow-x-auto pb-4 custom-scrollbar select-none">
-                    {/* Weekdays labels */}
-                    <div className="flex flex-col gap-1 pr-2 text-[9px] text-gray-500 font-mono font-semibold shrink-0 w-8">
-                      <span className="h-3.5 flex items-center">Mon</span>
-                      <span className="h-3.5 flex items-center opacity-0">Tue</span>
-                      <span className="h-3.5 flex items-center">Wed</span>
-                      <span className="h-3.5 flex items-center opacity-0">Thu</span>
-                      <span className="h-3.5 flex items-center">Fri</span>
-                      <span className="h-3.5 flex items-center opacity-0">Sat</span>
-                      <span className="h-3.5 flex items-center font-bold text-accent-pink">Sun</span>
-                    </div>
-                    
-                    {/* Weeks grid */}
-                    <div className="flex gap-1">
-                      {weeks.map((week, colIndex) => (
-                        <div key={colIndex} className="flex flex-col gap-1">
-                          {week.map((day) => {
-                            let colorClass = "bg-[#1a1625]";
-                            let glowColor = "transparent";
-                            if (day.intensity === 1) {
-                              colorClass = "bg-[#2f3e1f]/80 hover:bg-[#2f3e1f]";
-                              glowColor = "rgba(47, 62, 31, 0.2)";
-                            } else if (day.intensity === 2) {
-                              colorClass = "bg-[#4d6b2d]/90 hover:bg-[#4d6b2d]";
-                              glowColor = "rgba(77, 107, 45, 0.4)";
-                            } else if (day.intensity === 3) {
-                              colorClass = "bg-[#79a83b]/90 hover:bg-[#79a83b]";
-                              glowColor = "rgba(121, 168, 59, 0.6)";
-                            } else if (day.intensity === 4) {
-                              colorClass = "bg-[#c4ff5e] hover:shadow-[0_0_12px_#c4ff5e]";
-                              glowColor = "rgba(196, 255, 94, 0.8)";
-                            }
-                            
+                  {/* Heatmap Columns with horizontal scroll */}
+                  <div className="flex gap-1 overflow-x-auto pb-4 custom-scrollbar select-none flex-col">
+                    {/* Month Labels Row inside the scroll container */}
+                    <div className="relative h-5 text-[10px] text-gray-500 font-mono flex">
+                      <div className="w-8 shrink-0" />
+                      <div className="relative flex-1 h-full select-none">
+                        {weeks.map((week, colIndex) => {
+                          const prevWeek = weeks[colIndex - 1];
+                          const currentMonth = week[0].date.getUTCMonth();
+                          const prevMonth = prevWeek ? prevWeek[0].date.getUTCMonth() : -1;
+                          
+                          if (currentMonth !== prevMonth) {
+                            const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                            const monthName = MONTHS[currentMonth];
                             return (
-                              <div key={day.key} className="relative group">
-                                <div 
-                                  className={`w-3.5 h-3.5 rounded-[3px] transition-all duration-150 hover:scale-125 hover:ring-1 hover:ring-white/80 cursor-pointer ${colorClass}`}
-                                  style={{
-                                    boxShadow: day.intensity > 0 ? `0 0 8px ${glowColor}` : 'none'
-                                  }}
-                                />
-                                
-                                {/* Absolute Tooltip */}
-                                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:flex flex-col items-center pointer-events-none z-50">
-                                  <div className="bg-[#0b0813]/95 border border-white/10 px-3 py-1.5 rounded-lg text-[10px] text-gray-300 whitespace-nowrap shadow-2xl flex flex-col gap-0.5 backdrop-blur-md">
-                                    <span className="font-semibold text-white font-sans">{day.count} submissions</span>
-                                    <span className="text-gray-500 font-mono">{formatFullDate(day.date)}</span>
-                                  </div>
-                                  <div className="w-1.5 h-1.5 bg-[#0b0813] border-r border-b border-white/10 rotate-45 -mt-[4px]" />
-                                </div>
+                              <div 
+                                key={colIndex} 
+                                className="absolute text-center" 
+                                style={{ left: `${colIndex * 18}px` }}
+                              >
+                                {monthName}
                               </div>
                             );
-                          })}
-                        </div>
-                      ))}
+                          }
+                          return null;
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Grid Body */}
+                    <div className="flex gap-1">
+                      {/* Weekdays labels */}
+                      <div className="flex flex-col gap-1 pr-2 text-[9px] text-gray-500 font-mono font-semibold shrink-0 w-8">
+                        <span className="h-3.5 flex items-center">Mon</span>
+                        <span className="h-3.5 flex items-center opacity-0">Tue</span>
+                        <span className="h-3.5 flex items-center">Wed</span>
+                        <span className="h-3.5 flex items-center opacity-0">Thu</span>
+                        <span className="h-3.5 flex items-center">Fri</span>
+                        <span className="h-3.5 flex items-center opacity-0">Sat</span>
+                        <span className="h-3.5 flex items-center font-bold text-accent-pink">Sun</span>
+                      </div>
+                      
+                      {/* Weeks grid */}
+                      <div className="flex gap-1">
+                        {weeks.map((week, colIndex) => (
+                          <div key={colIndex} className="flex flex-col gap-1">
+                            {week.map((day) => {
+                              let colorClass = "bg-[#1a1625]";
+                              let glowColor = "transparent";
+                              if (day.intensity === 1) {
+                                colorClass = "bg-[#2f3e1f]/80 hover:bg-[#2f3e1f]";
+                                glowColor = "rgba(47, 62, 31, 0.2)";
+                              } else if (day.intensity === 2) {
+                                colorClass = "bg-[#4d6b2d]/90 hover:bg-[#4d6b2d]";
+                                glowColor = "rgba(77, 107, 45, 0.4)";
+                              } else if (day.intensity === 3) {
+                                colorClass = "bg-[#79a83b]/90 hover:bg-[#79a83b]";
+                                glowColor = "rgba(121, 168, 59, 0.6)";
+                              } else if (day.intensity === 4) {
+                                colorClass = "bg-[#c4ff5e] hover:shadow-[0_0_12px_#c4ff5e]";
+                                glowColor = "rgba(196, 255, 94, 0.8)";
+                              }
+                              
+                              return (
+                                <div key={day.key} className="relative group">
+                                  <div 
+                                    className={`w-3.5 h-3.5 rounded-[3px] transition-all duration-150 hover:scale-125 hover:ring-1 hover:ring-white/80 cursor-pointer ${colorClass}`}
+                                    style={{
+                                      boxShadow: day.intensity > 0 ? `0 0 8px ${glowColor}` : 'none'
+                                    }}
+                                  />
+                                  
+                                  {/* Absolute Tooltip */}
+                                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:flex flex-col items-center pointer-events-none z-50">
+                                    <div className="bg-[#0b0813]/95 border border-white/10 px-3 py-1.5 rounded-lg text-[10px] text-gray-300 whitespace-nowrap shadow-2xl flex flex-col gap-0.5 backdrop-blur-md">
+                                      <span className="font-semibold text-white font-sans">{day.count} submissions</span>
+                                      <span className="text-gray-500 font-mono">{formatFullDate(day.date)}</span>
+                                    </div>
+                                    <div className="w-1.5 h-1.5 bg-[#0b0813] border-r border-b border-white/10 rotate-45 -mt-[4px]" />
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
