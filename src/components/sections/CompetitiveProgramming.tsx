@@ -36,6 +36,16 @@ interface CPData {
   leetcode: LeetCodeData;
 }
 
+// Helper to format dates consistently (e.g. DD MMM YYYY)
+const formatContestDate = (startTimeSeconds: number): string => {
+  const date = new Date(startTimeSeconds * 1000);
+  const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = MONTHS[date.getMonth()];
+  const year = date.getFullYear();
+  return `${day} ${month} ${year}`;
+};
+
 export default function CompetitiveProgramming() {
   const [data, setData] = useState<CPData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -65,14 +75,12 @@ export default function CompetitiveProgramming() {
   // Format chart data
   const chartData = useMemo(() => {
     if (!lc?.history) return [];
-    return lc.history.map((h) => {
-      const date = new Date(h.contest.startTime * 1000);
-      return {
-        name: date.toLocaleDateString(undefined, { month: 'short', year: '2-digit' }),
-        rating: Math.round(h.rating),
-        contestName: h.contest.title
-      };
-    });
+    const sortedHistory = [...lc.history].sort((a, b) => a.contest.startTime - b.contest.startTime);
+    return sortedHistory.map((h) => ({
+      name: formatContestDate(h.contest.startTime),
+      rating: Math.round(h.rating),
+      contestName: h.contest.title
+    }));
   }, [lc]);
 
   // Generate heatmap data: last 365 days
@@ -190,9 +198,22 @@ export default function CompetitiveProgramming() {
                     <XAxis dataKey="name" stroke="#6b7280" fontSize={12} tickLine={false} axisLine={false} />
                     <YAxis stroke="#6b7280" fontSize={12} tickLine={false} axisLine={false} domain={['dataMin - 100', 'dataMax + 100']} width={40} />
                     <Tooltip 
-                      contentStyle={{ backgroundColor: '#111', borderColor: '#333', borderRadius: '10px' }}
-                      itemStyle={{ color: '#fff' }}
-                      labelStyle={{ color: '#9ca3af', marginBottom: '4px' }}
+                      content={({ active, payload }) => {
+                        if (active && payload && payload.length) {
+                          const data = payload[0].payload as { name: string; rating: number; contestName: string };
+                          return (
+                            <div className="bg-[#111] border border-[#333] p-4 rounded-xl shadow-lg font-sans">
+                              <p className="text-xs text-gray-400 font-mono mb-1">{data.name}</p>
+                              <p className="text-sm font-bold text-white mb-2 leading-snug">{data.contestName}</p>
+                              <div className="flex justify-between items-center gap-6 pt-2 border-t border-white/5">
+                                <span className="text-xs text-gray-500 font-mono uppercase">Rating</span>
+                                <span className="font-semibold text-[#ffa116]">{data.rating}</span>
+                              </div>
+                            </div>
+                          );
+                        }
+                        return null;
+                      }}
                     />
                     <Line 
                       type="monotone" 
@@ -231,7 +252,7 @@ export default function CompetitiveProgramming() {
                   <div className="relative z-10 flex flex-col h-full justify-between">
                     <div>
                       <span className="text-xs text-gray-400 mb-2 block">
-                        {new Date(h.contest.startTime * 1000).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                        {formatContestDate(h.contest.startTime)}
                       </span>
                       <h5 className="font-bold font-heading text-white text-base line-clamp-2 mb-4" title={h.contest.title}>{h.contest.title}</h5>
                     </div>
