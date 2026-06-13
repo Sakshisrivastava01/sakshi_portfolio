@@ -35,6 +35,8 @@ interface LeetCodeData {
   badges: LCBadge[];
   history: LCContestHistory[];
   calendar: Record<string, number>;
+  activeDays: number;
+  streak: number;
 }
 
 interface CPData {
@@ -219,37 +221,6 @@ export default function CompetitiveProgramming() {
     const sortedDates = Array.from(dates).sort();
     
     let maxStreak = 0;
-    let currentStreak = 0;
-    
-    const now = new Date();
-    const todayUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
-    
-    const formatDateStr = (d: Date) => {
-      const yyyy = d.getUTCFullYear();
-      const mm = String(d.getUTCMonth() + 1).padStart(2, '0');
-      const dd = String(d.getUTCDate()).padStart(2, '0');
-      return `${yyyy}-${mm}-${dd}`;
-    };
-    
-    const todayStr = formatDateStr(todayUTC);
-    const yesterday = new Date(todayUTC);
-    yesterday.setUTCDate(yesterday.getUTCDate() - 1);
-    const yesterdayStr = formatDateStr(yesterday);
-    
-    // Current streak calculation
-    if (dates.has(todayStr)) {
-      const temp = new Date(todayUTC);
-      while (dates.has(formatDateStr(temp))) {
-        currentStreak++;
-        temp.setUTCDate(temp.getUTCDate() - 1);
-      }
-    } else if (dates.has(yesterdayStr)) {
-      const temp = new Date(yesterday);
-      while (dates.has(formatDateStr(temp))) {
-        currentStreak++;
-        temp.setUTCDate(temp.getUTCDate() - 1);
-      }
-    }
     
     // Max streak calculation (mid-day UTC to avoid DST transition/day-light savings gaps)
     let prevDateParts: { y: number; m: number; d: number } | null = null;
@@ -278,13 +249,15 @@ export default function CompetitiveProgramming() {
       prevDateParts = { y, m, d };
     });
     
-    const activeDays = dates.size;
+    const activeDays = lc.activeDays || dates.size;
+    const currentStreak = lc.streak || 0;
+    const finalMaxStreak = Math.max(maxStreak, currentStreak);
     const consistency = Math.round((activeDays / 365) * 100);
     
     return {
       totalSolved: lc.solved || 0,
       currentStreak,
-      maxStreak,
+      maxStreak: finalMaxStreak,
       activeDays,
       consistency
     };

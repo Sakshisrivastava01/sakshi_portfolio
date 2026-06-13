@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+
 const FALLBACK_DATA = {
   username: '_sakshi19_',
   solved: 0,
@@ -10,7 +12,9 @@ const FALLBACK_DATA = {
   contestCount: 0,
   badges: [],
   history: [],
-  calendar: {}
+  calendar: {},
+  activeDays: 0,
+  streak: 0
 };
 
 async function getLeetCode(username: string) {
@@ -20,6 +24,11 @@ async function getLeetCode(username: string) {
         matchedUser(username: $username) {
           submitStats { acSubmissionNum { difficulty count } }
           badges { displayName icon creationDate category }
+          userCalendar {
+            activeYears
+            streak
+            totalActiveDays
+          }
           submissionCalendar
         }
         userContestRanking(username: $username) { 
@@ -39,7 +48,6 @@ async function getLeetCode(username: string) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ query, variables: { username } }),
-      next: { revalidate: 3600 }
     });
     
     if (!res.ok) {
@@ -70,7 +78,9 @@ async function getLeetCode(username: string) {
       contestCount: contest?.attendedContestsCount || 0,
       badges: matchedUser?.badges || [],
       history: history.filter((h: { rating?: number; contest?: unknown }) => h.rating && h.contest).slice(-20), // Last 20 attended contests
-      calendar
+      calendar,
+      activeDays: matchedUser?.userCalendar?.totalActiveDays || 0,
+      streak: matchedUser?.userCalendar?.streak || 0
     };
   } catch (error) {
     console.error('LeetCode fetch error:', error);
