@@ -2,9 +2,11 @@ import { NextResponse } from 'next/server';
 
 const FALLBACK_DATA = {
   username: '_sakshi19_',
-  solved: 470,
-  rating: 1735,
-  rank: '11.16%',
+  solved: 0,
+  rating: 0,
+  rank: 'N/A',
+  topPercentage: 0,
+  globalRanking: 0,
   contestCount: 0,
   badges: [],
   history: [],
@@ -17,13 +19,14 @@ async function getLeetCode(username: string) {
       query getUserProfile($username: String!) {
         matchedUser(username: $username) {
           submitStats { acSubmissionNum { difficulty count } }
-          badges { displayName icon }
+          badges { displayName icon creationDate category }
           submissionCalendar
         }
         userContestRanking(username: $username) { 
           rating 
           topPercentage 
           attendedContestsCount
+          globalRanking
         }
         userContestRankingHistory(username: $username) {
           rating
@@ -59,10 +62,12 @@ async function getLeetCode(username: string) {
 
     return {
       username,
-      solved: solved || FALLBACK_DATA.solved,
-      rating: contest?.rating ? Math.round(contest.rating) : FALLBACK_DATA.rating,
-      rank: contest?.topPercentage ? `Top ${contest.topPercentage}%` : FALLBACK_DATA.rank,
-      contestCount: contest?.attendedContestsCount || FALLBACK_DATA.contestCount,
+      solved: solved || 0,
+      rating: contest?.rating ? Math.round(contest.rating) : 0,
+      rank: contest?.globalRanking ? contest.globalRanking.toLocaleString() : 'N/A',
+      topPercentage: contest?.topPercentage || 0,
+      globalRanking: contest?.globalRanking || 0,
+      contestCount: contest?.attendedContestsCount || 0,
       badges: matchedUser?.badges || [],
       history: history.filter((h: { rating?: number; contest?: unknown }) => h.rating && h.contest).slice(-20), // Last 20 attended contests
       calendar

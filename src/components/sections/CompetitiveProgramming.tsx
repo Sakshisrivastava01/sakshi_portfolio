@@ -19,6 +19,9 @@ interface LCContestHistory {
 interface LCBadge {
   displayName: string;
   icon: string;
+  hoverText?: string;
+  creationDate?: string;
+  category?: string;
 }
 
 interface LeetCodeData {
@@ -26,6 +29,8 @@ interface LeetCodeData {
   solved: number;
   rating: number;
   rank: string;
+  topPercentage: number;
+  globalRanking: number;
   contestCount: number;
   badges: LCBadge[];
   history: LCContestHistory[];
@@ -36,88 +41,67 @@ interface CPData {
   leetcode: LeetCodeData;
 }
 
-// Helper to format dates consistently (e.g. DD MMM YYYY)
+// Helper to format dates consistently in UTC (e.g. DD MMM YYYY)
 const formatContestDate = (startTimeSeconds: number): string => {
   const date = new Date(startTimeSeconds * 1000);
   const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  const day = String(date.getDate()).padStart(2, '0');
-  const month = MONTHS[date.getMonth()];
-  const year = date.getFullYear();
+  const day = String(date.getUTCDate()).padStart(2, '0');
+  const month = MONTHS[date.getUTCMonth()];
+  const year = date.getUTCFullYear();
   return `${day} ${month} ${year}`;
 };
 
-// Helper for full date format (e.g. Sat, Jan 31, 2026)
+// Helper for full date format in UTC (e.g. Sat, Jan 31, 2026)
 const formatFullDate = (d: Date): string => {
   const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  return `${DAYS[d.getDay()]}, ${MONTHS[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+  return `${DAYS[d.getUTCDay()]}, ${MONTHS[d.getUTCMonth()]} ${d.getUTCDate()}, ${d.getUTCFullYear()}`;
 };
 
 interface BadgeDetail {
   date: string;
-  category: "Contest" | "Streak" | "Challenge";
+  category: "Contest" | "Streak" | "Quest";
   color: string;
   glowColor: string;
 }
 
-const getBadgeDetails = (displayName: string): BadgeDetail => {
-  let date = "Jan 2026";
-  let category: "Contest" | "Streak" | "Challenge" = "Challenge";
-  let color = "from-amber-500 to-orange-600";
-  let glowColor = "rgba(245, 158, 11, 0.4)";
+const formatBadgeDate = (dateStr?: string): string => {
+  if (!dateStr) return "N/A";
+  const parts = dateStr.split('-');
+  if (parts.length !== 3) return dateStr;
+  const year = parts[0];
+  const monthIdx = parseInt(parts[1], 10) - 1;
+  const day = parseInt(parts[2], 10);
+  const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const monthName = MONTHS[monthIdx] || parts[1];
+  return `${day} ${monthName} ${year}`;
+};
+
+const getBadgeDetails = (badge: LCBadge): BadgeDetail => {
+  const name = badge.displayName.toLowerCase();
+  const cat = (badge.category || "").toLowerCase();
   
-  const name = displayName.toLowerCase();
+  const date = formatBadgeDate(badge.creationDate);
+  let category: "Contest" | "Streak" | "Quest" = "Quest";
+  let color = "from-blue-400 to-indigo-600";
+  let glowColor = "rgba(59, 130, 246, 0.4)";
   
-  if (name.includes("100 days")) {
-    date = "Apr 2026";
+  if (cat === "annual" || name.includes("days")) {
     category = "Streak";
     color = "from-rose-500 to-red-600";
     glowColor = "rgba(239, 68, 68, 0.4)";
-  } else if (name.includes("50 days")) {
-    date = "Mar 2026";
-    category = "Streak";
-    color = "from-pink-500 to-rose-600";
-    glowColor = "rgba(244, 63, 94, 0.4)";
-  } else if (name.includes("may leetcoding")) {
-    date = "May 2026";
-    category = "Challenge";
-    color = "from-emerald-400 to-teal-600";
-    glowColor = "rgba(16, 185, 129, 0.4)";
-  } else if (name.includes("apr leetcoding")) {
-    date = "Apr 2026";
-    category = "Challenge";
-    color = "from-cyan-400 to-blue-600";
-    glowColor = "rgba(6, 182, 212, 0.4)";
-  } else if (name.includes("mar leetcoding")) {
-    date = "Mar 2026";
-    category = "Challenge";
-    color = "from-indigo-400 to-purple-600";
-    glowColor = "rgba(129, 140, 248, 0.4)";
-  } else if (name.includes("feb leetcoding")) {
-    date = "Feb 2026";
-    category = "Challenge";
-    color = "from-violet-400 to-fuchsia-600";
-    glowColor = "rgba(139, 92, 246, 0.4)";
-  } else if (name.includes("knight") || name.includes("guardian")) {
-    date = "2026";
+  } else if (cat === "contest" || name.includes("knight") || name.includes("guardian") || name.includes("contest")) {
     category = "Contest";
     color = "from-yellow-400 to-amber-600";
     glowColor = "rgba(251, 191, 36, 0.4)";
-  } else if (name.includes("data navigator")) {
-    date = "Feb 2026";
-    category = "Challenge";
-    color = "from-blue-400 to-indigo-600";
-    glowColor = "rgba(59, 130, 246, 0.4)";
-  } else if (name.includes("mathematical")) {
-    date = "Jan 2026";
-    category = "Challenge";
-    color = "from-violet-400 to-indigo-600";
+  } else if (cat === "dcc" || name.includes("leetcoding")) {
+    category = "Quest";
+    color = "from-emerald-400 to-teal-600";
+    glowColor = "rgba(16, 185, 129, 0.4)";
+  } else {
+    category = "Quest";
+    color = "from-indigo-400 to-purple-600";
     glowColor = "rgba(139, 92, 246, 0.4)";
-  } else if (name.includes("algorithm")) {
-    date = "Jan 2026";
-    category = "Challenge";
-    color = "from-amber-400 to-orange-600";
-    glowColor = "rgba(245, 158, 11, 0.4)";
   }
   
   return { date, category, color, glowColor };
@@ -226,9 +210,9 @@ export default function CompetitiveProgramming() {
     const dates = new Set<string>();
     for (const ts of Object.keys(lc.calendar)) {
       const d = new Date(parseInt(ts) * 1000);
-      const yyyy = d.getFullYear();
-      const mm = String(d.getMonth() + 1).padStart(2, '0');
-      const dd = String(d.getDate()).padStart(2, '0');
+      const yyyy = d.getUTCFullYear();
+      const mm = String(d.getUTCMonth() + 1).padStart(2, '0');
+      const dd = String(d.getUTCDate()).padStart(2, '0');
       dates.add(`${yyyy}-${mm}-${dd}`);
     }
     
@@ -236,51 +220,54 @@ export default function CompetitiveProgramming() {
     
     let maxStreak = 0;
     let currentStreak = 0;
-    let tempStreak = 0;
     
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const now = new Date();
+    const todayUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
     
     const formatDateStr = (d: Date) => {
-      const yyyy = d.getFullYear();
-      const mm = String(d.getMonth() + 1).padStart(2, '0');
-      const dd = String(d.getDate()).padStart(2, '0');
+      const yyyy = d.getUTCFullYear();
+      const mm = String(d.getUTCMonth() + 1).padStart(2, '0');
+      const dd = String(d.getUTCDate()).padStart(2, '0');
       return `${yyyy}-${mm}-${dd}`;
     };
     
-    const todayStr = formatDateStr(today);
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
+    const todayStr = formatDateStr(todayUTC);
+    const yesterday = new Date(todayUTC);
+    yesterday.setUTCDate(yesterday.getUTCDate() - 1);
     const yesterdayStr = formatDateStr(yesterday);
     
-    let startStreakFrom = today;
-    if (!dates.has(todayStr) && dates.has(yesterdayStr)) {
-      startStreakFrom = yesterday;
-    } else if (!dates.has(todayStr) && !dates.has(yesterdayStr)) {
-      startStreakFrom = today;
-    }
-    
-    const tempCurrentDate = new Date(startStreakFrom);
-    if (dates.has(formatDateStr(tempCurrentDate))) {
-      while (true) {
-        const dateStr = formatDateStr(tempCurrentDate);
-        if (dates.has(dateStr)) {
-          currentStreak++;
-          tempCurrentDate.setDate(tempCurrentDate.getDate() - 1);
-        } else {
-          break;
-        }
+    // Current streak calculation
+    if (dates.has(todayStr)) {
+      const temp = new Date(todayUTC);
+      while (dates.has(formatDateStr(temp))) {
+        currentStreak++;
+        temp.setUTCDate(temp.getUTCDate() - 1);
+      }
+    } else if (dates.has(yesterdayStr)) {
+      const temp = new Date(yesterday);
+      while (dates.has(formatDateStr(temp))) {
+        currentStreak++;
+        temp.setUTCDate(temp.getUTCDate() - 1);
       }
     }
     
-    let prevDate: Date | null = null;
+    // Max streak calculation (mid-day UTC to avoid DST transition/day-light savings gaps)
+    let prevDateParts: { y: number; m: number; d: number } | null = null;
+    let tempStreak = 0;
     sortedDates.forEach((dateStr) => {
-      const currDate = new Date(dateStr);
-      if (prevDate === null) {
+      const parts = dateStr.split('-');
+      const y = parseInt(parts[0], 10);
+      const m = parseInt(parts[1], 10) - 1;
+      const d = parseInt(parts[2], 10);
+      
+      const currTime = Date.UTC(y, m, d, 12, 0, 0);
+      
+      if (prevDateParts === null) {
         tempStreak = 1;
       } else {
-        const diffTime = Math.abs(currDate.getTime() - prevDate.getTime());
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        const prevTime = Date.UTC(prevDateParts.y, prevDateParts.m, prevDateParts.d, 12, 0, 0);
+        const diffTime = currTime - prevTime;
+        const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
         if (diffDays === 1) {
           tempStreak++;
         } else if (diffDays > 1) {
@@ -288,7 +275,7 @@ export default function CompetitiveProgramming() {
         }
       }
       maxStreak = Math.max(maxStreak, tempStreak);
-      prevDate = currDate;
+      prevDateParts = { y, m, d };
     });
     
     const activeDays = dates.size;
@@ -307,15 +294,16 @@ export default function CompetitiveProgramming() {
   const heatmapDataList = useMemo(() => {
     if (!lc?.calendar) return [];
     
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const now = new Date();
+    const todayUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
     
-    const startDate = new Date(today);
-    startDate.setDate(startDate.getDate() - 364);
+    const endDate = new Date(todayUTC);
+    const dayOfWeek = endDate.getUTCDay();
+    const diffToSunday = dayOfWeek === 0 ? 0 : 7 - dayOfWeek;
+    endDate.setUTCDate(endDate.getUTCDate() + diffToSunday);
     
-    const dayOfWeek = startDate.getDay();
-    const diffToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
-    startDate.setDate(startDate.getDate() - diffToMonday);
+    const startDate = new Date(endDate);
+    startDate.setUTCDate(startDate.getUTCDate() - 363);
     
     const days = [];
     const tempDate = new Date(startDate);
@@ -323,18 +311,13 @@ export default function CompetitiveProgramming() {
     const calendarLookup: Record<string, number> = {};
     for (const [ts, c] of Object.entries(lc.calendar)) {
       const subDate = new Date(parseInt(ts) * 1000);
-      const key = `${subDate.getFullYear()}-${String(subDate.getMonth() + 1).padStart(2, '0')}-${String(subDate.getDate()).padStart(2, '0')}`;
+      const key = `${subDate.getUTCFullYear()}-${String(subDate.getUTCMonth() + 1).padStart(2, '0')}-${String(subDate.getUTCDate()).padStart(2, '0')}`;
       calendarLookup[key] = (calendarLookup[key] || 0) + c;
     }
     
-    const endDate = new Date(today);
-    const endDayOfWeek = endDate.getDay();
-    const diffToSunday = endDayOfWeek === 0 ? 0 : 7 - endDayOfWeek;
-    endDate.setDate(endDate.getDate() + diffToSunday);
-    
     while (tempDate <= endDate) {
       const d = new Date(tempDate);
-      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      const key = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`;
       const count = calendarLookup[key] || 0;
       
       let intensity: 0 | 1 | 2 | 3 | 4 = 0;
@@ -350,7 +333,7 @@ export default function CompetitiveProgramming() {
         key
       });
       
-      tempDate.setDate(tempDate.getDate() + 1);
+      tempDate.setUTCDate(tempDate.getUTCDate() + 1);
     }
     
     return days;
@@ -364,6 +347,32 @@ export default function CompetitiveProgramming() {
     return w;
   }, [heatmapDataList]);
 
+  // Sort badges dynamically by creationDate (descending)
+  const sortedBadges = useMemo(() => {
+    if (!lc?.badges) return [];
+    return [...lc.badges].sort((a, b) => {
+      const dateA = a.creationDate || "";
+      const dateB = b.creationDate || "";
+      return dateB.localeCompare(dateA);
+    });
+  }, [lc]);
+
+  // Featured badge is the most recent badge
+  const featuredBadge = useMemo(() => {
+    if (sortedBadges.length === 0) return null;
+    return sortedBadges[0];
+  }, [sortedBadges]);
+
+  // Remaining badges
+  const remainingBadges = useMemo(() => {
+    if (sortedBadges.length === 0) return [];
+    return sortedBadges.filter(b => b.displayName !== featuredBadge?.displayName);
+  }, [sortedBadges, featuredBadge]);
+
+  const displayedBadges = useMemo(() => {
+    return showAllBadges ? remainingBadges : remainingBadges.slice(0, 4);
+  }, [showAllBadges, remainingBadges]);
+
   // Badge statistics
   const badgeStats = useMemo(() => {
     if (!lc?.badges) return { total: 0, contest: 0, streak: 0, challenge: 0 };
@@ -371,10 +380,10 @@ export default function CompetitiveProgramming() {
     let streak = 0;
     let challenge = 0;
     lc.badges.forEach((b) => {
-      const { category } = getBadgeDetails(b.displayName);
+      const { category } = getBadgeDetails(b);
       if (category === "Contest") contest++;
       else if (category === "Streak") streak++;
-      else if (category === "Challenge") challenge++;
+      else if (category === "Quest") challenge++;
     });
     return {
       total: lc.badges.length,
@@ -383,28 +392,6 @@ export default function CompetitiveProgramming() {
       challenge
     };
   }, [lc]);
-
-  // Featured badge
-  const featuredBadge = useMemo(() => {
-    if (!lc?.badges || lc.badges.length === 0) return null;
-    const badge100 = lc.badges.find(b => b.displayName.includes("100 Days"));
-    if (badge100) return badge100;
-    const badge50 = lc.badges.find(b => b.displayName.includes("50 Days"));
-    if (badge50) return badge50;
-    const streakBadge = lc.badges.find(b => getBadgeDetails(b.displayName).category === "Streak");
-    if (streakBadge) return streakBadge;
-    return lc.badges[0];
-  }, [lc]);
-
-  // Remaining badges
-  const remainingBadges = useMemo(() => {
-    if (!lc?.badges) return [];
-    return lc.badges.filter(b => b.displayName !== featuredBadge?.displayName);
-  }, [lc, featuredBadge]);
-
-  const displayedBadges = useMemo(() => {
-    return showAllBadges ? remainingBadges : remainingBadges.slice(0, 4);
-  }, [showAllBadges, remainingBadges]);
 
   const recentContests = useMemo(() => {
     if (!lc?.history) return [];
@@ -463,8 +450,15 @@ export default function CompetitiveProgramming() {
           </div>
           <div className="glass-panel p-6 md:p-8 rounded-3xl border border-white/5 hover:border-accent-purple/30 transition-all duration-300 relative overflow-hidden group">
              <div className="absolute inset-0 bg-gradient-to-br from-accent-purple/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-             <div className="text-gray-400 text-xs uppercase tracking-widest font-semibold mb-2 relative z-10">Global Percentile</div>
-             <div className="text-4xl font-bold font-heading text-white relative z-10">{loading && !lc ? '...' : lc?.rank || 'N/A'}</div>
+             <div className="text-gray-400 text-xs uppercase tracking-widest font-semibold mb-2 relative z-10">Global Ranking</div>
+             <div className="text-4xl font-bold font-heading text-white relative z-10">
+               {loading && !lc ? '...' : (lc?.globalRanking ? `#${lc.globalRanking.toLocaleString()}` : 'N/A')}
+             </div>
+             {lc?.topPercentage !== undefined && lc.topPercentage > 0 && (
+               <div className="text-xs text-accent-lavender font-semibold mt-1.5 font-mono relative z-10">
+                 Top {lc.topPercentage}%
+               </div>
+             )}
           </div>
           <div className="glass-panel p-6 md:p-8 rounded-3xl border border-white/5 hover:border-blue-400/30 transition-all duration-300 relative overflow-hidden group">
              <div className="absolute inset-0 bg-gradient-to-br from-blue-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -641,8 +635,8 @@ export default function CompetitiveProgramming() {
                     <div className="relative flex-1 h-full select-none">
                       {weeks.map((week, colIndex) => {
                         const prevWeek = weeks[colIndex - 1];
-                        const currentMonth = week[0].date.getMonth();
-                        const prevMonth = prevWeek ? prevWeek[0].date.getMonth() : -1;
+                        const currentMonth = week[0].date.getUTCMonth();
+                        const prevMonth = prevWeek ? prevWeek[0].date.getUTCMonth() : -1;
                         
                         if (currentMonth !== prevMonth) {
                           const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -665,11 +659,14 @@ export default function CompetitiveProgramming() {
                   {/* Heatmap Columns */}
                   <div className="flex gap-1 overflow-x-auto pb-4 custom-scrollbar select-none">
                     {/* Weekdays labels */}
-                    <div className="flex flex-col gap-1 pr-2 justify-between h-[120px] text-[9px] text-gray-500 font-mono font-semibold pt-1 shrink-0 w-8">
-                      <span>Mon</span>
-                      <span>Wed</span>
-                      <span>Fri</span>
-                      <span>Sun</span>
+                    <div className="flex flex-col gap-1 pr-2 text-[9px] text-gray-500 font-mono font-semibold shrink-0 w-8">
+                      <span className="h-3.5 flex items-center">Mon</span>
+                      <span className="h-3.5 flex items-center opacity-0">Tue</span>
+                      <span className="h-3.5 flex items-center">Wed</span>
+                      <span className="h-3.5 flex items-center opacity-0">Thu</span>
+                      <span className="h-3.5 flex items-center">Fri</span>
+                      <span className="h-3.5 flex items-center opacity-0">Sat</span>
+                      <span className="h-3.5 flex items-center font-bold text-accent-pink">Sun</span>
                     </div>
                     
                     {/* Weeks grid */}
@@ -806,7 +803,7 @@ export default function CompetitiveProgramming() {
                     
                     {/* Large Hexagon */}
                     {(() => {
-                      const { color, glowColor } = getBadgeDetails(featuredBadge.displayName);
+                      const { color, glowColor } = getBadgeDetails(featuredBadge);
                       return (
                         <HexagonBadge 
                           icon={featuredBadge.icon} 
@@ -830,13 +827,13 @@ export default function CompetitiveProgramming() {
                         <div>
                           <span className="text-[8px] text-gray-500 uppercase font-mono block">Class</span>
                           <span className="text-[10px] font-semibold text-white font-mono">
-                            {getBadgeDetails(featuredBadge.displayName).category}
+                            {getBadgeDetails(featuredBadge).category}
                           </span>
                         </div>
                         <div>
                           <span className="text-[8px] text-gray-500 uppercase font-mono block">Earned</span>
                           <span className="text-[10px] font-semibold text-[#ffa116] font-mono">
-                            {getBadgeDetails(featuredBadge.displayName).date}
+                            {getBadgeDetails(featuredBadge).date}
                           </span>
                         </div>
                       </div>
@@ -847,7 +844,7 @@ export default function CompetitiveProgramming() {
                 {/* Remaining Badges Grid */}
                 <div className="grid grid-cols-2 gap-3 flex-1">
                   {displayedBadges.map((badge, i) => {
-                    const { date, color, glowColor } = getBadgeDetails(badge.displayName);
+                    const { date, color, glowColor } = getBadgeDetails(badge);
                     return (
                       <motion.div 
                         key={badge.displayName}
