@@ -54,7 +54,13 @@ export default function Home() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
-    audioRef.current = document.getElementById("global-audio") as HTMLAudioElement;
+    const el = document.getElementById("global-audio") as HTMLAudioElement;
+    audioRef.current = el;
+    if (el && el.duration) {
+      setTimeout(() => {
+        setDuration(el.duration);
+      }, 0);
+    }
   }, []);
 
   const handleToggleAudio = async () => {
@@ -94,6 +100,7 @@ export default function Home() {
         }}
         onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
         onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)}
+        onDurationChange={(e) => setDuration(e.currentTarget.duration)}
         crossOrigin="anonymous"
       />
 
@@ -116,13 +123,13 @@ export default function Home() {
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
                     <div className="space-y-6 text-gray-300 text-lg leading-relaxed font-light">
                       <p>
-                        I am a Computer Science Engineering student specializing in Artificial Intelligence, currently pursuing my B.Tech at Parul Institute of Technology.
+                        I&apos;m Sakshi Srivastava, a Computer Science student passionate about Artificial Intelligence, Machine Learning, and intelligent software development.
                       </p>
                       <p>
-                        My passion lies at the intersection of <strong className="text-white font-medium">Artificial Intelligence, Machine Learning, and Backend Engineering</strong>. I thrive on building scalable software systems that bridge the gap between theoretical models and real-world applications.
+                        I enjoy building AI-powered applications and scalable backend systems that solve real-world problems.
                       </p>
                       <p>
-                        I am deeply focused on solving complex, real-world problems through intelligent systems, modern software engineering practices, and a relentless drive for continuous learning.
+                        With a strong foundation in problem-solving and software engineering, I continuously explore emerging technologies, work on innovative projects, and turn ideas into impactful solutions. My goal is to leverage AI and technology to create products that are both meaningful and efficient.
                       </p>
                     </div>
                     <div className="glass-panel p-10 rounded-3xl border border-white/5 shadow-[0_10px_30px_rgba(0,0,0,0.5)] relative overflow-hidden group">

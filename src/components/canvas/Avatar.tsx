@@ -42,7 +42,7 @@ export default function Avatar({ isSpeaking }: AvatarProps) {
   
   useEffect(() => {
     if (isSpeaking && !analyserRef.current) {
-      const audioEl = document.getElementById("avatar-audio") as HTMLAudioElement;
+      const audioEl = document.getElementById("global-audio") as HTMLAudioElement;
       if (audioEl) {
         const audioCtx = new (window.AudioContext || (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext)();
         const analyser = audioCtx.createAnalyser();
