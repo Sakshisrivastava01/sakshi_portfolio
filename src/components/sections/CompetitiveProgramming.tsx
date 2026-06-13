@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
-import { RefreshCw, Code2, Activity, Award, TrendingUp, Trophy, ExternalLink } from "lucide-react";
+import { RefreshCw, Code2, Activity, Award, TrendingUp, Trophy, ExternalLink, Flame, Calendar, Percent, ChevronDown, ChevronUp } from "lucide-react";
 import SectionLayout from "./SectionLayout";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import toast, { Toaster } from 'react-hot-toast';
@@ -46,9 +46,143 @@ const formatContestDate = (startTimeSeconds: number): string => {
   return `${day} ${month} ${year}`;
 };
 
+// Helper for full date format (e.g. Sat, Jan 31, 2026)
+const formatFullDate = (d: Date): string => {
+  const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  return `${DAYS[d.getDay()]}, ${MONTHS[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+};
+
+interface BadgeDetail {
+  date: string;
+  category: "Contest" | "Streak" | "Challenge";
+  color: string;
+  glowColor: string;
+}
+
+const getBadgeDetails = (displayName: string): BadgeDetail => {
+  let date = "Jan 2026";
+  let category: "Contest" | "Streak" | "Challenge" = "Challenge";
+  let color = "from-amber-500 to-orange-600";
+  let glowColor = "rgba(245, 158, 11, 0.4)";
+  
+  const name = displayName.toLowerCase();
+  
+  if (name.includes("100 days")) {
+    date = "Apr 2026";
+    category = "Streak";
+    color = "from-rose-500 to-red-600";
+    glowColor = "rgba(239, 68, 68, 0.4)";
+  } else if (name.includes("50 days")) {
+    date = "Mar 2026";
+    category = "Streak";
+    color = "from-pink-500 to-rose-600";
+    glowColor = "rgba(244, 63, 94, 0.4)";
+  } else if (name.includes("may leetcoding")) {
+    date = "May 2026";
+    category = "Challenge";
+    color = "from-emerald-400 to-teal-600";
+    glowColor = "rgba(16, 185, 129, 0.4)";
+  } else if (name.includes("apr leetcoding")) {
+    date = "Apr 2026";
+    category = "Challenge";
+    color = "from-cyan-400 to-blue-600";
+    glowColor = "rgba(6, 182, 212, 0.4)";
+  } else if (name.includes("mar leetcoding")) {
+    date = "Mar 2026";
+    category = "Challenge";
+    color = "from-indigo-400 to-purple-600";
+    glowColor = "rgba(129, 140, 248, 0.4)";
+  } else if (name.includes("feb leetcoding")) {
+    date = "Feb 2026";
+    category = "Challenge";
+    color = "from-violet-400 to-fuchsia-600";
+    glowColor = "rgba(139, 92, 246, 0.4)";
+  } else if (name.includes("knight") || name.includes("guardian")) {
+    date = "2026";
+    category = "Contest";
+    color = "from-yellow-400 to-amber-600";
+    glowColor = "rgba(251, 191, 36, 0.4)";
+  } else if (name.includes("data navigator")) {
+    date = "Feb 2026";
+    category = "Challenge";
+    color = "from-blue-400 to-indigo-600";
+    glowColor = "rgba(59, 130, 246, 0.4)";
+  } else if (name.includes("mathematical")) {
+    date = "Jan 2026";
+    category = "Challenge";
+    color = "from-violet-400 to-indigo-600";
+    glowColor = "rgba(139, 92, 246, 0.4)";
+  } else if (name.includes("algorithm")) {
+    date = "Jan 2026";
+    category = "Challenge";
+    color = "from-amber-400 to-orange-600";
+    glowColor = "rgba(245, 158, 11, 0.4)";
+  }
+  
+  return { date, category, color, glowColor };
+};
+
+// Hexagon Badge Component
+function HexagonBadge({ 
+  icon, 
+  name, 
+  date, 
+  size = "md", 
+  colorClass = "from-amber-400 to-orange-500", 
+  glowColor = "rgba(245, 158, 11, 0.4)" 
+}: { 
+  icon: string; 
+  name: string; 
+  date: string; 
+  size?: "md" | "lg"; 
+  colorClass?: string; 
+  glowColor?: string; 
+}) {
+  const isLarge = size === "lg";
+  const outerSize = isLarge ? "w-[120px] h-[120px]" : "w-[72px] h-[72px]";
+  
+  return (
+    <div className="flex flex-col items-center text-center">
+      <div 
+        className={`${outerSize} bg-gradient-to-br ${colorClass} p-[1.5px] hover:scale-105 transition-all duration-300 relative group flex items-center justify-center shrink-0`}
+        style={{
+          clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)',
+          filter: `drop-shadow(0 0 8px ${glowColor})`
+        }}
+      >
+        <div 
+          className="w-full h-full bg-[#0a0812] flex items-center justify-center"
+          style={{
+            clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)',
+          }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img 
+            src={icon.startsWith('/') ? `https://leetcode.com${icon}` : icon} 
+            alt={name} 
+            className={`${isLarge ? 'w-20 h-20' : 'w-11 h-11'} object-contain group-hover:rotate-12 transition-transform duration-500`}
+            loading="lazy"
+          />
+        </div>
+      </div>
+      
+      {name && (
+        <span className="font-semibold text-white mt-3 text-xs line-clamp-1 max-w-[120px] font-sans" title={name}>
+          {name}
+        </span>
+      )}
+      {date && (
+        <span className="text-[10px] text-gray-500 font-mono mt-0.5">{date}</span>
+      )}
+    </div>
+  );
+}
+
 export default function CompetitiveProgramming() {
   const [data, setData] = useState<CPData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showAllBadges, setShowAllBadges] = useState(false);
 
   const fetchData = async (showToast = false) => {
     try {
@@ -83,34 +217,194 @@ export default function CompetitiveProgramming() {
     }));
   }, [lc]);
 
-  // Generate heatmap data: last 365 days
-  const heatmapData = useMemo(() => {
-    if (!lc?.calendar) return Array(364).fill(0);
+  // Calculate stats, streaks, active days
+  const stats = useMemo(() => {
+    if (!lc?.calendar) {
+      return { totalSolved: 0, currentStreak: 0, maxStreak: 0, activeDays: 0, consistency: 0 };
+    }
+    
+    const dates = new Set<string>();
+    for (const ts of Object.keys(lc.calendar)) {
+      const d = new Date(parseInt(ts) * 1000);
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      dates.add(`${yyyy}-${mm}-${dd}`);
+    }
+    
+    const sortedDates = Array.from(dates).sort();
+    
+    let maxStreak = 0;
+    let currentStreak = 0;
+    let tempStreak = 0;
+    
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const days = [];
-    // Go back 364 days to have 52 complete weeks
-    for (let i = 364; i >= 0; i--) {
-      const d = new Date(today);
-      d.setDate(d.getDate() - i);
-      // so a proper approach is to group by YYYY-MM-DD. 
-      // But for simplicity, let's just check the exact timestamp or nearby ones
-      // Actually, LC provides exact day timestamps in UTC.
-      
-      // Better: Convert calendar to a local Date string map for lookup
-      let count = 0;
-      for (const [ts, c] of Object.entries(lc.calendar)) {
-         const subDate = new Date(parseInt(ts) * 1000);
-         if (subDate.getFullYear() === d.getFullYear() && 
-             subDate.getMonth() === d.getMonth() && 
-             subDate.getDate() === d.getDate()) {
-             count += c;
-         }
-      }
-      days.push(count);
+    
+    const formatDateStr = (d: Date) => {
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd}`;
+    };
+    
+    const todayStr = formatDateStr(today);
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = formatDateStr(yesterday);
+    
+    let startStreakFrom = today;
+    if (!dates.has(todayStr) && dates.has(yesterdayStr)) {
+      startStreakFrom = yesterday;
+    } else if (!dates.has(todayStr) && !dates.has(yesterdayStr)) {
+      startStreakFrom = today;
     }
+    
+    const tempCurrentDate = new Date(startStreakFrom);
+    if (dates.has(formatDateStr(tempCurrentDate))) {
+      while (true) {
+        const dateStr = formatDateStr(tempCurrentDate);
+        if (dates.has(dateStr)) {
+          currentStreak++;
+          tempCurrentDate.setDate(tempCurrentDate.getDate() - 1);
+        } else {
+          break;
+        }
+      }
+    }
+    
+    let prevDate: Date | null = null;
+    sortedDates.forEach((dateStr) => {
+      const currDate = new Date(dateStr);
+      if (prevDate === null) {
+        tempStreak = 1;
+      } else {
+        const diffTime = Math.abs(currDate.getTime() - prevDate.getTime());
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        if (diffDays === 1) {
+          tempStreak++;
+        } else if (diffDays > 1) {
+          tempStreak = 1;
+        }
+      }
+      maxStreak = Math.max(maxStreak, tempStreak);
+      prevDate = currDate;
+    });
+    
+    const activeDays = dates.size;
+    const consistency = Math.round((activeDays / 365) * 100);
+    
+    return {
+      totalSolved: lc.solved || 0,
+      currentStreak,
+      maxStreak,
+      activeDays,
+      consistency
+    };
+  }, [lc]);
+
+  // Generate heatmap data list
+  const heatmapDataList = useMemo(() => {
+    if (!lc?.calendar) return [];
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const startDate = new Date(today);
+    startDate.setDate(startDate.getDate() - 364);
+    
+    const dayOfWeek = startDate.getDay();
+    const diffToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+    startDate.setDate(startDate.getDate() - diffToMonday);
+    
+    const days = [];
+    const tempDate = new Date(startDate);
+    
+    const calendarLookup: Record<string, number> = {};
+    for (const [ts, c] of Object.entries(lc.calendar)) {
+      const subDate = new Date(parseInt(ts) * 1000);
+      const key = `${subDate.getFullYear()}-${String(subDate.getMonth() + 1).padStart(2, '0')}-${String(subDate.getDate()).padStart(2, '0')}`;
+      calendarLookup[key] = (calendarLookup[key] || 0) + c;
+    }
+    
+    const endDate = new Date(today);
+    const endDayOfWeek = endDate.getDay();
+    const diffToSunday = endDayOfWeek === 0 ? 0 : 7 - endDayOfWeek;
+    endDate.setDate(endDate.getDate() + diffToSunday);
+    
+    while (tempDate <= endDate) {
+      const d = new Date(tempDate);
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      const count = calendarLookup[key] || 0;
+      
+      let intensity: 0 | 1 | 2 | 3 | 4 = 0;
+      if (count > 0 && count <= 2) intensity = 1;
+      else if (count > 2 && count <= 4) intensity = 2;
+      else if (count > 4 && count <= 6) intensity = 3;
+      else if (count > 6) intensity = 4;
+      
+      days.push({
+        date: d,
+        count,
+        intensity,
+        key
+      });
+      
+      tempDate.setDate(tempDate.getDate() + 1);
+    }
+    
     return days;
   }, [lc]);
+  
+  const weeks = useMemo(() => {
+    const w = [];
+    for (let i = 0; i < heatmapDataList.length; i += 7) {
+      w.push(heatmapDataList.slice(i, i + 7));
+    }
+    return w;
+  }, [heatmapDataList]);
+
+  // Badge statistics
+  const badgeStats = useMemo(() => {
+    if (!lc?.badges) return { total: 0, contest: 0, streak: 0, challenge: 0 };
+    let contest = 0;
+    let streak = 0;
+    let challenge = 0;
+    lc.badges.forEach((b) => {
+      const { category } = getBadgeDetails(b.displayName);
+      if (category === "Contest") contest++;
+      else if (category === "Streak") streak++;
+      else if (category === "Challenge") challenge++;
+    });
+    return {
+      total: lc.badges.length,
+      contest,
+      streak,
+      challenge
+    };
+  }, [lc]);
+
+  // Featured badge
+  const featuredBadge = useMemo(() => {
+    if (!lc?.badges || lc.badges.length === 0) return null;
+    const badge100 = lc.badges.find(b => b.displayName.includes("100 Days"));
+    if (badge100) return badge100;
+    const badge50 = lc.badges.find(b => b.displayName.includes("50 Days"));
+    if (badge50) return badge50;
+    const streakBadge = lc.badges.find(b => getBadgeDetails(b.displayName).category === "Streak");
+    if (streakBadge) return streakBadge;
+    return lc.badges[0];
+  }, [lc]);
+
+  // Remaining badges
+  const remainingBadges = useMemo(() => {
+    if (!lc?.badges) return [];
+    return lc.badges.filter(b => b.displayName !== featuredBadge?.displayName);
+  }, [lc, featuredBadge]);
+
+  const displayedBadges = useMemo(() => {
+    return showAllBadges ? remainingBadges : remainingBadges.slice(0, 4);
+  }, [showAllBadges, remainingBadges]);
 
   const recentContests = useMemo(() => {
     if (!lc?.history) return [];
@@ -279,78 +573,325 @@ export default function CompetitiveProgramming() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           
-          {/* Heatmap */}
+          {/* Consistency Heatmap */}
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="glass-panel p-6 md:p-8 rounded-3xl border border-white/5 lg:col-span-2 overflow-x-auto"
+            className="p-6 md:p-8 rounded-3xl border border-white/[0.08] bg-[#0b0a12]/75 backdrop-blur-xl lg:col-span-2 flex flex-col shadow-2xl relative overflow-hidden group/heatmap"
           >
-            <h4 className="text-xl font-bold font-heading text-white mb-6 flex items-center gap-2">
-              <Activity className="text-[#ffa116]" /> Consistency Tracker
-            </h4>
-            <div className="min-w-[1040px] overflow-x-auto pb-4">
-              <div className="grid grid-rows-7 grid-flow-col gap-[4px]">
-                {heatmapData.map((count, i) => {
-                  let colorClass = 'bg-white/5';
-                  if (count > 0 && count <= 2) colorClass = 'bg-[#ffa116]/40';
-                  else if (count > 2 && count <= 5) colorClass = 'bg-[#ffa116]/70';
-                  else if (count > 5) colorClass = 'bg-[#ffa116]';
-                  
-                  return (
-                    <div 
-                      key={i} 
-                      className={`w-4 h-4 rounded-sm ${colorClass} hover:ring-1 hover:ring-white transition-all cursor-pointer`}
-                      title={`${count} submissions`}
-                    />
-                  );
-                })}
+            {/* Soft Ambient Light inside card */}
+            <div className="absolute -right-24 -top-24 w-48 h-48 bg-[#ffa116]/5 rounded-full blur-[80px] group-hover/heatmap:bg-[#ffa116]/10 transition-colors duration-1000 pointer-events-none" />
+            
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 relative z-10">
+              <div>
+                <h4 className="text-xl font-bold font-heading text-white flex items-center gap-2">
+                  <Activity className="text-[#ffa116]" /> Consistency Tracker
+                </h4>
+                <p className="text-xs text-gray-500 font-sans mt-0.5">LeetCode contributions map over the past year</p>
               </div>
-              <div className="flex justify-end items-center gap-2 mt-6 text-xs text-gray-400">
+              
+              {/* Legend */}
+              <div className="flex items-center gap-1.5 text-[10px] text-gray-500 font-mono self-start sm:self-center">
                 <span>Less</span>
-                <div className="flex gap-[4px]">
-                  <div className="w-4 h-4 rounded-sm bg-white/5" />
-                  <div className="w-4 h-4 rounded-sm bg-[#ffa116]/40" />
-                  <div className="w-4 h-4 rounded-sm bg-[#ffa116]/70" />
-                  <div className="w-4 h-4 rounded-sm bg-[#ffa116]" />
+                <div className="flex gap-[3px]">
+                  <div className="w-3 h-3 rounded-[2px] bg-[#1a1625]" title="No activity" />
+                  <div className="w-3 h-3 rounded-[2px] bg-[#2f3e1f]" title="1-2 submissions" />
+                  <div className="w-3 h-3 rounded-[2px] bg-[#4d6b2d]" title="3-4 submissions" />
+                  <div className="w-3 h-3 rounded-[2px] bg-[#79a83b]" title="5-6 submissions" />
+                  <div className="w-3 h-3 rounded-[2px] bg-[#c4ff5e] shadow-[0_0_8px_rgba(196,255,94,0.4)]" title="7+ submissions" />
                 </div>
                 <span>More</span>
               </div>
             </div>
+            
+            {loading && !lc ? (
+              <div className="animate-pulse space-y-4 relative z-10">
+                <div className="h-4 bg-white/5 rounded-md w-32 mb-2" />
+                <div className="flex gap-1 overflow-x-auto pb-4 select-none">
+                  <div className="flex flex-col gap-1 pr-2 justify-between h-[120px] pt-1 shrink-0 w-8">
+                    <div className="h-3 bg-white/5 rounded w-6" />
+                    <div className="h-3 bg-white/5 rounded w-6" />
+                    <div className="h-3 bg-white/5 rounded w-6" />
+                    <div className="h-3 bg-white/5 rounded w-6" />
+                  </div>
+                  <div className="flex gap-1">
+                    {Array(35).fill(0).map((_, i) => (
+                      <div key={i} className="flex flex-col gap-1">
+                        {Array(7).fill(0).map((_, j) => (
+                          <div key={j} className="w-3.5 h-3.5 rounded-[3px] bg-white/5" />
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 pt-6 border-t border-white/5 mt-2">
+                  {Array(5).fill(0).map((_, i) => (
+                    <div key={i} className="h-16 bg-white/5 rounded-2xl border border-white/5" />
+                  ))}
+                </div>
+              </div>
+            ) : lc && weeks.length > 0 ? (
+              <div className="relative z-10">
+                {/* Heatmap Grid Wrapper */}
+                <div className="flex flex-col gap-2">
+                  {/* Month Labels Row */}
+                  <div className="relative h-5 text-[10px] text-gray-500 font-mono flex">
+                    <div className="w-8 shrink-0" />
+                    <div className="relative flex-1 h-full select-none">
+                      {weeks.map((week, colIndex) => {
+                        const prevWeek = weeks[colIndex - 1];
+                        const currentMonth = week[0].date.getMonth();
+                        const prevMonth = prevWeek ? prevWeek[0].date.getMonth() : -1;
+                        
+                        if (currentMonth !== prevMonth) {
+                          const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                          const monthName = MONTHS[currentMonth];
+                          return (
+                            <div 
+                              key={colIndex} 
+                              className="absolute text-center" 
+                              style={{ left: `${colIndex * 19}px` }}
+                            >
+                              {monthName}
+                            </div>
+                          );
+                        }
+                        return null;
+                      })}
+                    </div>
+                  </div>
+                  
+                  {/* Heatmap Columns */}
+                  <div className="flex gap-1 overflow-x-auto pb-4 custom-scrollbar select-none">
+                    {/* Weekdays labels */}
+                    <div className="flex flex-col gap-1 pr-2 justify-between h-[120px] text-[9px] text-gray-500 font-mono font-semibold pt-1 shrink-0 w-8">
+                      <span>Mon</span>
+                      <span>Wed</span>
+                      <span>Fri</span>
+                      <span>Sun</span>
+                    </div>
+                    
+                    {/* Weeks grid */}
+                    <div className="flex gap-1">
+                      {weeks.map((week, colIndex) => (
+                        <div key={colIndex} className="flex flex-col gap-1">
+                          {week.map((day) => {
+                            let colorClass = "bg-[#1a1625]";
+                            let glowColor = "transparent";
+                            if (day.intensity === 1) {
+                              colorClass = "bg-[#2f3e1f]/80 hover:bg-[#2f3e1f]";
+                              glowColor = "rgba(47, 62, 31, 0.2)";
+                            } else if (day.intensity === 2) {
+                              colorClass = "bg-[#4d6b2d]/90 hover:bg-[#4d6b2d]";
+                              glowColor = "rgba(77, 107, 45, 0.4)";
+                            } else if (day.intensity === 3) {
+                              colorClass = "bg-[#79a83b]/90 hover:bg-[#79a83b]";
+                              glowColor = "rgba(121, 168, 59, 0.6)";
+                            } else if (day.intensity === 4) {
+                              colorClass = "bg-[#c4ff5e] hover:shadow-[0_0_12px_#c4ff5e]";
+                              glowColor = "rgba(196, 255, 94, 0.8)";
+                            }
+                            
+                            return (
+                              <div key={day.key} className="relative group">
+                                <div 
+                                  className={`w-3.5 h-3.5 rounded-[3px] transition-all duration-150 hover:scale-125 hover:ring-1 hover:ring-white/80 cursor-pointer ${colorClass}`}
+                                  style={{
+                                    boxShadow: day.intensity > 0 ? `0 0 8px ${glowColor}` : 'none'
+                                  }}
+                                />
+                                
+                                {/* Absolute Tooltip */}
+                                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:flex flex-col items-center pointer-events-none z-50">
+                                  <div className="bg-[#0b0813]/95 border border-white/10 px-3 py-1.5 rounded-lg text-[10px] text-gray-300 whitespace-nowrap shadow-2xl flex flex-col gap-0.5 backdrop-blur-md">
+                                    <span className="font-semibold text-white font-sans">{day.count} submissions</span>
+                                    <span className="text-gray-500 font-mono">{formatFullDate(day.date)}</span>
+                                  </div>
+                                  <div className="w-1.5 h-1.5 bg-[#0b0813] border-r border-b border-white/10 rotate-45 -mt-[4px]" />
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Stats Row */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 pt-6 border-t border-white/[0.05] mt-2">
+                  {[
+                    { label: "Total Solved", value: stats.totalSolved, icon: <Code2 className="text-[#ffa116] w-4.5 h-4.5" /> },
+                    { label: "Current Streak", value: `${stats.currentStreak} days`, icon: <Flame className="text-orange-500 w-4.5 h-4.5" /> },
+                    { label: "Max Streak", value: `${stats.maxStreak} days`, icon: <Trophy className="text-yellow-500 w-4.5 h-4.5" /> },
+                    { label: "Active Days", value: stats.activeDays, icon: <Calendar className="text-blue-400 w-4.5 h-4.5" /> },
+                    { label: "Consistency", value: `${stats.consistency}%`, icon: <Percent className="text-emerald-400 w-4.5 h-4.5" /> }
+                  ].map((item, i) => (
+                    <div key={i} className="glass-panel p-3.5 rounded-2xl border border-white/5 hover:border-white/10 transition-all duration-300 flex flex-col items-start gap-2.5 group/stat relative overflow-hidden">
+                      <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] to-transparent opacity-0 group-hover/stat:opacity-100 transition-opacity pointer-events-none" />
+                      <div className="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center shrink-0 border border-white/[0.05] group-hover/stat:scale-105 transition-transform duration-300">
+                        {item.icon}
+                      </div>
+                      <div>
+                        <div className="text-[9px] text-gray-500 font-mono uppercase tracking-wider">{item.label}</div>
+                        <div className="text-sm font-bold font-heading text-white mt-0.5">{item.value}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="w-full h-44 flex items-center justify-center text-gray-500 relative z-10">
+                No contribution data available.
+              </div>
+            )}
           </motion.div>
 
-          {/* Badges */}
+          {/* LeetCode Badges */}
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="glass-panel p-6 md:p-8 rounded-3xl border border-white/5 flex flex-col"
+            className="p-6 md:p-8 rounded-3xl border border-white/[0.08] bg-[#0b0a12]/75 backdrop-blur-xl flex flex-col shadow-2xl relative overflow-hidden group/badges"
           >
-            <h4 className="text-xl font-bold font-heading text-white mb-6 flex items-center gap-2">
-              <Award className="text-accent-purple" /> LeetCode Badges
-            </h4>
-            <div className="grid grid-cols-2 gap-4 overflow-y-auto custom-scrollbar pr-2">
-              {lc?.badges && lc.badges.length > 0 ? (
-                lc.badges.map((badge, i) => (
-                  <div key={i} className="flex flex-col items-center justify-center p-4 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors text-center gap-3">
-                    <div className="w-12 h-12 flex items-center justify-center">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img 
-                        src={badge.icon.startsWith('/') ? `https://leetcode.com${badge.icon}` : badge.icon} 
-                        alt={badge.displayName} 
-                        className="max-w-full max-h-full drop-shadow-md" 
-                        loading="lazy"
-                      />
-                    </div>
-                    <span className="text-xs font-medium text-gray-300">{badge.displayName}</span>
-                  </div>
-                ))
-              ) : (
-                <div className="col-span-2 flex items-center justify-center py-8 text-gray-500">
-                  {loading ? 'Loading badges...' : 'No badges earned yet.'}
-                </div>
-              )}
+            {/* Soft Ambient Light inside card */}
+            <div className="absolute -left-24 -top-24 w-48 h-48 bg-[#8a2be2]/5 rounded-full blur-[80px] group-hover/badges:bg-[#8a2be2]/10 transition-colors duration-1000 pointer-events-none" />
+
+            <div className="flex items-center justify-between mb-6 relative z-10">
+              <div>
+                <h4 className="text-xl font-bold font-heading text-white flex items-center gap-2">
+                  <Award className="text-accent-purple animate-pulse" /> LeetCode Badges
+                </h4>
+                <p className="text-xs text-gray-500 font-sans mt-0.5">Achievements and consistency milestones</p>
+              </div>
             </div>
+
+            {loading && !lc ? (
+              <div className="animate-pulse space-y-6 relative z-10">
+                <div className="grid grid-cols-4 gap-2">
+                  {Array(4).fill(0).map((_, i) => (
+                    <div key={i} className="h-14 bg-white/5 rounded-xl border border-white/5" />
+                  ))}
+                </div>
+                <div className="h-36 bg-white/5 rounded-2xl border border-white/5" />
+                <div className="grid grid-cols-2 gap-4">
+                  {Array(2).fill(0).map((_, i) => (
+                    <div key={i} className="h-28 bg-white/5 rounded-2xl border border-white/5" />
+                  ))}
+                </div>
+              </div>
+            ) : lc && lc.badges.length > 0 ? (
+              <div className="relative z-10 flex flex-col h-full">
+                
+                {/* Badges Summary Cards */}
+                <div className="grid grid-cols-4 gap-2 mb-6 select-none">
+                  {[
+                    { label: "Earned", value: badgeStats.total, color: "text-white" },
+                    { label: "Streak", value: badgeStats.streak, color: "text-rose-400" },
+                    { label: "Contest", value: badgeStats.contest, color: "text-amber-500" },
+                    { label: "Quest", value: badgeStats.challenge, color: "text-emerald-400" }
+                  ].map((stat, i) => (
+                    <div key={i} className="glass-panel p-2 rounded-xl border border-white/5 text-center flex flex-col justify-center">
+                      <span className="text-[8px] text-gray-500 uppercase font-mono block tracking-wider">{stat.label}</span>
+                      <span className={`text-base font-bold font-heading mt-0.5 ${stat.color}`}>{stat.value}</span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Featured Badge */}
+                {featuredBadge && (
+                  <div className="glass-panel p-4 rounded-2xl border border-white/5 relative overflow-hidden group/featured mb-6 flex items-center gap-4 shadow-lg hover:border-white/10 transition-all duration-300">
+                    <div className="absolute inset-0 bg-gradient-to-br from-accent-purple/[0.03] to-accent-pink/[0.03] opacity-50 group-hover/featured:opacity-100 transition-opacity duration-500 pointer-events-none" />
+                    
+                    {/* Large Hexagon */}
+                    {(() => {
+                      const { color, glowColor } = getBadgeDetails(featuredBadge.displayName);
+                      return (
+                        <HexagonBadge 
+                          icon={featuredBadge.icon} 
+                          name="" 
+                          date="" 
+                          size="lg" 
+                          colorClass={color}
+                          glowColor={glowColor}
+                        />
+                      );
+                    })()}
+                    
+                    <div className="relative z-10 flex-1 min-w-0">
+                      <span className="px-2 py-0.5 rounded-full bg-accent-purple/10 border border-accent-purple/20 text-accent-lavender text-[8px] font-mono font-bold tracking-wider uppercase shadow-[0_0_10px_rgba(138,43,226,0.2)]">
+                        ★ Featured Badge
+                      </span>
+                      <h5 className="text-sm font-bold font-heading text-white mt-1.5 truncate" title={featuredBadge.displayName}>
+                        {featuredBadge.displayName}
+                      </h5>
+                      <div className="flex gap-4 mt-2">
+                        <div>
+                          <span className="text-[8px] text-gray-500 uppercase font-mono block">Class</span>
+                          <span className="text-[10px] font-semibold text-white font-mono">
+                            {getBadgeDetails(featuredBadge.displayName).category}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-[8px] text-gray-500 uppercase font-mono block">Earned</span>
+                          <span className="text-[10px] font-semibold text-[#ffa116] font-mono">
+                            {getBadgeDetails(featuredBadge.displayName).date}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Remaining Badges Grid */}
+                <div className="grid grid-cols-2 gap-3 flex-1">
+                  {displayedBadges.map((badge, i) => {
+                    const { date, color, glowColor } = getBadgeDetails(badge.displayName);
+                    return (
+                      <motion.div 
+                        key={badge.displayName}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: i * 0.05 }}
+                        className="glass-panel p-3.5 rounded-2xl border border-white/5 hover:border-white/10 hover:shadow-[0_0_20px_rgba(255,255,255,0.02)] transition-all duration-300 flex flex-col items-center justify-center group/badge-card relative overflow-hidden"
+                      >
+                        <div className="absolute inset-0 bg-gradient-to-b from-white/[0.01] to-transparent opacity-0 group-hover/badge-card:opacity-100 transition-opacity pointer-events-none" />
+                        <HexagonBadge 
+                          icon={badge.icon} 
+                          name={badge.displayName} 
+                          date={date} 
+                          colorClass={color}
+                          glowColor={glowColor}
+                        />
+                      </motion.div>
+                    );
+                  })}
+                </div>
+
+                {/* View All Button */}
+                {remainingBadges.length > 4 && (
+                  <button
+                    onClick={() => setShowAllBadges(!showAllBadges)}
+                    className="mt-6 w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-accent-purple/30 text-xs text-gray-300 hover:text-white font-mono transition-all duration-300 group/btn"
+                  >
+                    {showAllBadges ? (
+                      <>
+                        Collapse Drawer <ChevronUp className="w-3.5 h-3.5 group-hover/btn:-translate-y-0.5 transition-transform" />
+                      </>
+                    ) : (
+                      <>
+                        View All Badges ({remainingBadges.length}) <ChevronDown className="w-3.5 h-3.5 group-hover/btn:translate-y-0.5 transition-transform" />
+                      </>
+                    )}
+                  </button>
+                )}
+              </div>
+            ) : (
+              <div className="w-full h-44 flex items-center justify-center text-gray-500 relative z-10">
+                No badges earned yet.
+              </div>
+            )}
           </motion.div>
 
         </div>
