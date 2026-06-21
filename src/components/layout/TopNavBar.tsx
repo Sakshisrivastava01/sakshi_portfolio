@@ -22,7 +22,7 @@ export default function TopNavBar() {
   const [activeSection, setActiveSection] = useState<string>("home");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [resumeUrl] = useState("/Sakshi_Srivastava_Resume.pdf");
+  const [resumeUrl] = useState("/Sakshi_Srivastava_Resume_2026.pdf");
   const router = useRouter();
 
   const handleLogoClick = useCallback(() => {
@@ -126,7 +126,7 @@ export default function TopNavBar() {
           <div className="flex items-center gap-4">
             <a
               href={resumeUrl}
-              download="Sakshi_Srivastava_Resume.pdf"
+              download="Sakshi_Srivastava_Resume_2026.pdf"
               className="hidden md:flex items-center gap-2 px-5 py-2 rounded-full bg-white/5 border border-white/10 hover:border-accent-pink/50 hover:bg-white/10 text-white text-sm font-medium transition-all duration-300 shadow-[0_0_15px_rgba(255,182,193,0.1)] hover:shadow-[0_0_20px_rgba(255,182,193,0.3)] group"
             >
               Resume
@@ -173,7 +173,7 @@ export default function TopNavBar() {
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 href={resumeUrl}
-                download="Sakshi_Srivastava_Resume.pdf"
+                download="Sakshi_Srivastava_Resume_2026.pdf"
                 className="mt-8 flex items-center justify-center gap-3 w-full py-4 rounded-xl bg-gradient-to-r from-accent-purple/20 to-accent-pink/20 border border-accent-pink/30 text-white font-semibold"
               >
                 Download Resume
