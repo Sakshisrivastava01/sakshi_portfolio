@@ -68,9 +68,9 @@ export default function InnovationLab() {
   const [selectedProject, setSelectedProject] = useState<ProjectData | null>(null);
 
   const themeColors = {
-    pink: "hover:border-pink-500/30 hover:shadow-[0_0_25px_rgba(244,63,94,0.06)]",
-    purple: "hover:border-purple-500/30 hover:shadow-[0_0_25px_rgba(168,85,247,0.06)]",
-    lavender: "hover:border-indigo-500/30 hover:shadow-[0_0_25px_rgba(99,102,241,0.06)]"
+    pink: "hover:border-pink-500/35 hover:shadow-[0_0_35px_rgba(244,63,94,0.08)]",
+    purple: "hover:border-purple-500/35 hover:shadow-[0_0_35px_rgba(168,85,247,0.08)]",
+    lavender: "hover:border-indigo-500/35 hover:shadow-[0_0_35px_rgba(99,102,241,0.08)]"
   };
 
   return (
@@ -92,7 +92,7 @@ export default function InnovationLab() {
         </div>
 
         {/* Premium 2-Column Projects Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
           {PROJECTS.map((project, idx) => (
             <motion.div
               key={project.id}
@@ -102,37 +102,54 @@ export default function InnovationLab() {
               transition={{ duration: 0.5, delay: idx * 0.1 }}
               onClick={() => setSelectedProject(project)}
               className={cn(
-                "group relative rounded-2xl border border-white/5 bg-[#0A0A0F]/65 backdrop-blur-xl overflow-hidden flex flex-col min-h-[250px] justify-between p-6 cursor-pointer hover:bg-[#0F0F16]/80 transition-all duration-300",
+                "group relative rounded-2xl border border-white/5 bg-[#0A0A0F]/70 backdrop-blur-xl overflow-hidden flex flex-col justify-between p-6 cursor-pointer hover:bg-[#0F0F16]/90 transition-all duration-300 hover:-translate-y-1 hover:border-purple-500/30 hover:shadow-[0_10px_30px_rgba(168,85,247,0.06)]",
                 themeColors[project.theme]
               )}
             >
-              {/* Tag & Status Row */}
-              <div className="flex items-center justify-between z-10">
-                <span className="text-[10px] text-gray-400 font-mono tracking-wider font-semibold">
-                  {project.tag}
-                </span>
-                <span className="text-[9px] px-2.5 py-0.5 rounded-full bg-white/5 border border-white/10 text-white font-mono">
-                  {project.status}
-                </span>
-              </div>
-
-              {/* Title & Description preview */}
-              <div className="z-10 mt-4">
-                <h3 className="text-xl font-bold font-heading text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-accent-lavender transition-all">
-                  {project.title}
-                </h3>
-                <p className="text-gray-400 text-xs font-light leading-relaxed mt-2 line-clamp-3">
-                  {project.description}
-                </p>
-              </div>
-
-              {/* Tech stack teaser list */}
-              <div className="flex flex-wrap gap-1 mt-4 z-10 pt-3 border-t border-white/5">
-                {project.tech.map((t) => (
-                  <span key={t} className="text-[9px] px-2 py-0.5 rounded bg-white/5 border border-white/5 text-gray-300 font-mono">
-                    {t}
+              {/* Soft background gradient overlay */}
+              <div className="absolute inset-0 bg-gradient-to-br from-white/[0.01] to-purple-500/[0.02] opacity-50 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+              
+              <div>
+                {/* Tag & Status Row */}
+                <div className="flex items-center justify-between z-10 relative">
+                  <span className="text-[10px] text-gray-400 font-mono tracking-wider font-semibold">
+                    {project.tag}
                   </span>
-                ))}
+                  <span className="text-[9px] px-2.5 py-0.5 rounded-full bg-white/5 border border-white/10 text-white font-mono">
+                    {project.status}
+                  </span>
+                </div>
+
+                {/* Title & Description preview */}
+                <div className="z-10 relative mt-4">
+                  <h3 className="text-xl font-bold font-heading text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-accent-lavender transition-all">
+                    {project.title}
+                  </h3>
+                  <p className="text-gray-400 text-xs font-light leading-relaxed mt-2 line-clamp-3">
+                    {project.description}
+                  </p>
+                </div>
+              </div>
+
+              <div>
+                {/* Project Impact Metrics Grid (Visible directly on card) */}
+                <div className="z-10 relative mt-5 grid grid-cols-2 sm:grid-cols-4 gap-2 pt-3 border-t border-white/5 select-none">
+                  {project.metrics.map((metric) => (
+                    <div key={metric.label} className="p-2 rounded bg-white/5 border border-white/5 hover:bg-white/10 transition-colors">
+                      <div className="text-xs font-bold text-white font-mono leading-tight">{metric.value}</div>
+                      <div className="text-[7px] text-gray-500 uppercase tracking-widest font-mono mt-0.5 leading-none">{metric.label}</div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Tech stack teaser list */}
+                <div className="flex flex-wrap gap-1 mt-4 z-10 relative pt-3 border-t border-white/5">
+                  {project.tech.map((t) => (
+                    <span key={t} className="text-[9px] px-2 py-0.5 rounded bg-white/5 border border-white/5 text-gray-300 font-mono">
+                      {t}
+                    </span>
+                  ))}
+                </div>
               </div>
             </motion.div>
           ))}

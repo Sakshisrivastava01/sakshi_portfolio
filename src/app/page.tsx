@@ -12,7 +12,7 @@ import CompetitiveProgramming from "@/components/sections/CompetitiveProgramming
 
 import { motion } from "framer-motion";
 import { 
-  GraduationCap, Trophy, Mail,
+  Trophy, Mail,
   BrainCircuit, CheckCircle2, Code2, MapPin
 } from "lucide-react";
 import { GithubIcon as Github, LinkedinIcon as Linkedin } from "@/components/icons/SocialIcons";
@@ -30,6 +30,19 @@ export default function Home() {
   const [duration, setDuration] = useState(0);
   const [audioUrl] = useState("/import.mp3");
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  const contactRef = useRef<HTMLDivElement>(null);
+  const [contactSpotlight, setContactSpotlight] = useState({ x: 0, y: 0 });
+  const [isContactHovered, setIsContactHovered] = useState(false);
+
+  const handleContactMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!contactRef.current) return;
+    const rect = contactRef.current.getBoundingClientRect();
+    setContactSpotlight({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    });
+  };
 
   useEffect(() => {
     const el = document.getElementById("global-audio") as HTMLAudioElement;
@@ -288,131 +301,165 @@ export default function Home() {
 
                 {/* 8. EDUCATION SECTION */}
                 <SectionLayout id="education" title="Education">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto py-2">
-                    
-                    {/* B.Tech */}
-                    <motion.div 
+                  <div className="max-w-3xl mx-auto py-2">
+                    <motion.div
                       initial={{ opacity: 0, y: 15 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
-                      transition={{ duration: 0.4 }}
-                      className="glass-panel p-5 rounded-2xl border border-white/5 bg-[#0A0A0F]/65 backdrop-blur-xl relative overflow-hidden flex flex-col justify-between hover:border-accent-pink/30 hover:shadow-[0_0_20px_rgba(255,182,193,0.06)] transition-all duration-300 group"
+                      className="glass-panel p-6 md:p-8 rounded-2xl border border-white/5 bg-[#0A0A0F]/65 backdrop-blur-xl relative overflow-hidden group hover:border-purple-500/20 transition-all duration-300"
                     >
-                      <div className="absolute inset-0 bg-gradient-to-br from-accent-pink/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-                      <div className="relative z-10">
-                        <div className="flex items-center gap-2 mb-3">
-                          <div className="p-1.5 rounded-lg bg-accent-pink/10 border border-accent-pink/20">
-                            <GraduationCap className="w-4 h-4 text-accent-pink" />
+                      {/* Ambient card glow background */}
+                      <div className="absolute inset-0 bg-gradient-to-br from-purple-500/[0.02] to-transparent pointer-events-none" />
+
+                      <div className="relative z-10 space-y-6 text-left">
+                        {/* Timeline Item 1: B.Tech CSE */}
+                        <div className="relative pl-6 border-l border-purple-500/30">
+                          {/* Dot Indicator */}
+                          <div className="absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full bg-accent-pink shadow-[0_0_8px_rgba(244,63,94,0.4)]" />
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-1">
+                            <h3 className="text-base font-bold text-white leading-snug">Bachelor of Technology in Computer Science</h3>
+                            <span className="text-[10px] text-accent-pink font-mono bg-accent-pink/10 border border-accent-pink/20 px-2.5 py-0.5 rounded font-semibold w-fit shrink-0">2023 – Present</span>
                           </div>
-                          <span className="text-[10px] text-accent-pink font-semibold tracking-widest uppercase font-mono">2023 – Present</span>
+                          <p className="text-xs text-gray-300 font-medium">Parul Institute of Technology</p>
+                          
+                          <div className="flex flex-wrap gap-x-4 gap-y-1.5 mt-2 text-[11px] text-gray-400 font-light">
+                            <span>CGPA: <strong className="text-white font-semibold font-mono">7.58</strong></span>
+                            <span className="hidden sm:inline text-white/10">|</span>
+                            <span>Coursework: <strong className="text-white/80 font-normal">Data Structures, Algorithms, DBMS, Operating Systems, OOP, Computer Networks, System Design</strong></span>
+                          </div>
+
+                          <div className="mt-3 select-none">
+                            <span className="text-[9px] text-gray-500 font-mono uppercase block mb-1">Key Achievements</span>
+                            <ul className="list-disc pl-4 text-xs text-gray-300 font-light space-y-1">
+                              <li><strong>Smart India Hackathon 2024</strong>: National Finalist as a Backend Developer.</li>
+                              <li><strong>MSU Footprints Hackathon</strong>: 1st Runner-Up position in Vadodara hackathon.</li>
+                              <li><strong>Open-Source Systems</strong>: Engineered Vaani-X speech buffers & NoteRoot AI retrieval logic.</li>
+                            </ul>
+                          </div>
                         </div>
-                        <h3 className="text-base font-bold text-white mb-1 group-hover:text-accent-pink transition-colors">B.Tech CSE</h3>
-                        <p className="text-gray-400 text-xs font-light">Parul Institute of Technology</p>
-                      </div>
-                      <div className="mt-6 pt-3 border-t border-white/5 flex items-center justify-between relative z-10">
-                        <span className="text-[10px] text-gray-500 font-mono uppercase">CGPA</span>
-                        <span className="text-xs font-bold text-white font-mono bg-accent-pink/10 border border-accent-pink/20 px-2 py-0.5 rounded">7.58</span>
+
+                        {/* Timeline Item 2: Class 12 */}
+                        <div className="relative pl-6 border-l border-purple-500/30">
+                          {/* Dot Indicator */}
+                          <div className="absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full bg-accent-lavender shadow-[0_0_8px_rgba(230,230,250,0.4)]" />
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-1">
+                            <h3 className="text-base font-bold text-white leading-snug">Higher Secondary Education (Class 12)</h3>
+                            <span className="text-[10px] text-accent-lavender font-mono bg-accent-lavender/10 border border-accent-lavender/20 px-2.5 py-0.5 rounded font-semibold w-fit shrink-0">2021 – 2023</span>
+                          </div>
+                          <p className="text-xs text-gray-300 font-medium">Divine Sainik School</p>
+                          
+                          <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-[11px] text-gray-400 font-light">
+                            <span>Percentage: <strong className="text-white font-semibold font-mono">76.7%</strong></span>
+                            <span className="hidden sm:inline text-white/10">|</span>
+                            <span>Stream: <strong className="text-white/80 font-normal">Science (PCM)</strong></span>
+                          </div>
+
+                          <div className="mt-3 select-none">
+                            <span className="text-[9px] text-gray-500 font-mono uppercase block mb-1">Key Achievements</span>
+                            <ul className="list-disc pl-4 text-xs text-gray-300 font-light space-y-1">
+                              <li>Ranked in top 15% of class in Science PCM under CBSE board.</li>
+                              <li>Maintained distinction score in Advanced Mathematics and Physics.</li>
+                            </ul>
+                          </div>
+                        </div>
+
+                        {/* Timeline Item 3: Class 10 */}
+                        <div className="relative pl-6">
+                          {/* Dot Indicator */}
+                          <div className="absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full bg-accent-purple shadow-[0_0_8px_rgba(168,85,247,0.4)]" />
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-1">
+                            <h3 className="text-base font-bold text-white leading-snug">Secondary Education (Class 10)</h3>
+                            <span className="text-[10px] text-accent-purple font-mono bg-accent-purple/10 border border-accent-purple/20 px-2.5 py-0.5 rounded font-semibold w-fit shrink-0">2019 – 2021</span>
+                          </div>
+                          <p className="text-xs text-gray-300 font-medium">Divine Sainik School</p>
+                          
+                          <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-[11px] text-gray-400 font-light">
+                            <span>Percentage: <strong className="text-white font-semibold font-mono">80.0%</strong></span>
+                          </div>
+
+                          <div className="mt-3 select-none">
+                            <span className="text-[9px] text-gray-500 font-mono uppercase block mb-1">Key Achievements</span>
+                            <ul className="list-disc pl-4 text-xs text-gray-300 font-light space-y-1">
+                              <li>Awarded Academic Distinction Grade in core Science and Mathematics subjects.</li>
+                            </ul>
+                          </div>
+                        </div>
                       </div>
                     </motion.div>
-
-                    {/* Class 12 */}
-                    <motion.div 
-                      initial={{ opacity: 0, y: 15 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.4, delay: 0.1 }}
-                      className="glass-panel p-5 rounded-2xl border border-white/5 bg-[#0A0A0F]/65 backdrop-blur-xl relative overflow-hidden flex flex-col justify-between hover:border-accent-lavender/30 hover:shadow-[0_0_20px_rgba(230,230,250,0.06)] transition-all duration-300 group"
-                    >
-                      <div className="absolute inset-0 bg-gradient-to-br from-accent-lavender/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-                      <div className="relative z-10">
-                        <div className="flex items-center gap-2 mb-3">
-                          <div className="p-1.5 rounded-lg bg-accent-lavender/10 border border-accent-lavender/20">
-                            <GraduationCap className="w-4 h-4 text-accent-lavender" />
-                          </div>
-                          <span className="text-[10px] text-accent-lavender font-semibold tracking-widest uppercase font-mono">2021 – 2023</span>
-                        </div>
-                        <h3 className="text-base font-bold text-white mb-1 group-hover:text-accent-lavender transition-colors">Higher Secondary</h3>
-                        <p className="text-gray-400 text-xs font-light">Divine Sainik School</p>
-                      </div>
-                      <div className="mt-6 pt-3 border-t border-white/5 flex items-center justify-between relative z-10">
-                        <span className="text-[10px] text-gray-500 font-mono uppercase">Percentage</span>
-                        <span className="text-xs font-bold text-white font-mono bg-accent-lavender/10 border border-accent-lavender/20 px-2 py-0.5 rounded">76.7%</span>
-                      </div>
-                    </motion.div>
-
-                    {/* Class 10 */}
-                    <motion.div 
-                      initial={{ opacity: 0, y: 15 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.4, delay: 0.2 }}
-                      className="glass-panel p-5 rounded-2xl border border-white/5 bg-[#0A0A0F]/65 backdrop-blur-xl relative overflow-hidden flex flex-col justify-between hover:border-accent-purple/30 hover:shadow-[0_0_20px_rgba(138,43,226,0.06)] transition-all duration-300 group"
-                    >
-                      <div className="absolute inset-0 bg-gradient-to-br from-accent-purple/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-                      <div className="relative z-10">
-                        <div className="flex items-center gap-2 mb-3">
-                          <div className="p-1.5 rounded-lg bg-accent-purple/10 border border-accent-purple/20">
-                            <GraduationCap className="w-4 h-4 text-accent-purple" />
-                          </div>
-                          <span className="text-[10px] text-accent-purple font-semibold tracking-widest uppercase font-mono">2019 – 2021</span>
-                        </div>
-                        <h3 className="text-base font-bold text-white mb-1 group-hover:text-accent-purple transition-colors">Secondary Education</h3>
-                        <p className="text-gray-400 text-xs font-light">Divine Sainik School</p>
-                      </div>
-                      <div className="mt-6 pt-3 border-t border-white/5 flex items-center justify-between relative z-10">
-                        <span className="text-[10px] text-gray-500 font-mono uppercase">Percentage</span>
-                        <span className="text-xs font-bold text-white font-mono bg-accent-purple/10 border border-accent-purple/20 px-2 py-0.5 rounded">80.0%</span>
-                      </div>
-                    </motion.div>
-
                   </div>
                 </SectionLayout>
 
                 {/* 9. CONTACT SECTION */}
                 <SectionLayout id="contact" title="Contact Me" className="pb-16 pt-8">
                   <div className="max-w-6xl mx-auto">
-                    <motion.div 
-                      initial={{ opacity: 0, y: 30 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.6 }}
-                      className="glass-panel p-6 md:p-10 rounded-2xl border border-white/5 bg-[#0A0A0F]/65 backdrop-blur-xl relative overflow-hidden group hover:border-accent-pink/30 transition-colors duration-500"
+                    <div 
+                      ref={contactRef}
+                      onMouseMove={handleContactMouseMove}
+                      onMouseEnter={() => setIsContactHovered(true)}
+                      onMouseLeave={() => setIsContactHovered(false)}
+                      className="glass-panel p-6 md:p-10 rounded-2xl border border-white/5 bg-[#0A0A0F]/65 backdrop-blur-xl relative overflow-hidden group hover:border-purple-500/20 transition-all duration-500"
                     >
-                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] bg-accent-glow rounded-full blur-[100px] opacity-10 group-hover:opacity-20 transition-opacity duration-700 pointer-events-none" />
+                      {/* Mouse Interactive Spotlight glow */}
+                      <div 
+                        className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl z-0"
+                        style={{
+                          background: isContactHovered 
+                            ? `radial-gradient(400px circle at ${contactSpotlight.x}px ${contactSpotlight.y}px, rgba(168,85,247,0.06), transparent 80%)` 
+                            : ""
+                        }}
+                      />
                       
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 relative z-10">
-                        {/* Left Column: Text and Details */}
-                        <div className="flex flex-col justify-center">
-                          <span className="text-xs font-mono font-bold text-accent-pink uppercase tracking-widest mb-2 flex items-center gap-1.5">
-                            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                        {/* Left Column: Personal Statement & Availability details */}
+                        <div className="flex flex-col justify-center text-left">
+                          <span className="text-[10px] font-mono font-bold text-accent-pink uppercase tracking-widest mb-3 flex items-center gap-1.5">
+                            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
                             Open to AI/ML Engineering Opportunities
                           </span>
                           
-                          <h3 className="text-3xl md:text-4xl font-bold font-heading text-white mb-4 tracking-tight leading-tight">
-                            Let&apos;s build something <br/>
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-pink to-accent-lavender">meaningful together.</span>
+                          <h3 className="text-3xl font-bold font-heading text-white mb-4 tracking-tight leading-tight">
+                            Let&apos;s build the future <br/>
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-pink via-white to-accent-lavender">together.</span>
                           </h3>
                           
-                          <p className="text-sm text-gray-400 font-light mb-8 leading-relaxed max-w-md">
-                            I am currently exploring opportunities in Backend Engineering and Artificial Intelligence. If you&apos;re looking for a dedicated engineer to help design and implement production-ready models, scalable pipelines, or robust systems, let&apos;s talk.
+                          <p className="text-sm text-gray-400 font-light mb-8 leading-relaxed">
+                            I am currently exploring opportunities in Machine Learning, Backend Architecture, and Generative AI systems. If you have an open position or are working on an exciting new product, feel free to reach out. I typically respond within 24 hours.
                           </p>
                           
-                          <div className="flex flex-col gap-5">
-                            <div className="inline-flex items-center gap-3 text-white hover:text-accent-pink transition-colors w-fit group/email">
-                              <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center border border-white/10 group-hover/email:border-accent-pink transition-colors">
+                          <div className="flex flex-col gap-4">
+                            <a 
+                              href="mailto:sakshisrivastava200306@gmail.com" 
+                              className="inline-flex items-center gap-3 text-gray-300 hover:text-accent-pink transition-colors w-fit group/link"
+                            >
+                              <div className="w-9 h-9 rounded-lg bg-white/5 flex items-center justify-center border border-white/5 group-hover/link:border-accent-pink transition-colors shrink-0">
                                 <Mail className="w-4 h-4" />
                               </div>
-                              <span className="text-sm font-medium">sakshisrivastava200306@gmail.com</span>
-                            </div>
+                              <span className="text-sm font-medium font-mono">sakshisrivastava200306@gmail.com</span>
+                            </a>
 
-                            <div className="inline-flex items-center gap-3 text-gray-400 w-fit">
-                              <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center border border-white/10">
+                            <div className="inline-flex items-center gap-3 text-gray-300 w-fit">
+                              <div className="w-9 h-9 rounded-lg bg-white/5 flex items-center justify-center border border-white/5 shrink-0">
                                 <MapPin className="w-4 h-4 text-accent-lavender" />
                               </div>
-                              <span className="text-sm font-medium">Gujarat, India (Remote Available)</span>
+                              <span className="text-sm font-medium font-mono">Gujarat, India (Remote Available)</span>
                             </div>
 
-                            <div className="flex gap-3 pt-2">
+                            {/* Direct Resume Download Link */}
+                            <a 
+                              href="/Sakshi_Srivastava_Resume_2026.pdf" 
+                              download="Sakshi_Srivastava_Resume_2026.pdf"
+                              className="inline-flex items-center gap-3 text-gray-300 hover:text-accent-pink transition-colors w-fit group/resume"
+                            >
+                              <div className="w-9 h-9 rounded-lg bg-white/5 flex items-center justify-center border border-white/5 group-hover/resume:border-accent-pink transition-colors shrink-0">
+                                <span className="relative flex h-2 w-2">
+                                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-pink opacity-75"></span>
+                                  <span className="relative inline-flex rounded-full h-2 w-2 bg-accent-pink"></span>
+                                </span>
+                              </div>
+                              <span className="text-sm font-semibold font-mono underline decoration-accent-purple/40 group-hover:decoration-accent-pink transition-colors">Download Resume PDF</span>
+                            </a>
+
+                            <div className="flex gap-3 pt-3 border-t border-white/5 max-w-xs">
                               {[
                                 { icon: <Github className="w-4 h-4" />, label: "GitHub", link: "https://github.com/Sakshisrivastava01" },
                                 { icon: <Linkedin className="w-4 h-4" />, label: "LinkedIn", link: "https://www.linkedin.com/in/sakshi19819/" },
@@ -424,7 +471,7 @@ export default function Home() {
                                   target="_blank" 
                                   rel="noopener noreferrer" 
                                   title={social.label} 
-                                  className="w-10 h-10 rounded-full glass-panel flex items-center justify-center text-gray-300 hover:text-white hover:bg-white/10 hover:scale-105 transition-all duration-200 border border-white/10 hover:border-accent-lavender"
+                                  className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center text-gray-300 hover:text-white hover:bg-white/10 hover:scale-105 transition-all duration-200 border border-white/5 hover:border-accent-lavender"
                                 >
                                   {social.icon}
                                 </a>
@@ -434,7 +481,7 @@ export default function Home() {
                         </div>
 
                         {/* Right Column: Contact Form */}
-                        <div className="bg-black/20 rounded-2xl p-5 md:p-6 border border-white/5 backdrop-blur-sm">
+                        <div className="bg-black/20 rounded-2xl p-5 md:p-6 border border-white/5 backdrop-blur-sm relative z-10">
                           <ContactForm />
                         </div>
                       </div>
@@ -449,7 +496,7 @@ export default function Home() {
                           <a href="https://codeforces.com/profile/sakshisrivastava01" target="_blank" rel="noopener noreferrer" className="hover:text-accent-purple transition-colors">CodeForces</a>
                         </div>
                       </div>
-                    </motion.div>
+                    </div>
                   </div>
                 </SectionLayout>
 

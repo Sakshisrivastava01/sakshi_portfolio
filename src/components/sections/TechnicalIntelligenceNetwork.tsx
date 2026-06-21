@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { motion, AnimatePresence, useInView } from "framer-motion";
-import { BrainCircuit, Database, Server, Cpu, Code2, Cloud } from "lucide-react";
+import { motion, useInView } from "framer-motion";
+import { BrainCircuit, Database, Server, Cpu, Code2, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface LCNode {
@@ -13,109 +13,124 @@ interface LCNode {
 interface LCCluster {
   id: string;
   label: string;
-  angle: number; // angle from core
-  nodes: LCNode[];
+  icon: React.ReactNode;
+  primaryNodes: LCNode[];
+  extendedNodes: LCNode[];
+  pathData: string; // SVG path from center (500, 500)
 }
 
-// Define the 6 skills domains exactly as requested
+// Define the 6 skills domains exactly as requested by the Principal Design Engineer
 const CLUSTERS: LCCluster[] = [
+  {
+    id: "languages",
+    label: "Languages",
+    icon: <Code2 className="w-5 h-5 text-emerald-400" />,
+    primaryNodes: [
+      { id: "python", label: "Python" },
+      { id: "java", label: "Java" },
+      { id: "javascript", label: "JavaScript" },
+      { id: "typescript", label: "TypeScript" },
+      { id: "cpp", label: "C++" },
+      { id: "sql", label: "SQL" },
+      { id: "htmlcss", label: "HTML/CSS" }
+    ],
+    extendedNodes: [],
+    pathData: "M 500 500 L 350 200 H 150" // Top-Left Card connection
+  },
   {
     id: "genai",
     label: "Generative AI & LLMs",
-    angle: -90, // Top center
-    nodes: [
-      { id: "genai_node", label: "GenAI" },
-      { id: "openai", label: "OpenAI API" },
-      { id: "ollama", label: "Ollama" },
+    icon: <BrainCircuit className="w-5 h-5 text-accent-pink" />,
+    primaryNodes: [
       { id: "langchain", label: "LangChain" },
       { id: "langgraph", label: "LangGraph" },
-      { id: "llms", label: "LLMs" },
+      { id: "openai", label: "OpenAI API" },
+      { id: "ollama", label: "Ollama" },
       { id: "rag", label: "RAG" },
       { id: "prompt", label: "Prompt Engineering" },
-      { id: "tokenization", label: "Tokenization" },
       { id: "embeddings", label: "Embeddings" },
-      { id: "transformers", label: "Transformers" },
+      { id: "transformers", label: "Transformers" }
+    ],
+    extendedNodes: [
+      { id: "genai_node", label: "GenAI" },
+      { id: "llms", label: "LLMs" },
+      { id: "tokenization", label: "Tokenization" },
       { id: "ethics", label: "AI Ethics & Bias" }
-    ]
+    ],
+    pathData: "M 500 500 H 150" // Middle-Left Card connection
   },
   {
     id: "ml",
-    label: "Machine Learning",
-    angle: -30, // Top right
-    nodes: [
-      { id: "scikit", label: "Scikit-Learn" },
-      { id: "tensorflow", label: "TensorFlow" },
+    label: "Machine Learning & Data",
+    icon: <Cpu className="w-5 h-5 text-[#ffa116]" />,
+    primaryNodes: [
       { id: "pytorch", label: "PyTorch" },
+      { id: "tensorflow", label: "TensorFlow" },
+      { id: "scikit", label: "Scikit-Learn" },
       { id: "pandas", label: "Pandas" },
       { id: "numpy", label: "NumPy" },
-      { id: "preprocessing", label: "Data Preprocessing" },
       { id: "feature_eng", label: "Feature Engineering" },
       { id: "etl", label: "ETL Pipelines" },
-      { id: "streamlit", label: "Streamlit" },
-      { id: "matplotlib", label: "Matplotlib" },
       { id: "mlops", label: "MLOps" }
-    ]
-  },
-  {
-    id: "databases",
-    label: "Databases",
-    angle: 30, // Bottom right
-    nodes: [
-      { id: "postgres", label: "PostgreSQL" },
-      { id: "mysql", label: "MySQL" },
-      { id: "mongo", label: "MongoDB" },
-      { id: "redis", label: "Redis" }
-    ]
-  },
-  {
-    id: "core_cs",
-    label: "Core Computer Science",
-    angle: 90, // Bottom center
-    nodes: [
-      { id: "dsa", label: "DSA" },
-      { id: "oop", label: "OOP" },
-      { id: "os", label: "Operating Systems" },
-      { id: "dbms", label: "DBMS" },
-      { id: "networks", label: "Computer Networks" },
-      { id: "sys_design", label: "System Design" }
-    ]
+    ],
+    extendedNodes: [
+      { id: "preprocessing", label: "Data Preprocessing" },
+      { id: "streamlit", label: "Streamlit" },
+      { id: "matplotlib", label: "Matplotlib" }
+    ],
+    pathData: "M 500 500 L 350 800 H 150" // Bottom-Left Card connection
   },
   {
     id: "backend",
-    label: "Backend Engineering",
-    angle: 150, // Bottom left
-    nodes: [
+    label: "Backend & Cloud",
+    icon: <Server className="w-5 h-5 text-accent-purple" />,
+    primaryNodes: [
       { id: "fastapi", label: "FastAPI" },
       { id: "flask", label: "Flask" },
       { id: "django", label: "Django" },
       { id: "apis", label: "REST APIs" },
       { id: "websockets", label: "WebSockets" },
-      { id: "microservices", label: "Microservices" }
-    ]
-  },
-  {
-    id: "cloud_devops",
-    label: "Cloud & DevOps",
-    angle: 210, // Top left
-    nodes: [
-      { id: "docker", label: "Docker" },
+      { id: "microservices", label: "Microservices" },
       { id: "aws", label: "AWS" },
-      { id: "devops", label: "DevOps Fundamentals" },
-      { id: "agile", label: "Agile/Scrum" },
+      { id: "docker", label: "Docker" },
       { id: "cicd", label: "CI/CD" },
       { id: "cloud_native", label: "Cloud-Native" }
-    ]
+    ],
+    extendedNodes: [
+      { id: "devops", label: "DevOps Fundamentals" },
+      { id: "agile", label: "Agile/Scrum" }
+    ],
+    pathData: "M 500 500 L 650 200 H 850" // Top-Right Card connection
+  },
+  {
+    id: "databases",
+    label: "Databases",
+    icon: <Database className="w-5 h-5 text-accent-lavender" />,
+    primaryNodes: [
+      { id: "postgres", label: "PostgreSQL" },
+      { id: "redis", label: "Redis" },
+      { id: "mongo", label: "MongoDB" },
+      { id: "mysql", label: "MySQL" }
+    ],
+    extendedNodes: [],
+    pathData: "M 500 500 H 850" // Middle-Right Card connection
+  },
+  {
+    id: "core_cs",
+    label: "Computer Science Fundamentals",
+    icon: <Code2 className="w-5 h-5 text-blue-400" />,
+    primaryNodes: [
+      { id: "dsa", label: "DSA" },
+      { id: "oop", label: "OOP" },
+      { id: "sys_design", label: "System Design" },
+      { id: "os", label: "Operating Systems" },
+      { id: "dbms", label: "DBMS" },
+      { id: "networks", label: "Computer Networks" }
+    ],
+    extendedNodes: [],
+    pathData: "M 500 500 L 650 800 H 850" // Bottom-Right Card connection
   }
 ];
-
-const CATEGORY_ICONS: Record<string, React.ReactNode> = {
-  genai: <BrainCircuit className="w-5 h-5 text-accent-pink animate-pulse" />,
-  backend: <Server className="w-5 h-5 text-accent-purple" />,
-  ml: <Cpu className="w-5 h-5 text-[#ffa116]" />,
-  cloud_devops: <Cloud className="w-5 h-5 text-blue-400" />,
-  databases: <Database className="w-5 h-5 text-accent-lavender" />,
-  core_cs: <Code2 className="w-5 h-5 text-emerald-400" />
-};
 
 interface NetworkProps {
   onSkillSelect?: (skill: string) => void;
@@ -126,117 +141,244 @@ export default function TechnicalIntelligenceNetwork({ onSkillSelect, activeSkil
   const containerRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(containerRef, { once: true, amount: 0.1 });
   const [hoveredClusterId, setHoveredClusterId] = useState<string | null>(null);
-  const [hoveredSubNodeId, setHoveredSubNodeId] = useState<string | null>(null);
-  const [hoveredCenter, setHoveredCenter] = useState(false);
-  const [mouseOffset, setMouseOffset] = useState({ x: 0, y: 0 });
 
-  const CLUSTER_RADIUS = 190; // Spacing distance from core to domain nodes
+  return (
+    <div 
+      ref={containerRef}
+      className="w-full relative max-w-6xl mx-auto px-4 md:px-0 py-6 font-sans"
+    >
+      {/* SVG Network Lines Overlay (Desktop Only) */}
+      <div className="absolute inset-0 z-0 pointer-events-none hidden lg:block">
+        <svg className="w-full h-full" viewBox="0 0 1000 1000" fill="none">
+          {isInView && CLUSTERS.map((cluster) => {
+            const isHovered = hoveredClusterId === cluster.id;
+            const opacity = hoveredClusterId ? (isHovered ? 0.8 : 0.08) : 0.2;
+            
+            return (
+              <motion.path
+                key={`path-${cluster.id}`}
+                d={cluster.pathData}
+                stroke={isHovered ? "#a855f7" : "#3b0764"}
+                strokeWidth={isHovered ? 2.5 : 1}
+                initial={{ pathLength: 0 }}
+                animate={{ pathLength: 1, opacity }}
+                transition={{ duration: 1.5, ease: "easeOut" }}
+                className={cn(isHovered ? "drop-shadow-[0_0_8px_rgba(168,85,247,0.5)]" : "")}
+              />
+            );
+          })}
+        </svg>
+      </div>
 
-  // Parallax Handler
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    const x = (e.clientX - rect.left - rect.width / 2) / (rect.width / 2);
-    const y = (e.clientY - rect.top - rect.height / 2) / (rect.height / 2);
-    setMouseOffset({ x: x * 0.3, y: y * 0.3 });
+      {/* MOBILE PROFILE SUMMARY (Top on Mobile/Tablet, hidden on Desktop) */}
+      <div className="block lg:hidden mb-8">
+        <CenterCoreCard />
+      </div>
+
+      {/* Grid Container */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch relative z-10">
+        
+        {/* LEFT COLUMN: 3 Domain Cards (Languages, GenAI, ML & Data) */}
+        <div className="flex flex-col gap-6 lg:col-span-4 h-full">
+          {/* Languages */}
+          <DomainCard
+            cluster={CLUSTERS[0]}
+            isAnyCardHovered={hoveredClusterId !== null}
+            onHoverChange={(isHovered) => setHoveredClusterId(isHovered ? CLUSTERS[0].id : null)}
+            activeSkill={activeSkill}
+            onSkillSelect={onSkillSelect}
+          />
+          {/* Generative AI & LLMs */}
+          <DomainCard
+            cluster={CLUSTERS[1]}
+            isAnyCardHovered={hoveredClusterId !== null}
+            onHoverChange={(isHovered) => setHoveredClusterId(isHovered ? CLUSTERS[1].id : null)}
+            activeSkill={activeSkill}
+            onSkillSelect={onSkillSelect}
+          />
+          {/* Machine Learning & Data */}
+          <DomainCard
+            cluster={CLUSTERS[2]}
+            isAnyCardHovered={hoveredClusterId !== null}
+            onHoverChange={(isHovered) => setHoveredClusterId(isHovered ? CLUSTERS[2].id : null)}
+            activeSkill={activeSkill}
+            onSkillSelect={onSkillSelect}
+          />
+        </div>
+
+        {/* CENTER COLUMN: Central AI/ML Engineer Core Hub (Desktop Only) */}
+        <div className="hidden lg:flex lg:col-span-4 flex-col justify-between h-full">
+          <CenterCoreCard />
+        </div>
+
+        {/* RIGHT COLUMN: 3 Domain Cards (Backend & Cloud, Databases, CS Fundamentals) */}
+        <div className="flex flex-col gap-6 lg:col-span-4 h-full">
+          {/* Backend & Cloud */}
+          <DomainCard
+            cluster={CLUSTERS[3]}
+            isAnyCardHovered={hoveredClusterId !== null}
+            onHoverChange={(isHovered) => setHoveredClusterId(isHovered ? CLUSTERS[3].id : null)}
+            activeSkill={activeSkill}
+            onSkillSelect={onSkillSelect}
+          />
+          {/* Databases */}
+          <DomainCard
+            cluster={CLUSTERS[4]}
+            isAnyCardHovered={hoveredClusterId !== null}
+            onHoverChange={(isHovered) => setHoveredClusterId(isHovered ? CLUSTERS[4].id : null)}
+            activeSkill={activeSkill}
+            onSkillSelect={onSkillSelect}
+          />
+          {/* Computer Science Fundamentals */}
+          <DomainCard
+            cluster={CLUSTERS[5]}
+            isAnyCardHovered={hoveredClusterId !== null}
+            onHoverChange={(isHovered) => setHoveredClusterId(isHovered ? CLUSTERS[5].id : null)}
+            activeSkill={activeSkill}
+            onSkillSelect={onSkillSelect}
+          />
+        </div>
+
+      </div>
+    </div>
+  );
+}
+
+/* Central AI/ML Engineer Card component */
+function CenterCoreCard() {
+  return (
+    <div className="glass-panel p-6 md:p-8 rounded-2xl border border-purple-500/20 bg-[#07070B]/50 backdrop-blur-xl relative overflow-hidden flex flex-col items-center justify-center text-center h-full group hover:border-purple-500/30 hover:shadow-[0_0_40px_rgba(168,85,247,0.15)] transition-all duration-500 shadow-lg">
+      {/* Ambient background glows */}
+      <div className="absolute inset-0 bg-gradient-to-b from-purple-500/[0.03] to-transparent pointer-events-none" />
+      <div className="absolute inset-8 rounded-full border border-dashed border-purple-500/10 animate-spin-slow pointer-events-none" />
+      
+      <div className="relative z-10 flex flex-col items-center justify-center">
+        {/* Pulsing Brain core */}
+        <div className="relative flex items-center justify-center w-20 h-20 rounded-full bg-purple-500/10 border border-purple-500/20 mb-4 shadow-[0_0_30px_rgba(168,85,247,0.15)] group-hover:scale-105 group-hover:border-purple-500/40 transition-all duration-300">
+          <BrainCircuit className="w-10 h-10 text-purple-400 animate-pulse" />
+        </div>
+        
+        <h3 className="text-sm uppercase tracking-[0.25em] text-white font-bold leading-tight">
+          AI / ML
+        </h3>
+        <p className="text-[10px] uppercase tracking-[0.2em] text-accent-pink mt-1 font-semibold">
+          ENGINEER CORE
+        </p>
+        
+        <div className="mt-4 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[8px] text-emerald-400 font-mono tracking-widest uppercase mb-5 flex items-center gap-1">
+          <span className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse" />
+          ACTIVE STACK
+        </div>
+        
+        <p className="text-xs text-gray-300 font-light leading-relaxed mb-6 max-w-[270px] text-center">
+          Passionate AI/ML Engineer with a solid foundation in computer science and active hands-on experience building production-grade LLM applications, retrieval-augmented pipelines (RAG), and high-throughput backend services.
+        </p>
+        
+        {/* Stats Row */}
+        <div className="w-full grid grid-cols-2 gap-4 pt-5 border-t border-white/5 select-none">
+          <div className="text-center border-r border-white/5">
+            <div className="text-sm md:text-base font-bold text-accent-pink font-mono">3+ Years</div>
+            <div className="text-[8px] text-gray-500 uppercase tracking-wider font-mono mt-0.5">Active Learning</div>
+          </div>
+          <div className="text-center">
+            <div className="text-sm md:text-base font-bold text-accent-purple font-mono">45+ Techs</div>
+            <div className="text-[8px] text-gray-500 uppercase tracking-wider font-mono mt-0.5">Mastered</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+interface DomainCardProps {
+  cluster: LCCluster;
+  isAnyCardHovered: boolean;
+  onHoverChange: (isHovered: boolean) => void;
+  activeSkill?: string | null;
+  onSkillSelect?: (skill: string) => void;
+}
+
+function DomainCard({ cluster, isAnyCardHovered, onHoverChange, activeSkill, onSkillSelect }: DomainCardProps) {
+  const [isHovered, setIsHovered] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+    onHoverChange(true);
   };
 
   const handleMouseLeave = () => {
-    setMouseOffset({ x: 0, y: 0 });
-    setHoveredClusterId(null);
-    setHoveredSubNodeId(null);
-    setHoveredCenter(false);
+    setIsHovered(false);
+    onHoverChange(false);
   };
 
-  // Convert polar coordinates to percentage relative coordinates for HTML elements
-  const getCoordinates = (angleDeg: number, radius: number, centerPct = 50) => {
-    const angleRad = (angleDeg * Math.PI) / 180;
-    const radiusPct = (radius / 500) * 50;
-    return {
-      x: centerPct + radiusPct * Math.cos(angleRad),
-      y: centerPct + radiusPct * Math.sin(angleRad),
-      xPixel: radius * Math.cos(angleRad),
-      yPixel: radius * Math.sin(angleRad)
-    };
-  };
-
-  // Convert polar coordinates relative to a cluster node center
-  const getRadialSubNodeCoordinates = (
-    clusterAngle: number,
-    clusterRadius: number,
-    subAngle: number,
-    subRadius: number,
-    centerPct = 50
-  ) => {
-    const clusterAngleRad = (clusterAngle * Math.PI) / 180;
-    const subAngleRad = (subAngle * Math.PI) / 180;
-
-    const cxPixel = clusterRadius * Math.cos(clusterAngleRad);
-    const cyPixel = clusterRadius * Math.sin(clusterAngleRad);
-
-    const sxPixel = cxPixel + subRadius * Math.cos(subAngleRad);
-    const syPixel = cyPixel + subRadius * Math.sin(subAngleRad);
-
-    return {
-      x: centerPct + (sxPixel / 500) * 50,
-      y: centerPct + (syPixel / 500) * 50,
-      xPixel: sxPixel,
-      yPixel: syPixel
-    };
-  };
-
-  const isClusterOpen = (clusterId: string) => hoveredClusterId === clusterId;
-
-  // Node highlight calculator
-  const isNodeHighlighted = (nodeId: string) => {
-    if (hoveredCenter) return true;
-    if (!hoveredClusterId && !hoveredSubNodeId) return true;
-
-    if (hoveredSubNodeId) {
-      if (nodeId === "center" || nodeId === hoveredClusterId || nodeId === hoveredSubNodeId) return true;
-      return false;
-    }
-
-    if (hoveredClusterId) {
-      if (nodeId === "center" || nodeId === hoveredClusterId) return true;
-      const cluster = CLUSTERS.find(c => c.id === hoveredClusterId);
-      if (cluster && cluster.nodes.some(n => n.id === nodeId)) return true;
-      return false;
-    }
-
-    return false;
-  };
+  const isHighlighted = isHovered || !isAnyCardHovered;
 
   return (
-    <>
-      {/* Mobile Accordion / Fallback list */}
-      <div className="w-full flex flex-col gap-4 md:hidden px-4 py-4">
-        <div className="flex items-center justify-center mb-2">
-          <div className="flex flex-col items-center justify-center w-28 h-28 rounded-full border border-accent-purple/30 bg-black/40 backdrop-blur-md shadow-[0_0_20px_rgba(138,43,226,0.15)]">
-            <BrainCircuit className="w-6 h-6 text-white mb-1.5 animate-pulse" />
-            <span className="text-[9px] uppercase tracking-[0.2em] text-accent-pink font-semibold text-center leading-tight">
-              AI / ML<br />Engineer
-            </span>
+    <div
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      className={cn(
+        "glass-panel p-5 rounded-2xl border transition-all duration-300 relative overflow-hidden flex flex-col justify-between flex-1 group",
+        isHighlighted 
+          ? "border-purple-500/20 bg-[#08080E]/70 shadow-[0_0_30px_rgba(168,85,247,0.06)] hover:-translate-y-0.5"
+          : "border-white/5 bg-[#05050A]/40 opacity-40"
+      )}
+    >
+      {/* Background subtle glow overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-purple-500/[0.01] to-transparent pointer-events-none" />
+
+      <div>
+        {/* Title row */}
+        <div className="flex items-center gap-2.5 mb-3.5">
+          <div className="w-8 h-8 rounded-lg bg-white/5 border border-white/5 flex items-center justify-center shrink-0 group-hover:border-purple-500/30 transition-colors">
+            {cluster.icon}
           </div>
+          <h4 className="text-sm font-bold text-white tracking-wide font-sans group-hover:text-purple-300 transition-colors">
+            {cluster.label}
+          </h4>
         </div>
 
-        {CLUSTERS.map((cluster, i) => (
+        {/* Core tags list (ALWAYS visible, recruiters scan in 3s) */}
+        <div className="flex flex-wrap gap-1.5 select-none">
+          {cluster.primaryNodes.map((node) => (
+            <button
+              key={node.id}
+              onClick={() => {
+                if (onSkillSelect) {
+                  onSkillSelect(node.id);
+                  document.getElementById("innovation-lab")?.scrollIntoView({ behavior: "smooth" });
+                }
+              }}
+              className={cn(
+                "text-[10px] px-2 py-0.5 rounded border transition-all font-sans cursor-pointer flex items-center gap-1",
+                activeSkill === node.id
+                  ? "bg-accent-pink/20 border-accent-pink text-white animate-pulse"
+                  : "bg-purple-500/5 border-purple-500/10 text-purple-200 hover:text-white hover:border-purple-500/30"
+              )}
+            >
+              {activeSkill === node.id && <Check className="w-2.5 h-2.5 text-accent-pink" />}
+              {node.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Expanded tags list (Framer Motion height reveal on button click) */}
+      {cluster.extendedNodes.length > 0 && (
+        <div className="w-full">
           <motion.div
-            key={cluster.id}
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4, delay: i * 0.05 }}
-            className="p-4 rounded-xl border border-white/5 bg-[#0A0A0F]/70 backdrop-blur-md relative overflow-hidden"
+            initial={false}
+            animate={{ 
+              height: isExpanded ? "auto" : 0, 
+              opacity: isExpanded ? 1 : 0,
+              marginTop: isExpanded ? 12 : 0
+            }}
+            className="overflow-hidden"
+            transition={{ duration: 0.35, ease: "easeInOut" }}
           >
-            <div className="flex items-center gap-2 mb-2">
-              {CATEGORY_ICONS[cluster.id]}
-              <h4 className="text-xs font-bold text-white tracking-wide">
-                {cluster.label}
-              </h4>
-            </div>
-            <div className="flex flex-wrap gap-1.5">
-              {cluster.nodes.map(node => (
+            <div className="flex flex-wrap gap-1.5 pt-3.5 border-t border-white/5 select-none">
+              {cluster.extendedNodes.map((node) => (
                 <button
                   key={node.id}
                   onClick={() => {
@@ -246,246 +388,28 @@ export default function TechnicalIntelligenceNetwork({ onSkillSelect, activeSkil
                     }
                   }}
                   className={cn(
-                    "text-[10px] px-2 py-1 rounded bg-white/5 border transition-colors",
+                    "text-[10px] px-2 py-0.5 rounded border transition-all font-sans cursor-pointer flex items-center gap-1",
                     activeSkill === node.id
-                      ? "border-accent-pink bg-accent-pink/15 text-white"
-                      : "border-white/5 text-gray-400 hover:text-white"
+                      ? "bg-accent-pink/20 border-accent-pink text-white"
+                      : "bg-white/5 border-white/5 text-gray-400 hover:text-white hover:border-white/10"
                   )}
                 >
+                  {activeSkill === node.id && <Check className="w-2.5 h-2.5 text-accent-pink" />}
                   {node.label}
                 </button>
               ))}
             </div>
           </motion.div>
-        ))}
-      </div>
 
-      {/* Desktop SVG / HTML Interactive Skills Network */}
-      <div
-        ref={containerRef}
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
-        className="hidden md:flex relative w-full h-[600px] items-center justify-center overflow-hidden font-sans cursor-default select-none"
-      >
-        {/* Parallax Background Glowing Spotlights */}
-        <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none">
-          <motion.div
-            animate={{
-              x: -mouseOffset.x * 20,
-              y: -mouseOffset.y * 20,
-              scale: hoveredClusterId ? 1.1 : 1,
-              opacity: hoveredClusterId ? 0.15 : 0.05
-            }}
-            transition={{ type: "spring", stiffness: 60, damping: 15 }}
-            className="w-[450px] h-[450px] rounded-full bg-accent-purple/20 blur-[100px]"
-          />
+          {/* Interactive Expand Details Button */}
+          <button
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="mt-4 w-full py-1.5 px-3 text-[9px] font-bold font-mono tracking-widest border border-purple-500/20 bg-purple-500/5 hover:bg-purple-600/15 hover:border-purple-500/40 text-purple-300 hover:text-white rounded transition-all duration-200 select-none cursor-pointer text-center"
+          >
+            {isExpanded ? "SHOW LESS" : "SHOW MORE"}
+          </button>
         </div>
-
-        {/* Core Galaxy Container */}
-        <motion.div
-          animate={{
-            x: mouseOffset.x * 15,
-            y: mouseOffset.y * 15
-          }}
-          transition={{ type: "spring", stiffness: 80, damping: 20 }}
-          className="relative z-10 w-full max-w-[700px] aspect-square"
-        >
-          {/* SVG Connection Layer */}
-          <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="-500 -500 1000 1000">
-            <defs>
-              <linearGradient id="lineGlow" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#8a2be2" stopOpacity="0.4" />
-                <stop offset="100%" stopColor="#ffb6c1" stopOpacity="0.4" />
-              </linearGradient>
-            </defs>
-
-            {isInView && (
-              <>
-                {/* Center Core to Domain Node lines */}
-                {CLUSTERS.map((cluster, i) => {
-                  const pos = getCoordinates(cluster.angle, CLUSTER_RADIUS);
-                  const isHighlighted = isNodeHighlighted(cluster.id);
-                  const opacity = hoveredCenter || hoveredClusterId === cluster.id || (hoveredSubNodeId && isNodeHighlighted(cluster.id)) ? 0.7 : 0.15;
-
-                  return (
-                    <motion.line
-                      key={`core-${cluster.id}`}
-                      x1="0"
-                      y1="0"
-                      x2={pos.xPixel}
-                      y2={pos.yPixel}
-                      stroke={isHighlighted ? "url(#lineGlow)" : "#ffffff"}
-                      strokeWidth={isHighlighted ? 2.5 : 0.8}
-                      initial={{ pathLength: 0, opacity: 0 }}
-                      animate={{ pathLength: 1, opacity }}
-                      transition={{ duration: 1.2, delay: i * 0.05, ease: "easeOut" }}
-                    />
-                  );
-                })}
-
-                {/* Domain Node to radial bloomed sub-nodes connections */}
-                {CLUSTERS.map((cluster) => {
-                  const cPos = getCoordinates(cluster.angle, CLUSTER_RADIUS);
-                  const isOpen = isClusterOpen(cluster.id);
-                  const N = cluster.nodes.length;
-
-                  return cluster.nodes.map((node, j) => {
-                    const subAngle = j * (360 / N);
-                    const currentSubRadius = isOpen ? (j % 2 === 0 ? 65 : 90) : 0;
-                    const subPos = getRadialSubNodeCoordinates(cluster.angle, CLUSTER_RADIUS, subAngle, currentSubRadius);
-                    const isSubActive = isNodeHighlighted(node.id);
-
-                    return (
-                      <motion.line
-                        key={`sub-${node.id}`}
-                        animate={{
-                          x1: cPos.xPixel,
-                          y1: cPos.yPixel,
-                          x2: subPos.xPixel,
-                          y2: subPos.yPixel,
-                          opacity: isOpen ? (hoveredSubNodeId ? (hoveredSubNodeId === node.id ? 0.8 : 0.1) : 0.3) : 0
-                        }}
-                        transition={{
-                          type: "spring",
-                          stiffness: 100,
-                          damping: 15,
-                          mass: 0.8
-                        }}
-                        stroke={isSubActive && hoveredSubNodeId === node.id ? "#ffa116" : "#8a2be2"}
-                        strokeWidth={isSubActive && hoveredSubNodeId === node.id ? 1.5 : 0.6}
-                        strokeDasharray="2 2"
-                      />
-                    );
-                  });
-                })}
-              </>
-            )}
-          </svg>
-
-          {/* Central glowing AI/ML Engineer Core */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-40">
-            <AnimatePresence>
-              {isInView && (
-                <motion.div
-                  initial={{ scale: 0, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ duration: 0.8, type: "spring", bounce: 0.2 }}
-                  className={cn(
-                    "relative flex flex-col items-center justify-center w-32 h-32 rounded-full border border-accent-purple/20 bg-black/60 backdrop-blur-md shadow-[0_0_35px_rgba(138,43,226,0.18)] transition-all duration-300 hover:scale-105",
-                    (hoveredClusterId || hoveredSubNodeId) && !hoveredCenter ? "opacity-30 scale-95 shadow-none border-white/5" : ""
-                  )}
-                  onMouseEnter={() => setHoveredCenter(true)}
-                  onMouseLeave={() => setHoveredCenter(false)}
-                >
-                  <BrainCircuit className="w-6 h-6 text-white mb-1.5 animate-pulse" />
-                  <span className="text-[9px] uppercase tracking-[0.2em] text-accent-pink font-semibold text-center leading-tight">
-                    AI / ML<br />Engineer
-                  </span>
-                  <div className="absolute -bottom-1 px-1.5 py-0.5 rounded-full bg-accent-purple/20 border border-accent-purple/40 text-[6px] text-accent-lavender tracking-wider font-mono">
-                    CORE
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-
-          {/* Surround Clusters and Radial Sub-nodes Overlay */}
-          <div className="absolute inset-0 z-20">
-            {isInView && CLUSTERS.map((cluster) => {
-              const cPos = getCoordinates(cluster.angle, CLUSTER_RADIUS);
-              const isClusterActive = isNodeHighlighted(cluster.id);
-              const isAnyClusterHovered = hoveredClusterId !== null || hoveredSubNodeId !== null;
-              
-              // Fade unhovered clusters slightly
-              const clusterOpacity = hoveredCenter || (isAnyClusterHovered && !isClusterActive) ? 0.25 : 1;
-
-              return (
-                <div key={cluster.id}>
-                  {/* Large Premium Domain Node */}
-                  <motion.div
-                    initial={{ scale: 0, opacity: 0 }}
-                    animate={{ scale: 1, opacity: clusterOpacity }}
-                    transition={{ duration: 0.5, type: "spring" }}
-                    className="absolute -translate-x-1/2 -translate-y-1/2 z-30"
-                    style={{ left: `${cPos.x}%`, top: `${cPos.y}%` }}
-                    onMouseEnter={() => setHoveredClusterId(cluster.id)}
-                  >
-                    <div
-                      className={cn(
-                        "px-4 py-2.5 rounded-xl border backdrop-blur-md whitespace-nowrap cursor-pointer transition-all duration-300 flex items-center gap-2",
-                        isClusterActive
-                          ? "bg-accent-purple/35 border-accent-pink shadow-[0_0_20px_rgba(255,182,193,0.35)] text-white scale-105"
-                          : "bg-[#09090F]/90 border-accent-purple/10 text-gray-300 hover:text-white"
-                      )}
-                    >
-                      {CATEGORY_ICONS[cluster.id]}
-                      <span className="text-[11px] font-bold tracking-wide font-sans">{cluster.label}</span>
-                    </div>
-                  </motion.div>
-
-                  {/* radial blooming Sub-Nodes (Rendered around the domain node center) */}
-                  {cluster.nodes.map((node, j) => {
-                    const N = cluster.nodes.length;
-                    const subAngle = j * (360 / N);
-                    const isOpen = isClusterOpen(cluster.id);
-                    
-                    // Alternate radii to guarantee zero overlap
-                    const currentSubRadius = isOpen ? (j % 2 === 0 ? 65 : 90) : 0;
-                    const subPos = getRadialSubNodeCoordinates(cluster.angle, CLUSTER_RADIUS, subAngle, currentSubRadius);
-                    const isSubActive = isNodeHighlighted(node.id);
-                    const nodeOpacity = isOpen ? (isSubActive ? 1 : 0.15) : 0;
-
-                    return (
-                      <motion.div
-                        key={node.id}
-                        initial={{ scale: 0, opacity: 0 }}
-                        animate={{ 
-                          scale: isOpen ? 1 : 0, 
-                          opacity: nodeOpacity,
-                          left: `${subPos.x}%`,
-                          top: `${subPos.y}%`
-                        }}
-                        transition={{ 
-                          type: "spring",
-                          stiffness: 110,
-                          damping: 14,
-                          mass: 0.6
-                        }}
-                        className="absolute -translate-x-1/2 -translate-y-1/2 z-25 pointer-events-auto"
-                        style={{ left: `${subPos.x}%`, top: `${subPos.y}%` }}
-                        onMouseEnter={() => {
-                          setHoveredClusterId(cluster.id);
-                          setHoveredSubNodeId(node.id);
-                        }}
-                        onMouseLeave={() => {
-                          setHoveredSubNodeId(null);
-                        }}
-                      >
-                        <button
-                          onClick={() => {
-                            if (onSkillSelect) {
-                              onSkillSelect(node.id);
-                              document.getElementById("innovation-lab")?.scrollIntoView({ behavior: "smooth" });
-                            }
-                          }}
-                          className={cn(
-                            "px-2 py-0.5 rounded border backdrop-blur-md cursor-pointer transition-all duration-200 whitespace-nowrap text-[9px] font-medium tracking-wider shadow-sm",
-                            isSubActive || activeSkill === node.id
-                              ? "bg-white/10 border-accent-lavender text-white shadow-[0_0_8px_rgba(230,230,250,0.25)] scale-105 z-30"
-                              : "bg-transparent border-white/5 text-gray-500 hover:text-white"
-                          )}
-                        >
-                          {node.label}
-                        </button>
-                      </motion.div>
-                    );
-                  })}
-                </div>
-              );
-            })}
-          </div>
-        </motion.div>
-      </div>
-    </>
+      )}
+    </div>
   );
 }

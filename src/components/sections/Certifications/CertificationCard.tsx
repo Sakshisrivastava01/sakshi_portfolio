@@ -23,7 +23,7 @@ export default function CertificationCard({ cert }: CertificationCardProps) {
 
     const xc = rect.width / 2;
     const yc = rect.height / 2;
-    // Max tilt angle = 8 degrees
+    // Max tilt = 8 degrees for premium physics feel
     const tiltX = -(y - yc) / (rect.height / 2) * 8;
     const tiltY = (x - xc) / (rect.width / 2) * 8;
     setTilt({ x: tiltX, y: tiltY });
@@ -47,36 +47,42 @@ export default function CertificationCard({ cert }: CertificationCardProps) {
       className="group w-full h-[190px] [perspective:1000px] cursor-default"
     >
       <div 
-        className="relative w-full h-full duration-500 ease-out border border-white/5 bg-[#07070B]/60 backdrop-blur-xl rounded-xl shadow-lg transition-all"
+        className="relative w-full h-full duration-500 ease-out rounded-xl shadow-lg transition-all"
         style={{ 
           transformStyle: "preserve-3d",
           transform: isHovered 
             ? `rotateY(180deg) rotateX(${tilt.x}deg) rotateY(${-tilt.y}deg)` 
             : 'rotateY(0deg) rotateX(0deg) rotateY(0deg)',
-          transition: isHovered ? 'none' : 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s'
+          transition: isHovered ? 'none' : 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)'
         }}
       >
-        {/* Spotlight Glow (Tracks mouse coordinate) */}
+        {/* Spotlight glow tracking */}
         <div 
           className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl z-20"
           style={{
-            background: `radial-gradient(150px circle at ${spotlight.x}px ${spotlight.y}px, rgba(168,85,247,0.15), transparent 80%)`
+            background: `radial-gradient(150px circle at ${spotlight.x}px ${spotlight.y}px, rgba(168,85,247,0.12), transparent 80%)`,
+            backfaceVisibility: "hidden",
+            WebkitBackfaceVisibility: "hidden"
           }}
         />
 
         {/* FRONT SIDE */}
         <div 
-          className="absolute inset-0 w-full h-full p-4 flex flex-col justify-between"
-          style={{ backfaceVisibility: "hidden", WebkitBackfaceVisibility: "hidden" }}
+          className="absolute inset-0 w-full h-full p-4 flex flex-col justify-between border border-white/5 bg-[#07070B]/70 backdrop-blur-xl rounded-xl"
+          style={{ 
+            backfaceVisibility: "hidden", 
+            WebkitBackfaceVisibility: "hidden",
+            transform: "rotateY(0deg)"
+          }}
         >
-          {/* Header row */}
+          {/* Header */}
           <div className="flex items-center justify-between gap-2">
             <span className="text-[9px] text-purple-400 font-semibold tracking-widest uppercase font-mono truncate max-w-[70%]">
               {cert.issuer}
             </span>
             <span className="shrink-0 flex items-center gap-1 text-[8px] px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-mono font-medium">
               <span className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse" />
-              Verified
+              Verifiable
             </span>
           </div>
 
@@ -87,7 +93,7 @@ export default function CertificationCard({ cert }: CertificationCardProps) {
             </h4>
           </div>
 
-          {/* Bottom Row: Skills */}
+          {/* Bottom Row: Skills covered tags */}
           <div className="flex flex-wrap gap-1 mt-auto">
             {cert.skills.slice(0, 3).map((skill, i) => (
               <span 
@@ -107,28 +113,34 @@ export default function CertificationCard({ cert }: CertificationCardProps) {
 
         {/* BACK SIDE */}
         <div 
-          className="absolute inset-0 w-full h-full p-4 flex flex-col justify-between bg-[#0B0B11]/90 rounded-xl"
+          className="absolute inset-0 w-full h-full p-4 flex flex-col justify-between bg-[#08080E]/95 border border-purple-500/20 rounded-xl"
           style={{ 
             backfaceVisibility: "hidden", 
             WebkitBackfaceVisibility: "hidden",
             transform: "rotateY(180deg)"
           }}
         >
-          {/* Back Header */}
-          <div className="flex items-center justify-between border-b border-white/5 pb-2">
-            <span className="text-[9px] text-gray-400 font-mono">STATUS</span>
+          {/* Status Header */}
+          <div className="flex items-center justify-between border-b border-white/5 pb-1.5">
+            <span className="text-[8px] text-gray-500 font-mono uppercase">CREDENTIAL STATUS</span>
             <span className="flex items-center gap-1 text-[9px] text-emerald-400 font-mono font-bold">
               <CheckCircle className="w-2.5 h-2.5 text-emerald-400" />
               Active & Verified
             </span>
           </div>
 
-          {/* Back Info */}
-          <div className="flex flex-col gap-1 my-auto">
-            <span className="text-[8px] text-gray-500 font-mono uppercase tracking-wider">SKILLS COVERED</span>
-            <p className="text-[10px] text-gray-300 line-clamp-2 leading-relaxed">
-              {cert.skills.join(", ")}
-            </p>
+          {/* Core Info */}
+          <div className="flex flex-col gap-1.5 my-auto text-left">
+            <div>
+              <span className="text-[8px] text-gray-500 font-mono uppercase block">ISSUED BY</span>
+              <span className="text-[10px] text-white font-medium">{cert.issuer}</span>
+            </div>
+            <div>
+              <span className="text-[8px] text-gray-500 font-mono uppercase block">KEY LEARNINGS</span>
+              <p className="text-[9px] text-gray-300 line-clamp-2 leading-relaxed font-sans">
+                {cert.skills.join(", ")}
+              </p>
+            </div>
           </div>
 
           {/* Action Buttons */}
@@ -138,9 +150,9 @@ export default function CertificationCard({ cert }: CertificationCardProps) {
                 href={cert.verifyUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 h-7 flex items-center justify-center gap-1 rounded bg-purple-600/10 border border-purple-500/30 hover:bg-purple-600/25 text-purple-300 hover:text-white font-semibold text-[9px] transition-all duration-200"
+                className="flex-1 h-7 flex items-center justify-center rounded bg-purple-600/15 border border-purple-500/30 hover:bg-purple-600/30 text-purple-200 hover:text-white font-semibold text-[9px] transition-all duration-200"
               >
-                Verify
+                Verify Link
               </a>
             )}
             {(cert.pdfUrl || cert.imageUrl) && (
@@ -148,9 +160,9 @@ export default function CertificationCard({ cert }: CertificationCardProps) {
                 href={cert.pdfUrl || cert.imageUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 h-7 flex items-center justify-center gap-1 rounded bg-white/5 border border-white/10 hover:bg-white/10 text-white/80 hover:text-white font-semibold text-[9px] transition-all duration-200"
+                className="flex-1 h-7 flex items-center justify-center rounded bg-white/5 border border-white/10 hover:bg-white/10 text-white/80 hover:text-white font-semibold text-[9px] transition-all duration-200"
               >
-                View Cert
+                Download Cert
               </a>
             )}
           </div>
