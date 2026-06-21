@@ -14,7 +14,8 @@ const FALLBACK_DATA = {
   history: [],
   calendar: {},
   activeDays: 0,
-  streak: 0
+  streak: 0,
+  recentSubmissions: []
 };
 
 async function getLeetCode(username: string) {
@@ -42,12 +43,22 @@ async function getLeetCode(username: string) {
           ranking
           contest { title startTime }
         }
+        recentAcSubmissionList(username: $username, limit: 10) {
+          id
+          title
+          titleSlug
+          timestamp
+        }
       }
     `;
+    
+    // Explicitly configure fetch to disable next/vercel routing cache
     const res = await fetch('https://leetcode.com/graphql', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ query, variables: { username } }),
+      cache: 'no-store',
+      next: { revalidate: 0 }
     });
     
     if (!res.ok) {
@@ -60,6 +71,7 @@ async function getLeetCode(username: string) {
     const solved = stats ? stats.find((s: { difficulty: string; count: number }) => s.difficulty === 'All')?.count : FALLBACK_DATA.solved;
     const contest = data.data?.userContestRanking;
     const history = data.data?.userContestRankingHistory || [];
+    const recentSubmissions = data.data?.recentAcSubmissionList || [];
     
     let calendar = {};
     try {
@@ -80,7 +92,8 @@ async function getLeetCode(username: string) {
       history: history.filter((h: { rating?: number; contest?: unknown }) => h.rating && h.contest).slice(-20), // Last 20 attended contests
       calendar,
       activeDays: matchedUser?.userCalendar?.totalActiveDays || 0,
-      streak: matchedUser?.userCalendar?.streak || 0
+      streak: matchedUser?.userCalendar?.streak || 0,
+      recentSubmissions
     };
   } catch (error) {
     console.error('LeetCode fetch error:', error);
@@ -91,7 +104,14 @@ async function getLeetCode(username: string) {
 export async function GET() {
   const leetcode = await getLeetCode('_sakshi19_');
 
-  return NextResponse.json({
-    leetcode
-  });
+  return NextResponse.json(
+    { leetcode },
+    {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+      }
+    }
+  );
 }

@@ -1,23 +1,21 @@
 "use client";
 
-import React, { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
-import { BrainCircuit, ExternalLink, FileText, Cpu } from "lucide-react";
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { BrainCircuit, ExternalLink, Cpu, X, Sparkles } from "lucide-react";
 import { GithubIcon as Github } from "@/components/icons/SocialIcons";
 import { cn } from "@/lib/utils";
 
-// Types
+// Project Interface
 interface ProjectData {
   id: string;
   title: string;
   tag: string;
-  description: React.ReactNode;
+  description: string;
   metrics: { label: string; value: string }[];
   tech: string[];
-  icon: React.ReactNode;
   theme: "pink" | "purple" | "lavender";
-  status: "Live" | "Production Ready" | "Active Development";
-  isFlagship?: boolean;
+  status: "Live" | "Production Ready" | "Active Development" | "Completed";
   links: {
     github: string;
     demo: string;
@@ -31,15 +29,14 @@ const PROJECTS: ProjectData[] = [
     title: "Vaani-X",
     tag: "AI Communication Platform",
     status: "Active Development",
-    icon: <BrainCircuit className="w-6 h-6" />,
     theme: "pink",
-    description: "AI-powered communication platform focused on creating seamless human-computer conversations through speech processing.",
+    description: "An AI-powered communication platform focused on creating seamless human-computer conversations through advanced voice processing, real-time feedback, and low-latency speech pipelines.",
     metrics: [
       { label: "Response Time", value: "<200ms" },
       { label: "Speech Recognition", value: "95%" },
       { label: "Concurrent Users", value: "10k+" }
     ],
-    tech: ["Python", "AI", "NLP", "Speech Processing", "Machine Learning"],
+    tech: ["Python", "AI", "NLP", "Speech Processing", "Machine Learning", "FastAPI"],
     links: {
       github: "https://github.com/Kumardeepakchaudhary01/VaaniX_v1",
       demo: "https://vaani-x-v1.vercel.app"
@@ -50,252 +47,257 @@ const PROJECTS: ProjectData[] = [
     title: "NoteRoot AI",
     tag: "AI Productivity Platform",
     status: "Production Ready",
-    icon: <FileText className="w-6 h-6" />,
     theme: "lavender",
-    description: "AI productivity platform transforming notes into intelligent knowledge systems using RAG and vector search.",
+    description: "An AI-driven productivity platform designed to transform raw notes and repositories into intelligent knowledge graphs using Retrieval-Augmented Generation (RAG) and optimized vector searches.",
     metrics: [
       { label: "Query Speed", value: "<100ms" },
       { label: "Context Window", value: "128k" },
       { label: "Retrieval Accuracy", value: "98%" }
     ],
-    tech: ["Python", "LLMs", "AI", "RAG", "Vector Search", "NLP"],
+    tech: ["Python", "LLMs", "AI", "RAG", "Vector Search", "NLP", "LangChain"],
     links: {
       github: "https://github.com/KunalGupta25/NoterootAI",
       demo: "https://noteroot-ai.vercel.app"
     }
+  },
+  {
+    id: "project-portfolio",
+    title: "AI Portfolio Engine",
+    tag: "Next-Gen Developer Canvas",
+    status: "Completed",
+    theme: "purple",
+    description: "A highly interactive, dynamic, and fluid developer portfolio engine utilizing React, Next.js, and Framer Motion to showcase technical engineering logs with optimal performance metrics.",
+    metrics: [
+      { label: "Lighthouse Performance", value: "100/100" },
+      { label: "Animation Lag", value: "0ms" },
+      { label: "First Load Time", value: "0.8s" }
+    ],
+    tech: ["Next.js", "React", "TypeScript", "Tailwind CSS", "Framer Motion", "Three.js"],
+    links: {
+      github: "https://github.com/Sakshisrivastava01/sakshi_portfolio",
+      demo: "https://sakshisrivastava.dev"
+    }
   }
 ];
 
-// Abstract Visual Generators for Project "Screenshots"
-
-
-const VoiceAbstractVisual = () => (
-  <div className="absolute inset-0 overflow-hidden flex items-center justify-center opacity-40 group-hover:opacity-80 transition-opacity duration-1000 bg-[#050002]">
-    <div className="relative w-full h-full flex items-center justify-center gap-3">
-      {/* Waveforms representing Voice/Speech */}
-      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
+// Visual illustrations inside cards / modals
+const VoiceVisual = () => (
+  <div className="absolute inset-0 overflow-hidden flex items-center justify-center opacity-30 bg-[#080205] select-none pointer-events-none">
+    <div className="flex gap-2 items-center">
+      {[1, 2, 3, 4, 5, 6].map((i) => (
         <motion.div 
           key={i}
-          animate={{ height: ["20px", `${(i * 37) % 200 + 50}px`, "20px"] }}
-          transition={{ duration: 1.2 + (i % 4) * 0.3, repeat: Infinity, ease: "easeInOut" }}
-          className="w-2 md:w-3 bg-gradient-to-t from-accent-pink/20 via-accent-pink to-accent-pink/20 rounded-full shadow-[0_0_15px_rgba(255,182,193,0.5)]"
+          animate={{ height: ["12px", `${(i * 27) % 60 + 20}px`, "12px"] }}
+          transition={{ duration: 1.2 + (i % 3) * 0.2, repeat: Infinity, ease: "easeInOut" }}
+          className="w-1.5 bg-accent-pink rounded-full shadow-[0_0_8px_rgba(255,182,193,0.3)]"
         />
       ))}
-      <motion.div 
-        animate={{ scale: [1, 2.5], opacity: [0.4, 0] }} 
-        transition={{ duration: 4, repeat: Infinity, ease: "easeOut" }}
-        className="absolute w-32 h-32 bg-accent-pink rounded-full mix-blend-screen filter blur-[50px]" 
-      />
     </div>
   </div>
 );
 
-const KnowledgeAbstractVisual = () => (
-  <div className="absolute inset-0 overflow-hidden flex items-center justify-center opacity-40 group-hover:opacity-80 transition-opacity duration-1000 bg-[#020205]">
-    <div className="relative w-full h-full flex items-center justify-center">
-      {/* Knowledge Graph Nodes */}
-      <motion.div 
-        animate={{ rotate: 360 }} 
-        transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
-        className="absolute w-[120%] h-[120%] border border-accent-lavender/10 border-dashed rounded-full flex items-center justify-center"
-      >
-        <div className="absolute top-10 w-4 h-4 rounded-full bg-accent-lavender shadow-[0_0_20px_rgba(230,230,250,0.8)]" />
-        <div className="absolute bottom-20 left-20 w-3 h-3 rounded-full bg-accent-lavender shadow-[0_0_15px_rgba(230,230,250,0.8)]" />
-        <div className="absolute top-40 right-20 w-5 h-5 rounded-full bg-accent-lavender shadow-[0_0_25px_rgba(230,230,250,0.8)]" />
-      </motion.div>
-      <Cpu className="w-24 h-24 text-accent-lavender/40 absolute z-10" />
-      <motion.div 
-        animate={{ scale: [0.8, 1.2, 0.8], opacity: [0.2, 0.5, 0.2] }} 
-        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute w-64 h-64 bg-accent-lavender rounded-full mix-blend-screen filter blur-[80px]" 
-      />
-    </div>
+const KnowledgeVisual = () => (
+  <div className="absolute inset-0 overflow-hidden flex items-center justify-center opacity-30 bg-[#020208] select-none pointer-events-none">
+    <motion.div 
+      animate={{ rotate: 360 }} 
+      transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+      className="absolute w-[80%] h-[80%] border border-accent-lavender/10 border-dashed rounded-full flex items-center justify-center"
+    >
+      <div className="absolute top-2 w-2.5 h-2.5 rounded-full bg-accent-lavender shadow-[0_0_10px_rgba(230,230,250,0.6)]" />
+      <div className="absolute bottom-6 left-6 w-2 h-2 rounded-full bg-accent-lavender shadow-[0_0_8px_rgba(230,230,250,0.6)]" />
+    </motion.div>
+    <Cpu className="w-10 h-10 text-accent-lavender/30 absolute" />
+  </div>
+);
+
+const EngineVisual = () => (
+  <div className="absolute inset-0 overflow-hidden flex items-center justify-center opacity-30 bg-[#050208] select-none pointer-events-none">
+    <motion.div 
+      animate={{ scale: [0.9, 1.1, 0.9] }} 
+      transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+      className="absolute w-12 h-12 bg-accent-purple rounded-full blur-2xl" 
+    />
+    <BrainCircuit className="w-10 h-10 text-accent-purple/40" />
   </div>
 );
 
 export default function InnovationLab() {
-  return (
-    <section id="innovation-lab" className="relative w-full py-32 px-6 md:px-12 lg:px-24 border-t border-white/5">
-      
-      {/* Header */}
-      <div className="max-w-7xl mx-auto mb-24 relative z-10 flex flex-col md:items-center text-left md:text-center">
-        <h2 className="text-5xl md:text-6xl font-bold font-heading tracking-tight mb-6">
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-accent-lavender to-accent-purple">
-            My Work
-          </span>
-        </h2>
-        <p className="text-xl md:text-2xl text-gray-400 font-light max-w-3xl">
-          Building intelligent systems, AI products, and scalable applications that solve real-world problems.
-        </p>
-      </div>
+  const [selectedProject, setSelectedProject] = useState<ProjectData | null>(null);
 
-      {/* Projects Timeline/Showcase */}
-      <div className="max-w-7xl mx-auto space-y-16 md:space-y-32">
-        {PROJECTS.map((project, index) => (
-          <ProjectShowcase 
-            key={project.id} 
-            project={project} 
-            index={index} 
-          />
-        ))}
-      </div>
-      
-    </section>
-  );
-}
-
-// Subcomponent: Premium Horizontal Project Card
-function ProjectShowcase({ project, index }: { project: ProjectData; index: number }) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start 90%", "end start"]
-  });
-
-  const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
-  const y = useTransform(scrollYProgress, [0, 0.2], [100, 0]);
-
-  // Alternate layout on desktop: Image Left vs Image Right
-  const isImageRight = index % 2 !== 0;
-
-  // Theme styling helpers
   const themeColors = {
-    pink: {
-      borderHover: "hover:border-accent-pink/50",
-      shadowHover: "hover:shadow-[0_0_60px_rgba(255,182,193,0.15)]",
-      text: "text-accent-pink",
-      bgSubtle: "bg-accent-pink/10",
-      borderSubtle: "border-accent-pink/30",
-      gradientBtn: "bg-gradient-to-r from-accent-pink to-accent-purple hover:from-white hover:to-white hover:text-black",
-      glowHover: "hover:shadow-[0_0_30px_rgba(255,182,193,0.6)]"
-    },
-    purple: {
-      borderHover: "hover:border-accent-purple/50",
-      shadowHover: "hover:shadow-[0_0_60px_rgba(138,43,226,0.15)]",
-      text: "text-accent-purple",
-      bgSubtle: "bg-accent-purple/10",
-      borderSubtle: "border-accent-purple/30",
-      gradientBtn: "bg-gradient-to-r from-accent-purple to-accent-lavender hover:from-white hover:to-white hover:text-black",
-      glowHover: "hover:shadow-[0_0_30px_rgba(138,43,226,0.6)]"
-    },
-    lavender: {
-      borderHover: "hover:border-accent-lavender/50",
-      shadowHover: "hover:shadow-[0_0_60px_rgba(230,230,250,0.15)]",
-      text: "text-accent-lavender",
-      bgSubtle: "bg-accent-lavender/10",
-      borderSubtle: "border-accent-lavender/30",
-      gradientBtn: "bg-gradient-to-r from-accent-lavender to-accent-purple hover:from-white hover:to-white hover:text-black",
-      glowHover: "hover:shadow-[0_0_30px_rgba(230,230,250,0.6)]"
-    }
+    pink: "hover:border-accent-pink/40 hover:shadow-[0_0_30px_rgba(255,182,193,0.1)] text-accent-pink bg-accent-pink/10 border-accent-pink/30",
+    purple: "hover:border-accent-purple/40 hover:shadow-[0_0_30px_rgba(138,43,226,0.1)] text-accent-purple bg-accent-purple/10 border-accent-purple/30",
+    lavender: "hover:border-accent-lavender/40 hover:shadow-[0_0_30px_rgba(230,230,250,0.1)] text-accent-lavender bg-accent-lavender/10 border-accent-lavender/30"
   };
 
-  const theme = themeColors[project.theme];
-
   return (
-    <motion.div 
-      ref={containerRef}
-      style={{ opacity, y }}
-      data-cursor="view"
-      className={cn(
-        "group relative w-full rounded-[2rem] md:rounded-[3rem] border border-white/10 glass-panel overflow-hidden flex flex-col lg:flex-row shadow-2xl transition-all duration-700",
-        theme.borderHover,
-        theme.shadowHover
-      )}
-    >
-      {/* 1. Visual Presentation (Banner/Screenshot Placeholder) */}
-      <div className={cn(
-        "relative w-full lg:w-[45%] h-[300px] md:h-[400px] lg:h-auto overflow-hidden border-b lg:border-b-0 lg:border-r border-white/10 bg-black/40",
-        isImageRight ? "lg:order-2 lg:border-r-0 lg:border-l" : "lg:order-1"
-      )}>
-        {project.id === "project-vaani" && <VoiceAbstractVisual />}
-        {project.id === "project-noteroot" && <KnowledgeAbstractVisual />}
+    <section id="innovation-lab" className="relative w-full py-16 px-6 md:px-12 lg:px-24 border-t border-white/5">
+      <div className="max-w-7xl mx-auto">
         
-        {/* Hover zoom overlay effect */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-80 group-hover:opacity-60 transition-opacity duration-700" />
-      </div>
-
-      {/* 2. Content & Details */}
-      <div className={cn(
-        "relative w-full lg:w-[55%] p-8 md:p-12 lg:p-16 flex flex-col justify-center",
-        isImageRight ? "lg:order-1" : "lg:order-2"
-      )}>
-        {/* Tag & Status Badge */}
-        <div className="flex flex-wrap items-center justify-between mb-6 gap-4">
-          <div className="flex flex-wrap items-center gap-3">
-            <div className={cn("px-4 py-1.5 rounded-full bg-white/5 border backdrop-blur-md flex items-center gap-2", theme.borderSubtle)}>
-              <span className={cn(
-                "w-2 h-2 rounded-full",
-                project.status === "Live" ? "bg-green-500 animate-pulse" : 
-                project.status === "Production Ready" ? "bg-blue-400" : "bg-yellow-500"
-              )} />
-              <span className="text-xs text-white font-mono tracking-wider font-semibold">
-                {project.status}
+        {/* Simplified Header */}
+        <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div>
+            <h2 className="text-4xl font-bold font-heading tracking-tight mb-3">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-accent-lavender to-accent-purple">
+                My Work
               </span>
-            </div>
-            {project.isFlagship && (
-              <div className="px-4 py-1.5 rounded-full border border-accent-purple/50 bg-accent-purple/20 text-accent-lavender text-xs font-bold tracking-widest uppercase shadow-[0_0_20px_rgba(138,43,226,0.3)]">
-                ★ Flagship Project
-              </div>
-            )}
+            </h2>
+            <p className="text-gray-400 font-light max-w-xl text-base md:text-lg">
+              Intelligent systems, scalable backend log architectures, and AI-driven platforms. Click a card to explore.
+            </p>
           </div>
         </div>
 
-        {/* Title */}
-        <h3 className="text-4xl md:text-5xl font-bold font-heading text-white mb-4 leading-tight">
-          {project.title}
-        </h3>
+        {/* Compact Projects Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {PROJECTS.map((project, idx) => (
+            <motion.div
+              key={project.id}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.5, delay: idx * 0.1 }}
+              onClick={() => setSelectedProject(project)}
+              className={cn(
+                "group relative rounded-3xl border border-white/5 glass-panel overflow-hidden flex flex-col h-[280px] justify-between p-6 cursor-pointer hover:bg-white/[0.02] transition-all duration-300",
+                themeColors[project.theme]
+              )}
+            >
+              {/* Graphic Placeholder (reduced opacity inside card) */}
+              {project.id === "project-vaani" && <VoiceVisual />}
+              {project.id === "project-noteroot" && <KnowledgeVisual />}
+              {project.id === "project-portfolio" && <EngineVisual />}
 
-        {/* One-line impact statement */}
-        <p className="text-gray-300 font-medium text-lg md:text-xl leading-relaxed mb-8 border-l-2 border-white/20 pl-4">
-          {project.description}
-        </p>
+              {/* Tag & Status Row */}
+              <div className="flex items-center justify-between z-10">
+                <span className="text-[10px] text-gray-400 font-mono tracking-wider font-semibold">
+                  {project.tag}
+                </span>
+                <span className="text-[9px] px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-white font-mono">
+                  {project.status}
+                </span>
+              </div>
 
-        {/* Key Metrics */}
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
-          {project.metrics.map((metric, i) => (
-            <div key={i} className="flex flex-col p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-white/20 transition-colors">
-              <span className={cn("text-2xl font-bold font-heading mb-1", theme.text)}>{metric.value}</span>
-              <span className="text-xs text-gray-400 uppercase tracking-wider font-mono">{metric.label}</span>
-            </div>
+              {/* Title & Description preview */}
+              <div className="z-10 mt-6">
+                <h3 className="text-2xl font-bold font-heading text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-accent-lavender transition-all">
+                  {project.title}
+                </h3>
+                <p className="text-gray-400 text-sm font-light line-clamp-3 mt-2">
+                  {project.description}
+                </p>
+              </div>
+
+              {/* Tech stack teaser list */}
+              <div className="flex flex-wrap gap-1.5 mt-auto z-10 pt-4 border-t border-white/5">
+                {project.tech.slice(0, 3).map((t) => (
+                  <span key={t} className="text-[10px] px-2 py-0.5 rounded bg-white/5 border border-white/5 text-gray-300 font-mono">
+                    {t}
+                  </span>
+                ))}
+                {project.tech.length > 3 && (
+                  <span className="text-[10px] px-2 py-0.5 text-gray-500 font-mono">
+                    +{project.tech.length - 3} more
+                  </span>
+                )}
+              </div>
+            </motion.div>
           ))}
-        </div>
-
-        {/* Tech Stack Pills */}
-        <div className="flex flex-wrap gap-2 mb-10">
-          {project.tech.map((t, i) => (
-            <span key={i} className="text-xs px-3 py-1.5 rounded-md bg-white/5 border border-white/10 text-gray-300 font-mono shadow-sm hover:bg-white/10 transition-colors">
-              {t}
-            </span>
-          ))}
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex flex-wrap items-center gap-4 mt-auto">
-          <a 
-            href={project.links.github} 
-            target="_blank" 
-            rel="noopener noreferrer" 
-            className="flex items-center gap-2 px-8 py-4 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/30 transition-all font-medium text-white group/btn"
-          >
-            <Github className="w-5 h-5 group-hover/btn:scale-110 transition-transform" />
-            Source Code
-          </a>
-          <a 
-            href={project.links.demo} 
-            target="_blank" 
-            rel="noopener noreferrer" 
-            className={cn(
-              "flex items-center gap-2 px-8 py-4 rounded-full text-white font-bold transition-all shadow-lg hover:scale-105 active:scale-95",
-              theme.gradientBtn,
-              theme.glowHover
-            )}
-          >
-            Live Demo
-            <ExternalLink className="w-4 h-4 ml-1" />
-          </a>
         </div>
       </div>
-    </motion.div>
+
+      {/* Case Study Details Modal */}
+      <AnimatePresence>
+        {selectedProject && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/80 backdrop-blur-md">
+            {/* Click outside to close */}
+            <div className="absolute inset-0 cursor-default" onClick={() => setSelectedProject(null)} />
+            
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              transition={{ type: "spring", duration: 0.5 }}
+              className="relative w-full max-w-3xl rounded-[2.5rem] border border-white/10 bg-[#0d0c15] p-8 md:p-12 overflow-hidden shadow-2xl flex flex-col gap-6 text-left"
+            >
+              {/* Header inside modal */}
+              <div className="flex items-start justify-between relative z-10">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-3">
+                    <Sparkles className="w-4 h-4 text-accent-pink" />
+                    <span className="text-xs uppercase tracking-widest text-accent-lavender font-mono font-bold">
+                      {selectedProject.tag}
+                    </span>
+                  </div>
+                  <h3 className="text-3xl md:text-4xl font-bold font-heading text-white">
+                    {selectedProject.title}
+                  </h3>
+                </div>
+                
+                <button
+                  onClick={() => setSelectedProject(null)}
+                  className="p-2.5 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 text-gray-400 hover:text-white transition-all cursor-pointer"
+                  aria-label="Close modal"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Illustration and Full Description */}
+              <div className="relative z-10 space-y-4">
+                <p className="text-gray-300 leading-relaxed font-light text-base md:text-lg">
+                  {selectedProject.description}
+                </p>
+              </div>
+
+              {/* Performance Metrics */}
+              <div className="relative z-10 grid grid-cols-3 gap-4 pt-4 border-t border-white/5">
+                {selectedProject.metrics.map((metric) => (
+                  <div key={metric.label} className="p-4 rounded-2xl bg-white/5 border border-white/5">
+                    <div className="text-lg md:text-xl font-bold font-heading text-white">{metric.value}</div>
+                    <div className="text-[10px] text-gray-500 uppercase tracking-wider mt-0.5 font-mono">{metric.label}</div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Full Tech Stack */}
+              <div className="relative z-10 space-y-2">
+                <h4 className="text-xs uppercase tracking-wider text-gray-500 font-mono">Engine Tech Stack</h4>
+                <div className="flex flex-wrap gap-2">
+                  {selectedProject.tech.map((t) => (
+                    <span key={t} className="text-xs px-3 py-1 bg-white/5 border border-white/10 text-gray-300 font-mono rounded">
+                      {t}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="relative z-10 flex flex-wrap items-center gap-4 mt-6 pt-6 border-t border-white/5">
+                <a 
+                  href={selectedProject.links.github} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="flex items-center gap-2 px-6 py-3 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 text-white font-medium text-sm transition-all"
+                >
+                  <Github className="w-4 h-4" />
+                  GitHub Repository
+                </a>
+                <a 
+                  href={selectedProject.links.demo} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="flex items-center gap-2 px-6 py-3 rounded-full bg-white text-black hover:bg-gray-200 font-bold text-sm transition-all shadow-md"
+                >
+                  Live Demo
+                  <ExternalLink className="w-4 h-4" />
+                </a>
+              </div>
+
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+    </section>
   );
 }
-

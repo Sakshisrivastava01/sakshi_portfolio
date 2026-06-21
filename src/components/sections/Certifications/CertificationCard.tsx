@@ -1,6 +1,6 @@
 "use client";
 
-import { ExternalLink, Download, Award, Image as ImageIcon } from "lucide-react";
+import { ExternalLink, Download, Award } from "lucide-react";
 import { Certification } from "@/data/certifications";
 
 interface CertificationCardProps {
@@ -9,112 +9,71 @@ interface CertificationCardProps {
 
 export default function CertificationCard({ cert }: CertificationCardProps) {
   return (
-    <div className="group relative w-full h-[400px] perspective-1000 [perspective:1000px] cursor-pointer">
-      {/* 3D Container */}
-      <div className="w-full h-full relative transition-all duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)] shadow-xl group-hover:shadow-[0_0_20px_rgba(168,85,247,0.3)] rounded-3xl">
-        
-        {/* ======================= FRONT SIDE ======================= */}
-        <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] [-webkit-backface-visibility:hidden] rounded-3xl overflow-hidden bg-[#0A0A0F] border border-white/10 flex flex-col items-center justify-center p-6 relative">
-          {/* Neon Glow Background Effects - pointer-events-none is CRITICAL to prevent hover interception */}
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-transparent to-pink-500/10 opacity-50 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-          <div className="absolute -top-16 -right-16 w-32 h-32 bg-purple-600/20 blur-[40px] rounded-full group-hover:bg-purple-500/30 transition-colors duration-500 pointer-events-none" />
-          <div className="absolute -bottom-16 -left-16 w-32 h-32 bg-pink-600/10 blur-[40px] rounded-full group-hover:bg-pink-500/20 transition-colors duration-500 pointer-events-none" />
-          
-          {/* Border Glow on Hover - pointer-events-none is CRITICAL here, this was blocking clicks! */}
-          <div className="absolute inset-0 rounded-3xl border border-transparent group-hover:border-purple-500/30 transition-colors duration-500 z-10 pointer-events-none" />
+    <div className="group relative w-full rounded-2xl bg-[#0A0A0F]/75 backdrop-blur-xl border border-white/5 hover:border-purple-500/30 p-5 flex flex-col justify-between transition-all duration-300 hover:shadow-[0_0_25px_rgba(168,85,247,0.15)] hover:-translate-y-1">
+      {/* Background gradients */}
+      <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-pink-500/5 rounded-2xl opacity-50 group-hover:opacity-100 transition-opacity pointer-events-none" />
+      <div className="absolute -top-12 -right-12 w-24 h-24 bg-purple-600/10 blur-2xl rounded-full pointer-events-none group-hover:bg-purple-500/20 transition-colors" />
 
-          {/* Floating Issuer Badge */}
-          <div className="absolute top-4 right-4 bg-white/5 border border-white/10 backdrop-blur-md px-3 py-1 rounded-full flex items-center gap-2 z-20 shadow-[0_0_15px_rgba(168,85,247,0.1)] pointer-events-none">
-            <Award className="w-3 h-3 text-purple-400" />
-            <span className="text-[10px] text-white/80 font-medium tracking-wide">{cert.issuer}</span>
-          </div>
-
-          {/* Center Graphic - NO IMAGE ON FRONT */}
-          <div className="relative w-24 h-24 mb-6 z-20 group-hover:scale-105 transition-transform duration-500 pointer-events-none">
-            <div className="absolute inset-0 bg-gradient-to-tr from-purple-600 to-pink-600 rounded-2xl blur-md opacity-40 group-hover:opacity-70 transition-opacity duration-500 animate-pulse" />
-            <div className="relative w-full h-full bg-[#13131A] border border-white/20 rounded-2xl flex items-center justify-center shadow-inner overflow-hidden">
-               <Award className="w-10 h-10 text-purple-400 drop-shadow-[0_0_8px_rgba(168,85,247,0.6)]" />
-            </div>
-          </div>
-
-          {/* Certificate Title */}
-          <div className="relative z-20 text-center w-full pointer-events-none">
-            <h3 className="text-lg md:text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white via-purple-100 to-white/70 tracking-tight leading-tight group-hover:text-white transition-colors duration-300">
-              {cert.title}
-            </h3>
-            <div className="h-0.5 w-12 bg-gradient-to-r from-purple-500 to-pink-500 mx-auto mt-4 rounded-full group-hover:w-20 transition-all duration-500" />
-          </div>
+      <div className="relative z-10 flex gap-4">
+        {/* Certification Icon Container */}
+        <div className="w-12 h-12 rounded-xl bg-purple-600/10 border border-purple-500/20 flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(168,85,247,0.1)] group-hover:scale-105 transition-transform duration-300">
+          <Award className="w-6 h-6 text-purple-400 drop-shadow-[0_0_4px_rgba(168,85,247,0.5)]" />
         </div>
 
-        {/* ======================= BACK SIDE ======================= */}
-        <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] [-webkit-backface-visibility:hidden] [transform:rotateY(180deg)] [transform-style:preserve-3d] rounded-3xl bg-[#0A0A0F] border border-white/10 flex flex-col p-6 overflow-hidden">
-          {/* Background Effects */}
-          <div className="absolute inset-0 bg-gradient-to-t from-purple-900/10 to-transparent opacity-50 pointer-events-none" />
-          
-          <div className="relative z-50 flex flex-col h-full [transform:translateZ(30px)] pointer-events-auto" style={{ gap: "12px" }}>
-            {/* Header section */}
-            <div className="flex-none text-center">
-              <h4 className="text-base font-semibold text-white/90 mb-1 leading-tight">{cert.title}</h4>
-              <p className="text-xs text-purple-400/80">{cert.issuer}</p>
-              {cert.credentialId && (
-                 <p className="text-[10px] text-gray-500 mt-1 font-mono break-all">ID: {cert.credentialId}</p>
-              )}
-            </div>
+        {/* Content Area */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center justify-between gap-2 mb-1">
+            <span className="text-[10px] text-purple-400 font-semibold tracking-wider uppercase font-mono">{cert.issuer}</span>
+            {cert.credentialId && (
+              <span className="text-[9px] text-gray-500 font-mono hidden sm:inline" title={`Credential ID: ${cert.credentialId}`}>
+                ID: {cert.credentialId.length > 12 ? `${cert.credentialId.substring(0, 10)}...` : cert.credentialId}
+              </span>
+            )}
+          </div>
+          <h4 className="text-sm font-bold text-white leading-snug line-clamp-2 group-hover:text-purple-300 transition-colors font-sans mb-2">
+            {cert.title}
+          </h4>
 
-            {/* Skills Tags */}
-            <div className="flex-grow overflow-hidden relative">
-              <div className="absolute inset-0 overflow-y-auto custom-scrollbar flex flex-wrap content-center justify-center" style={{ gap: "6px" }}>
-                {cert.skills.map((skill, i) => (
-                  <span 
-                    key={i} 
-                    className="text-[9px] px-2 py-0.5 rounded-full bg-white/5 border border-purple-500/20 text-purple-200/80 whitespace-nowrap"
-                  >
-                    #{skill}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            {/* Actions (Stacked vertically to prevent overflow and ensure equal width) */}
-            <div className="flex-none flex flex-col w-full mt-auto" style={{ gap: "8px" }}>
-              {cert.verifyUrl && (
-                <a 
-                  href={cert.verifyUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full min-h-[36px] group/btn flex items-center justify-center gap-2 px-3 rounded-xl bg-purple-600/10 border border-purple-500/30 hover:bg-purple-600/30 text-purple-200 font-semibold text-[11px] transition-all duration-300 hover:shadow-[0_0_15px_rgba(168,85,247,0.4)] backdrop-blur-md"
-                >
-                  <ExternalLink className="w-3.5 h-3.5 shrink-0 group-hover/btn:scale-110 transition-transform" />
-                  <span className="truncate">Verify Certificate</span>
-                </a>
-              )}
-              
-              {cert.imageUrl && (
-                <a 
-                  href={cert.imageUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full min-h-[36px] group/btn flex items-center justify-center gap-2 px-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-white/90 font-semibold text-[11px] transition-all duration-300 hover:shadow-[0_0_15px_rgba(255,255,255,0.1)] backdrop-blur-md"
-                >
-                  <ImageIcon className="w-3.5 h-3.5 shrink-0 group-hover/btn:scale-110 transition-transform" />
-                  <span className="truncate">View Badge</span>
-                </a>
-              )}
-
-              {cert.pdfUrl && (
-                <a 
-                  href={cert.pdfUrl}
-                  download
-                  className="w-full min-h-[36px] group/btn flex items-center justify-center gap-2 px-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-white/90 font-semibold text-[11px] transition-all duration-300 hover:shadow-[0_0_15px_rgba(255,255,255,0.1)] backdrop-blur-md"
-                >
-                  <Download className="w-3.5 h-3.5 shrink-0 group-hover/btn:-translate-y-0.5 transition-transform" />
-                  <span className="truncate">Download PDF</span>
-                </a>
-              )}
-            </div>
+          {/* Skills tags */}
+          <div className="flex flex-wrap gap-1 mb-4">
+            {cert.skills.slice(0, 3).map((skill, i) => (
+              <span key={i} className="text-[9px] px-2 py-0.5 rounded-full bg-white/5 border border-white/5 text-gray-400 font-sans">
+                {skill}
+              </span>
+            ))}
+            {cert.skills.length > 3 && (
+              <span className="text-[9px] px-1.5 py-0.5 text-gray-500 font-sans">
+                +{cert.skills.length - 3} more
+              </span>
+            )}
           </div>
         </div>
+      </div>
 
+      {/* Action Buttons */}
+      <div className="relative z-10 flex gap-2 pt-3 border-t border-white/5 mt-auto">
+        {cert.verifyUrl && (
+          <a
+            href={cert.verifyUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex-1 min-h-[30px] flex items-center justify-center gap-1.5 px-3 py-1 rounded-lg bg-purple-600/10 border border-purple-500/20 hover:bg-purple-600/25 text-purple-300 hover:text-white font-semibold text-[10px] transition-all duration-200"
+          >
+            <ExternalLink className="w-3 h-3" />
+            <span>Verify</span>
+          </a>
+        )}
+        {(cert.pdfUrl || cert.imageUrl) && (
+          <a
+            href={cert.pdfUrl || cert.imageUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex-1 min-h-[30px] flex items-center justify-center gap-1.5 px-3 py-1 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 text-white/80 hover:text-white font-semibold text-[10px] transition-all duration-200"
+          >
+            <Download className="w-3 h-3" />
+            <span>Download</span>
+          </a>
+        )}
       </div>
     </div>
   );

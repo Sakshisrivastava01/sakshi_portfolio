@@ -8,40 +8,18 @@ import TechnicalIntelligenceNetwork from "@/components/sections/TechnicalIntelli
 import InnovationLab from "@/components/sections/InnovationLab";
 import Certifications from "@/components/sections/Certifications";
 import CompetitiveProgramming from "@/components/sections/CompetitiveProgramming";
-import { motion, useInView, useMotionValue, useSpring } from "framer-motion";
+
+
+import { motion } from "framer-motion";
 import { 
-  GraduationCap, Database, Terminal, 
-  Trophy, Mail,
-  BrainCircuit, CheckCircle2, Network, Activity, Code2
+  GraduationCap, Trophy, Mail,
+  BrainCircuit, CheckCircle2, Activity, Code2
 } from "lucide-react";
 import { GithubIcon as Github, LinkedinIcon as Linkedin } from "@/components/icons/SocialIcons";
 import ContactForm from "@/components/sections/ContactForm";
 import dynamic from "next/dynamic";
 
 const Scene = dynamic(() => import("@/components/canvas/Scene"), { ssr: false });
-
-function Counter({ value, suffix = "", prefix = "" }: { value: number; suffix?: string; prefix?: string }) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-100px" });
-  const motionValue = useMotionValue(0);
-  const springValue = useSpring(motionValue, { damping: 30, stiffness: 100 });
-
-  useEffect(() => {
-    if (inView) {
-      motionValue.set(value);
-    }
-  }, [inView, motionValue, value]);
-
-  useEffect(() => {
-    springValue.on("change", (latest) => {
-      if (ref.current) {
-        ref.current.textContent = prefix + Intl.NumberFormat("en-US").format(Math.floor(latest)) + suffix;
-      }
-    });
-  }, [springValue, prefix, suffix]);
-
-  return <span ref={ref}>{prefix}0{suffix}</span>;
-}
 
 export type AudioState = "idle" | "playing" | "paused" | "finished";
 
@@ -168,134 +146,71 @@ export default function Home() {
                 {/* 5. EXPERIENCE SECTION */}
                 <SectionLayout id="experience" title="Experience">
                   <motion.div 
-                    initial={{ opacity: 0, y: 30 }}
+                    initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-100px" }}
-                    transition={{ duration: 0.8, ease: "easeOut" }}
-                    className="max-w-4xl mx-auto"
+                    viewport={{ once: true, margin: "-50px" }}
+                    transition={{ duration: 0.6 }}
+                    className="max-w-4xl mx-auto relative pl-6 border-l-2 border-accent-purple/30 space-y-12"
                   >
-                    <div className="w-full rounded-2xl glass-panel border border-white/10 shadow-[0_0_30px_rgba(138,43,226,0.1)] overflow-hidden font-mono text-sm md:text-base group hover:border-accent-purple/30 transition-colors">
-                      {/* Terminal Header */}
-                      <div className="flex items-center px-4 py-3 bg-white/5 border-b border-white/10">
-                        <div className="flex gap-2 mr-4">
-                          <div className="w-3 h-3 rounded-full bg-red-500/80" />
-                          <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
-                          <div className="w-3 h-3 rounded-full bg-green-500/80" />
-                        </div>
-                        <div className="text-gray-500 text-xs tracking-wider flex-1 text-center">sakshi@deployment-dashboard:~</div>
-                      </div>
+                    {/* CheeseCakeLabs Internship */}
+                    <div className="relative">
+                      {/* Timeline Dot Indicator */}
+                      <div className="absolute -left-[35px] top-1.5 w-4 h-4 rounded-full bg-accent-purple border-4 border-luxury-black shadow-[0_0_12px_rgba(138,43,226,0.8)]" />
                       
-                      {/* Terminal Body */}
-                      <div className="p-6 md:p-8 text-gray-300">
-                        <div className="mb-8">
-                          <span className="text-accent-pink font-bold">sakshi</span>
-                          <span className="text-white">@portfolio</span>
-                          <span className="text-gray-500"> ~ % </span>
-                          <span className="text-accent-lavender">cat active_deployments.log</span>
-                        </div>
+                      <div className="glass-panel p-6 md:p-8 rounded-3xl border border-white/5 hover:border-accent-purple/30 transition-all duration-300 relative overflow-hidden group">
+                        <div className="absolute inset-0 bg-gradient-to-br from-accent-purple/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
                         
-                        <div className="space-y-8 pl-0 md:pl-4 border-l border-white/10">
-                          {/* CheeseCakeLabs Internship */}
-                          <div className="relative">
-                            <div className="absolute -left-[21px] top-1.5 w-2 h-2 rounded-full bg-accent-purple shadow-[0_0_10px_rgba(138,43,226,0.8)] hidden md:block" />
-                            
-                            <div className="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-8 relative z-10">
-                              <div>
-                                <h3 className="text-3xl font-bold font-heading text-white mb-2">CheeseCakeLabs</h3>
-                                <div className="flex flex-wrap items-center gap-3">
-                                  <span className="px-3 py-1 rounded-md bg-white/5 border border-white/10 text-accent-lavender text-sm font-semibold tracking-wider">
-                                    Backend Developer Intern
-                                  </span>
-                                  <span className="px-3 py-1 rounded-md bg-accent-purple/10 border border-accent-purple/20 text-accent-purple text-sm font-mono flex items-center gap-2 shadow-[0_0_10px_rgba(138,43,226,0.1)]">
-                                    <Terminal className="w-3 h-3" /> Backend Specialization
-                                  </span>
-                                  <span className="px-3 py-1 rounded-md bg-white/5 border border-white/10 text-gray-400 text-xs font-mono">
-                                    May 2025 – Aug 2025
-                                  </span>
-                                </div>
-                              </div>
-                              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-accent-purple to-accent-pink flex items-center justify-center shrink-0 shadow-[0_0_20px_rgba(138,43,226,0.4)]">
-                                <Terminal className="w-6 h-6 text-white" />
-                              </div>
-                            </div>
-                            
-                            {/* Deployment Metrics Dashboard Style */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-                              <div className="p-4 rounded-xl bg-white/5 border border-white/5 hover:border-accent-pink/30 transition-colors flex items-start gap-4">
-                                <div className="p-2 rounded-full bg-green-500/10 text-green-400 shrink-0">
-                                  <CheckCircle2 className="w-5 h-5" />
-                                </div>
-                                <div>
-                                  <div className="text-2xl font-bold text-white mb-1">
-                                    <Counter value={8} suffix="+" />
-                                  </div>
-                                  <div className="text-xs text-gray-400 uppercase tracking-wider">APIs</div>
-                                </div>
-                              </div>
-                              
-                              <div className="p-4 rounded-xl bg-white/5 border border-white/5 hover:border-accent-lavender/30 transition-colors flex items-start gap-4">
-                                <div className="p-2 rounded-full bg-accent-lavender/10 text-accent-lavender shrink-0">
-                                  <Database className="w-5 h-5" />
-                                </div>
-                                <div>
-                                  <div className="text-2xl font-bold text-white mb-1">
-                                    <Counter value={15} suffix="+" />
-                                  </div>
-                                  <div className="text-xs text-gray-400 uppercase tracking-wider">Query Optimizations</div>
-                                </div>
-                              </div>
-                              
-                              <div className="p-4 rounded-xl bg-white/5 border border-white/5 hover:border-blue-400/30 transition-colors flex items-start gap-4">
-                                <div className="p-2 rounded-full bg-blue-500/10 text-blue-400 shrink-0">
-                                  <Network className="w-5 h-5" />
-                                </div>
-                                <div>
-                                  <div className="text-2xl font-bold text-white mb-1">
-                                    <Counter value={5} suffix="+" />
-                                  </div>
-                                  <div className="text-xs text-gray-400 uppercase tracking-wider">Integrations</div>
-                                </div>
-                              </div>
-
-                              <div className="p-4 rounded-xl bg-accent-purple/10 border border-accent-purple/30 hover:border-accent-pink/50 transition-colors flex items-start gap-4 shadow-[0_0_15px_rgba(138,43,226,0.1)]">
-                                <div className="p-2 rounded-full bg-accent-pink/20 text-accent-pink shrink-0">
-                                  <Activity className="w-5 h-5" />
-                                </div>
-                                <div>
-                                  <div className="text-2xl font-bold text-white mb-1">
-                                    <Counter value={30} suffix="%" />
-                                  </div>
-                                  <div className="text-xs text-accent-lavender uppercase tracking-wider">Performance Improvement</div>
-                                </div>
-                              </div>
-                            </div>
-                            
-                            <div className="flex flex-wrap gap-2 mt-6">
-                              {["Architecture", "Query Optimization", "API Design", "Database Modeling"].map((tag, i) => (
-                                <span key={i} className="text-xs px-3 py-1 rounded-full bg-black/40 border border-white/10 text-gray-400">
-                                  #{tag}
-                                </span>
-                              ))}
+                        {/* Title Row */}
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 relative z-10">
+                          <div>
+                            <h3 className="text-2xl font-bold font-heading text-white">CheeseCakeLabs</h3>
+                            <div className="text-accent-lavender text-sm font-semibold mt-1">
+                              Backend Developer Intern
                             </div>
                           </div>
-                          
-                          {/* Awaiting Next Entry */}
-                          <div className="relative pt-6">
-                            <div className="absolute -left-[21px] top-[26px] w-2 h-2 rounded-full border-2 border-gray-600 bg-transparent hidden md:block" />
-                            <div className="text-gray-500 italic flex items-center gap-2">
-                              <span className="w-2 h-2 rounded-full bg-gray-600 animate-pulse" />
-                              Awaiting next engineering milestone...
-                            </div>
+                          <div className="text-xs text-gray-500 font-mono flex items-center gap-2">
+                            <span>May 2025 – Aug 2025</span>
+                            <span className="w-1.5 h-1.5 rounded-full bg-accent-pink" />
+                            <span>Remote / Internship</span>
                           </div>
+                        </div>
 
+                        {/* Professional Responsibilities Bullets */}
+                        <ul className="space-y-3 text-gray-300 text-sm md:text-base font-light mb-8 list-disc pl-5 relative z-10 leading-relaxed">
+                          <li>Engineered 8+ custom RESTful API endpoints using Python (Django/Flask) for core backend services.</li>
+                          <li>Optimized complex database queries on PostgreSQL, achieving a 30% latency reduction and minimizing database lock constraints.</li>
+                          <li>Integrated 5+ third-party service gateways enabling seamless real-time data synchronization.</li>
+                          <li>Designed database schemas and executed structured migrations utilizing SQLAlchemy for data consistency.</li>
+                        </ul>
+
+                        {/* Technical Accomplishments metrics row */}
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-6 border-t border-white/5 relative z-10 select-none">
+                          <div className="text-center p-3 rounded-2xl bg-white/5 border border-white/5">
+                            <div className="text-xl font-bold text-accent-pink">8+</div>
+                            <div className="text-[10px] text-gray-500 uppercase tracking-widest font-mono mt-1">APIs Built</div>
+                          </div>
+                          <div className="text-center p-3 rounded-2xl bg-white/5 border border-white/5">
+                            <div className="text-xl font-bold text-accent-purple">15+</div>
+                            <div className="text-[10px] text-gray-500 uppercase tracking-widest font-mono mt-1">Queries Opt</div>
+                          </div>
+                          <div className="text-center p-3 rounded-2xl bg-white/5 border border-white/5">
+                            <div className="text-xl font-bold text-accent-lavender">5+</div>
+                            <div className="text-[10px] text-gray-500 uppercase tracking-widest font-mono mt-1">Integrations</div>
+                          </div>
+                          <div className="text-center p-3 rounded-2xl bg-accent-purple/10 border border-accent-purple/20">
+                            <div className="text-xl font-bold text-white">30%</div>
+                            <div className="text-[10px] text-accent-lavender uppercase tracking-widest font-mono mt-1">Speed Gain</div>
+                          </div>
                         </div>
-                        
-                        <div className="mt-8 flex items-center">
-                          <span className="text-accent-pink font-bold">sakshi</span>
-                          <span className="text-white">@portfolio</span>
-                          <span className="text-gray-500"> ~ % </span>
-                          <span className="w-2.5 h-5 bg-white/70 animate-pulse ml-2" />
-                        </div>
+                      </div>
+                    </div>
+
+                    {/* Next Engineering Milestone placeholder */}
+                    <div className="relative">
+                      <div className="absolute -left-[33px] top-1.5 w-3 h-3 rounded-full bg-gray-700 border-2 border-luxury-black" />
+                      <div className="text-gray-500 italic text-sm pl-2 flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-gray-600 animate-pulse" />
+                        Awaiting next engineering milestone...
                       </div>
                     </div>
                   </motion.div>
@@ -303,42 +218,78 @@ export default function Home() {
 
                 {/* 6. ACHIEVEMENTS SECTION */}
                 <SectionLayout id="achievements" title="Achievements">
-                   <div className="space-y-6 max-w-4xl mx-auto">
-                     {[
-                       { title: "Smart India Hackathon 2024", role: "Backend Developer", highlight: "Selected participant for national level hackathon." },
-                       { title: "Footprints Hackathon", role: "1st Runner-Up", highlight: "MSU Vadodara" }
-                     ].map((achievement, index) => (
-                       <motion.div 
-                         key={index} 
-                         initial={{ opacity: 0, scale: 0.95, filter: "blur(10px)" }}
-                         whileInView={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-                         viewport={{ once: true, margin: "-100px" }}
-                         transition={{ duration: 0.8, type: "spring", bounce: 0.4 }}
-                         className="flex items-center gap-8 glass-panel p-6 md:p-8 rounded-3xl border border-white/5 hover:border-accent-purple/40 transition-colors group relative overflow-hidden"
-                       >
-                         {/* Flare effect on entry */}
-                         <motion.div 
-                           initial={{ x: "-100%", opacity: 0 }}
-                           whileInView={{ x: "200%", opacity: [0, 0.5, 0] }}
-                           viewport={{ once: true, margin: "-100px" }}
-                           transition={{ duration: 1.5, ease: "easeInOut" }}
-                           className="absolute inset-0 w-1/2 bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-[-20deg]" 
-                         />
-                         
-                         <div className="hidden md:flex w-16 h-16 shrink-0 rounded-full bg-white/5 items-center justify-center group-hover:bg-accent-purple group-hover:shadow-[0_0_30px_rgba(138,43,226,0.5)] transition-all duration-500">
-                           <Trophy className="w-6 h-6 text-accent-purple group-hover:text-white" />
+                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
+                     {/* Smart India Hackathon */}
+                     <motion.div 
+                       initial={{ opacity: 0, scale: 0.95 }}
+                       whileInView={{ opacity: 1, scale: 1 }}
+                       viewport={{ once: true, margin: "-50px" }}
+                       className="glass-panel p-6 rounded-3xl border border-white/5 hover:border-accent-purple/30 transition-all duration-300 relative overflow-hidden group flex flex-col justify-between"
+                     >
+                       <div className="absolute inset-0 bg-gradient-to-br from-accent-purple/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+                       <div className="relative z-10">
+                         <div className="flex items-center justify-between mb-4">
+                           <Trophy className="w-6 h-6 text-accent-purple" />
+                           <span className="px-2.5 py-0.5 rounded-full bg-accent-purple/10 border border-accent-purple/20 text-accent-lavender text-[9px] font-mono font-semibold uppercase tracking-wider">
+                             National Finalist
+                           </span>
                          </div>
-                         <div className="relative z-10">
-                           <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-2">
-                             <h4 className="text-white font-bold font-heading text-xl md:text-2xl group-hover:text-accent-lavender transition-colors">{achievement.title}</h4>
-                             <span className="px-3 py-1 rounded-full bg-accent-purple/20 text-accent-lavender text-xs font-semibold tracking-wider uppercase w-fit border border-accent-purple/30">
-                               {achievement.role}
-                             </span>
-                           </div>
-                           <p className="text-gray-400 font-light">{achievement.highlight}</p>
+                         <h4 className="text-lg font-bold text-white mb-2 leading-tight group-hover:text-accent-lavender transition-colors">
+                           Smart India Hackathon 2024
+                         </h4>
+                         <p className="text-xs text-gray-400 font-light leading-relaxed">
+                           Selected participant for national level hackathon as a Backend Developer. Designed core database schemas and API specifications.
+                         </p>
+                       </div>
+                     </motion.div>
+
+                     {/* Footprints Hackathon */}
+                     <motion.div 
+                       initial={{ opacity: 0, scale: 0.95 }}
+                       whileInView={{ opacity: 1, scale: 1 }}
+                       viewport={{ once: true, margin: "-50px" }}
+                       className="glass-panel p-6 rounded-3xl border border-white/5 hover:border-accent-pink/30 transition-all duration-300 relative overflow-hidden group flex flex-col justify-between"
+                     >
+                       <div className="absolute inset-0 bg-gradient-to-br from-accent-pink/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+                       <div className="relative z-10">
+                         <div className="flex items-center justify-between mb-4">
+                           <Trophy className="w-6 h-6 text-accent-pink" />
+                           <span className="px-2.5 py-0.5 rounded-full bg-accent-pink/10 border border-accent-pink/20 text-accent-pink text-[9px] font-mono font-semibold uppercase tracking-wider">
+                             1st Runner-Up
+                           </span>
                          </div>
-                       </motion.div>
-                     ))}
+                         <h4 className="text-lg font-bold text-white mb-2 leading-tight group-hover:text-accent-pink transition-colors">
+                           Footprints Hackathon
+                         </h4>
+                         <p className="text-xs text-gray-400 font-light leading-relaxed">
+                           Achieved 1st Runner-Up position in MSU Vadodara hackathon. Engineered highly responsive pipelines under tight deadline constraints.
+                         </p>
+                       </div>
+                     </motion.div>
+
+                     {/* LeetCode Milestone */}
+                     <motion.div 
+                       initial={{ opacity: 0, scale: 0.95 }}
+                       whileInView={{ opacity: 1, scale: 1 }}
+                       viewport={{ once: true, margin: "-50px" }}
+                       className="glass-panel p-6 rounded-3xl border border-white/5 hover:border-accent-lavender/30 transition-all duration-300 relative overflow-hidden group flex flex-col justify-between"
+                     >
+                       <div className="absolute inset-0 bg-gradient-to-br from-accent-lavender/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+                       <div className="relative z-10">
+                         <div className="flex items-center justify-between mb-4">
+                           <Activity className="w-6 h-6 text-[#ffa116]" />
+                           <span className="px-2.5 py-0.5 rounded-full bg-white/5 border border-white/10 text-white text-[9px] font-mono font-semibold uppercase tracking-wider">
+                             Competitive
+                           </span>
+                         </div>
+                         <h4 className="text-lg font-bold text-white mb-2 leading-tight group-hover:text-accent-lavender transition-colors">
+                           LeetCode Milestones
+                         </h4>
+                         <p className="text-xs text-gray-400 font-light leading-relaxed">
+                           Solved 200+ algorithm challenges. Maintained continuous streaks, earned consistency badges, and tracked ratings on live contests.
+                         </p>
+                       </div>
+                     </motion.div>
                    </div>
                 </SectionLayout>
 
