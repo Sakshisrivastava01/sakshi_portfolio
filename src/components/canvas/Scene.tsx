@@ -1,6 +1,5 @@
 "use client";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { SoftShadows } from "@react-three/drei";
 import { Suspense, useRef, useMemo } from "react";
 import * as THREE from "three";
 
@@ -51,8 +50,8 @@ function StarfieldLayer({ count, size, depth, speed, color }: StarfieldProps) {
       pointsRef.current.rotation.x = state.clock.getElapsedTime() * 0.004 * speed;
 
       // Smooth parallax reaction to cursor (opposite direction of mouse)
-      pointsRef.current.position.x = THREE.MathUtils.lerp(pointsRef.current.position.x, -x * 2.5 * speed, 0.05);
-      pointsRef.current.position.y = THREE.MathUtils.lerp(pointsRef.current.position.y, -y * 2.5 * speed, 0.05);
+      pointsRef.current.position.x = THREE.MathUtils.lerp(pointsRef.current.position.x, -x * 2.0 * speed, 0.05);
+      pointsRef.current.position.y = THREE.MathUtils.lerp(pointsRef.current.position.y, -y * 2.0 * speed, 0.05);
     }
   });
 
@@ -69,7 +68,7 @@ function StarfieldLayer({ count, size, depth, speed, color }: StarfieldProps) {
         size={size}
         sizeAttenuation
         transparent
-        opacity={0.6}
+        opacity={0.5}
         depthWrite={false}
         blending={THREE.AdditiveBlending}
       />
@@ -84,11 +83,11 @@ function NebulaClouds({ isSpeaking }: { isSpeaking: boolean }) {
   useFrame(({ clock, pointer }) => {
     if (groupRef.current) {
       // Rotation
-      groupRef.current.rotation.y = clock.getElapsedTime() * 0.015;
+      groupRef.current.rotation.y = clock.getElapsedTime() * 0.012;
       
       // Dynamic shift based on pointer
-      groupRef.current.position.x = THREE.MathUtils.lerp(groupRef.current.position.x, -pointer.x * 1.5, 0.04);
-      groupRef.current.position.y = THREE.MathUtils.lerp(groupRef.current.position.y, -pointer.y * 1.5, 0.04);
+      groupRef.current.position.x = THREE.MathUtils.lerp(groupRef.current.position.x, -pointer.x * 1.2, 0.04);
+      groupRef.current.position.y = THREE.MathUtils.lerp(groupRef.current.position.y, -pointer.y * 1.2, 0.04);
     }
   });
 
@@ -96,18 +95,18 @@ function NebulaClouds({ isSpeaking }: { isSpeaking: boolean }) {
     <group ref={groupRef} position={[0, 0, -12]}>
       {/* Deep Purple Cloud */}
       <mesh position={[-8, 4, -5]}>
-        <sphereGeometry args={[12, 32, 32]} />
-        <meshBasicMaterial color="#200530" transparent opacity={0.4} blending={THREE.AdditiveBlending} depthWrite={false} />
+        <sphereGeometry args={[12, 8, 8]} />
+        <meshBasicMaterial color="#200530" transparent opacity={0.35} blending={THREE.AdditiveBlending} depthWrite={false} />
       </mesh>
       {/* Pink Cosmic Fog */}
       <mesh position={[8, -4, -8]}>
-        <sphereGeometry args={[15, 32, 32]} />
-        <meshBasicMaterial color="#300515" transparent opacity={0.3} blending={THREE.AdditiveBlending} depthWrite={false} />
+        <sphereGeometry args={[15, 8, 8]} />
+        <meshBasicMaterial color="#300515" transparent opacity={0.25} blending={THREE.AdditiveBlending} depthWrite={false} />
       </mesh>
       {/* Lavender Energy Center */}
       <mesh position={[0, 2, -2]}>
-        <sphereGeometry args={[10, 32, 32]} />
-        <meshBasicMaterial color={isSpeaking ? "#401060" : "#200530"} transparent opacity={isSpeaking ? 0.3 : 0.15} blending={THREE.AdditiveBlending} depthWrite={false} />
+        <sphereGeometry args={[10, 8, 8]} />
+        <meshBasicMaterial color={isSpeaking ? "#401060" : "#200530"} transparent opacity={isSpeaking ? 0.25 : 0.1} blending={THREE.AdditiveBlending} depthWrite={false} />
       </mesh>
     </group>
   );
@@ -117,24 +116,20 @@ export default function Scene({ isSpeaking }: SceneProps) {
   return (
     <Canvas
       camera={{ position: [0, 0, 5], fov: 45 }}
-      dpr={[1, 2]}
-      gl={{ antialias: true, alpha: true }}
+      dpr={1} // Optimize for low GPU usage by using 1 DPR on high-dpi screens
+      gl={{ antialias: false, alpha: true, powerPreference: "high-performance" }} // Disable MSAA antialias for performance boost on low-end devices
     >
-      <SoftShadows size={10} samples={10} focus={0.5} />
-      
-      {/* Cinematic Lighting Setup */}
+      {/* Cinematic Lighting Setup without shadows */}
       <ambientLight intensity={0.2} />
       <directionalLight 
         position={[2, 5, 4]} 
         intensity={1.0} 
         color="#e0eaff"
-        castShadow
-        shadow-mapSize={[1024, 1024]}
       />
-      <pointLight position={[-4, -1, 2]} intensity={3} color="#ffb6c1" />
+      <pointLight position={[-4, -1, 2]} intensity={2} color="#ffb6c1" />
       <spotLight 
         position={[0, 3, -4]} 
-        intensity={8} 
+        intensity={6} 
         color="#8a2be2" 
         angle={0.6} 
         penumbra={1} 
@@ -142,9 +137,9 @@ export default function Scene({ isSpeaking }: SceneProps) {
 
       <Suspense fallback={null}>
         {/* Parallax Starfield Layers (Background, Midground, Foreground) */}
-        <StarfieldLayer count={1500} size={0.06} depth={30} speed={0.4} color="#e6e6fa" />
-        <StarfieldLayer count={800} size={0.12} depth={15} speed={0.8} color="#ffffff" />
-        <StarfieldLayer count={300} size={0.18} depth={5} speed={1.3} color="#ffb6c1" />
+        <StarfieldLayer count={1000} size={0.05} depth={30} speed={0.4} color="#e6e6fa" />
+        <StarfieldLayer count={500} size={0.10} depth={15} speed={0.7} color="#ffffff" />
+        <StarfieldLayer count={150} size={0.15} depth={5} speed={1.1} color="#ffb6c1" />
         
         {/* Nebula Fog */}
         <NebulaClouds isSpeaking={isSpeaking} />
