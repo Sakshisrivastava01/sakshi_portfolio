@@ -13,7 +13,7 @@ import CompetitiveProgramming from "@/components/sections/CompetitiveProgramming
 import { motion } from "framer-motion";
 import { 
   GraduationCap, Trophy, Mail,
-  BrainCircuit, CheckCircle2, Activity, Code2
+  BrainCircuit, CheckCircle2, Code2
 } from "lucide-react";
 import { GithubIcon as Github, LinkedinIcon as Linkedin } from "@/components/icons/SocialIcons";
 import ContactForm from "@/components/sections/ContactForm";
@@ -267,31 +267,31 @@ export default function Home() {
                        </div>
                      </motion.div>
 
-                     {/* LeetCode Milestone */}
-                     <motion.div 
-                       initial={{ opacity: 0, scale: 0.95 }}
-                       whileInView={{ opacity: 1, scale: 1 }}
-                       viewport={{ once: true, margin: "-50px" }}
-                       className="glass-panel p-6 rounded-3xl border border-white/5 hover:border-accent-lavender/30 transition-all duration-300 relative overflow-hidden group flex flex-col justify-between"
-                     >
-                       <div className="absolute inset-0 bg-gradient-to-br from-accent-lavender/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-                       <div className="relative z-10">
-                         <div className="flex items-center justify-between mb-4">
-                           <Activity className="w-6 h-6 text-[#ffa116]" />
-                           <span className="px-2.5 py-0.5 rounded-full bg-white/5 border border-white/10 text-white text-[9px] font-mono font-semibold uppercase tracking-wider">
-                             Competitive
-                           </span>
-                         </div>
-                         <h4 className="text-lg font-bold text-white mb-2 leading-tight group-hover:text-accent-lavender transition-colors">
-                           LeetCode Milestones
-                         </h4>
-                         <p className="text-xs text-gray-400 font-light leading-relaxed">
-                           Solved 200+ algorithm challenges. Maintained continuous streaks, earned consistency badges, and tracked ratings on live contests.
-                         </p>
-                       </div>
-                     </motion.div>
-                   </div>
-                </SectionLayout>
+                      {/* AI Engineering Projects */}
+                      <motion.div 
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        viewport={{ once: true, margin: "-50px" }}
+                        className="glass-panel p-6 rounded-3xl border border-white/5 hover:border-accent-lavender/30 transition-all duration-300 relative overflow-hidden group flex flex-col justify-between"
+                      >
+                        <div className="absolute inset-0 bg-gradient-to-br from-accent-lavender/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+                        <div className="relative z-10">
+                          <div className="flex items-center justify-between mb-4">
+                            <BrainCircuit className="w-6 h-6 text-accent-lavender" />
+                            <span className="px-2.5 py-0.5 rounded-full bg-white/5 border border-white/10 text-white text-[9px] font-mono font-semibold uppercase tracking-wider">
+                              AI & ML
+                            </span>
+                          </div>
+                          <h4 className="text-lg font-bold text-white mb-2 leading-tight group-hover:text-accent-lavender transition-colors">
+                            AI Engineering Projects
+                          </h4>
+                          <p className="text-xs text-gray-400 font-light leading-relaxed">
+                            Designed and deployed production-grade AI applications using LLMs, RAG pipelines, FastAPI, cloud-native architectures, and modern MLOps workflows.
+                          </p>
+                        </div>
+                      </motion.div>
+                    </div>
+                 </SectionLayout>
 
                 {/* COMPETITIVE PROGRAMMING SECTION */}
                 <CompetitiveProgramming />
