@@ -121,7 +121,7 @@ export default function InnovationLab() {
       <div className="max-w-7xl mx-auto mb-24 relative z-10 flex flex-col md:items-center text-left md:text-center">
         <h2 className="text-5xl md:text-6xl font-bold font-heading tracking-tight mb-6">
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-accent-lavender to-accent-purple">
-            Featured Engineering Projects
+            My Work
           </span>
         </h2>
         <p className="text-xl md:text-2xl text-gray-400 font-light max-w-3xl">

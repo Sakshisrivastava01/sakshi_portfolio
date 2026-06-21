@@ -158,7 +158,7 @@ export default function Home() {
                 </SectionLayout>
 
                 {/* 3. SKILLS SECTION */}
-                <SectionLayout id="intelligence" title="Technical Intelligence Network">
+                <SectionLayout id="intelligence" title="Technical Skills">
                   <TechnicalIntelligenceNetwork onSkillSelect={setActiveSkill} activeSkill={activeSkill} />
                 </SectionLayout>
 
@@ -166,7 +166,7 @@ export default function Home() {
                 <InnovationLab />
 
                 {/* 5. EXPERIENCE SECTION */}
-                <SectionLayout id="experience" title="Experience Log">
+                <SectionLayout id="experience" title="Experience">
                   <motion.div 
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -302,7 +302,7 @@ export default function Home() {
                 </SectionLayout>
 
                 {/* 6. ACHIEVEMENTS SECTION */}
-                <SectionLayout id="achievements" title="Milestones">
+                <SectionLayout id="achievements" title="Achievements">
                    <div className="space-y-6 max-w-4xl mx-auto">
                      {[
                        { title: "Smart India Hackathon 2024", role: "Backend Developer", highlight: "Selected participant for national level hackathon." },
@@ -446,7 +446,7 @@ export default function Home() {
                 </SectionLayout>
 
                 {/* 9. CONTACT SECTION */}
-                <SectionLayout id="contact" title="Get in Touch" className="pb-32 pt-20">
+                <SectionLayout id="contact" title="Contact Me" className="pb-32 pt-20">
                   <div className="max-w-6xl mx-auto">
                     <motion.div 
                       initial={{ opacity: 0, y: 50 }}
